@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUDHARSARTHI - Duhai civic issue map</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+*{box-sizing:border-box}
+:root{--blue:#1e3a8a;--teal:#0ea5a4;--high:#dc2626;--med:#f59e0b;--low:#16a34a;--done:#94a3b8;--bg:#f1f5f9;--ink:#0f172a;--mut:#64748b}
+body{margin:0;font-family:Poppins,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column}
+header{background:#fff;border-bottom:1px solid #e2e8f0;padding:8px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{height:40px}
+.brand b{font-size:20px;letter-spacing:.5px;color:var(--blue)}.brand b span{color:var(--teal)}
+.brand small{display:block;color:var(--mut);font-size:11px;letter-spacing:2px}
+.pill{background:#e6f6f6;color:#0f6e56;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:500}
+main{flex:1;display:grid;grid-template-columns:380px 1fr;min-height:0}
+aside{background:#fff;border-right:1px solid #e2e8f0;overflow-y:auto;padding:16px}
+#map{height:100%;min-height:420px}
+h2{font-size:16px;margin:0 0 10px}
+label{display:block;font-size:12px;color:var(--mut);margin:10px 0 4px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;font-size:14px}
+textarea{resize:vertical;min-height:70px}
+button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:10px 14px;font-weight:600}
+.primary{background:var(--blue);color:#fff;width:100%;margin-top:14px}
+.primary:disabled{opacity:.6;cursor:wait}
+.ghost{background:#e6f6f6;color:#0f6e56;font-size:13px;padding:8px 10px}
+.row{display:flex;gap:8px;align-items:center}
+.hint{font-size:12px;color:var(--mut);margin:6px 0}
+#picked{font-size:12px;padding:8px;border-radius:8px;background:#f8fafc;border:1px dashed #cbd5e1;margin-top:6px}
+#picked.ok{background:#ecfdf5;border-color:#86efac;color:#166534}
+#msg{margin-top:10px;font-size:13px;padding:10px;border-radius:8px;display:none}
+#msg.err{display:block;background:#fef2f2;color:#991b1b}
+#msg.ok{display:block;background:#ecfdf5;color:#166534}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 10px}
+.chip{padding:5px 11px;border-radius:999px;border:1px solid #cbd5e1;background:#fff;font-size:12px;cursor:pointer;font-weight:500}
+.chip.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.item{border:1px solid #e2e8f0;border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer;display:flex;gap:10px}
+.item:hover{border-color:var(--teal)}
+.dot{width:12px;height:12px;border-radius:50%;margin-top:4px;flex:none}
+.item b{font-size:13px;display:block}.item span{font-size:12px;color:var(--mut)}
+.pin{position:relative}
+.pin svg{filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.pin.high::after{content:"";position:absolute;left:5px;top:34px;width:18px;height:6px;border-radius:50%;background:rgba(220,38,38,.55);animation:pulse 1.4s infinite}
+@keyframes pulse{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.6);opacity:0}}
+.legend{background:#fff;padding:10px 12px;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.25);font-size:12px;line-height:1.9}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:7px;vertical-align:-1px}
+.pop b{font-size:14px}.pop .tag{display:inline-block;padding:2px 9px;border-radius:999px;color:#fff;font-size:12px;font-weight:600;margin:4px 0}
+.pop img{width:100%;border-radius:8px;margin-top:6px}
+.bar{height:6px;background:#e2e8f0;border-radius:4px;margin:2px 0 6px}.bar div{height:100%;border-radius:4px;background:var(--teal)}
+.pop small{color:var(--mut)}
+@media(max-width:820px){main{grid-template-columns:1fr;grid-template-rows:55vh auto}#map{order:-1}aside{border-right:0}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><img src="assets/logo-icon.svg" alt="SUDHARSARTHI logo"><div><b>SUDHAR<span>SARTHI</span></b><small>BETTER DUHAI, TOGETHER</small></div></div>
+  <div class="pill" id="count">Loading...</div>
+</header>
+<main>
+  <aside>
+    <h2>Report an issue in Duhai</h2>
+    <label>Category</label><select id="category"></select>
+    <label>What is wrong?</label><textarea id="description" placeholder="Example: Deep pothole, two-wheelers are skidding"></textarea>
+    <label>Photo (helps the AI judge urgency)</label><input type="file" id="photo" accept="image/*">
+    <label>Place name or landmark</label><input id="location" placeholder="Example: Near Duhai RRTS station gate">
+    <label>Location</label>
+    <div class="row"><button class="ghost" id="gps" type="button">Use my GPS</button><span class="hint" style="margin:0">or tap the map</span></div>
+    <div id="picked">No location chosen yet. Tap the map where the issue is.</div>
+    <button class="primary" id="submit">Submit report</button>
+    <div id="msg"></div>
+    <div class="chips" id="chips"></div>
+    <div id="list"></div>
+  </aside>
+  <div id="map"></div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const API = window.API_BASE || '';
+const COLORS = {High:'#dc2626', Medium:'#f59e0b', Low:'#16a34a', Resolved:'#94a3b8'};
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let map, cfg, reports = [], markers = {}, filter = 'All', picked = null, pickMarker = null;
+
+const level = r => r.status === 'Resolved' ? 'Resolved' : r.priority;
+function icon(r){
+  const l = level(r), c = COLORS[l] || COLORS.Low;
+  return L.divIcon({className:'', iconSize:[30,40], iconAnchor:[15,40], popupAnchor:[0,-34],
+    html:`<div class="pin ${l==='High'?'high':''}"><svg width="30" height="40" viewBox="0 0 30 40"><path d="M15 1C7.3 1 1 7.2 1 14.8 1 25 15 39 15 39s14-14 14-24.200C29 7.200 22.700 1 15 1z" fill="${c}" stroke="#fff" stroke-width="2"/><circle cx="15" cy="15" r="5.500" fill="#fff"/></svg></div>`});
+}
+function popup(r, reasons){
+  const b = r.scoreBreakdown || {}, rows = [['Severity',b.severity,40],['Traffic',b.trafficVolume,25],['Repeat reports',b.repeatReports,20],['Ageing',b.agingFactor,15]]
+    .map(([n,v,m]) => `<small>${n}: ${v||0}/${m}</small><div class="bar"><div style="width:${Math.min(100,100*(v||0)/m)}%"></div></div>`).join('');
+  const why = reasons && reasons.length ? `<p><small><b>Why this score:</b><br>${reasons.map(esc).join('<br>')}</small></p>` : '';
+  const img = r.imageUrl ? `<img src="${esc(r.imageUrl)}" alt="Issue photo" loading="lazy">` : '';
+  return `<div class="pop"><b>${esc(r.title)}</b><br><span class="tag" style="background:${COLORS[level(r)]}">${esc(level(r))} - urgency ${esc(r.riskScore)}</span><br>
+  <small>${esc(r.category)} | ${esc(r.status)}<br>${esc(r.location)}<br>${esc(r.ward)}</small>${img}<p>${esc(r.description)}</p>${rows}${why}</div>`;
+}
+function addMarker(r, reasons){
+  if (markers[r.id]) map.removeLayer(markers[r.id]);
+  markers[r.id] = L.marker([r.lat, r.lng], {icon: icon(r)}).bindPopup(popup(r, reasons), {maxWidth:260}).addTo(map);
+}
+function render(){
+  const shown = reports.filter(r => filter === 'All' || level(r) === filter);
+  Object.entries(markers).forEach(([id, m]) => {
+    const r = reports.find(x => x.id === id), on = r && shown.includes(r);
+    if (on && !map.hasLayer(m)) m.addTo(map); if (!on && map.hasLayer(m)) map.removeLayer(m);
+  });
+  const open = reports.filter(r => r.status !== 'Resolved'), high = open.filter(r => r.priority === 'High').length;
+  document.getElementById('count').textContent = `${open.length} open | ${high} high urgency`;
+  document.getElementById('list').innerHTML = shown.sort((a,b) => b.riskScore - a.riskScore).map(r =>
+    `<div class="item" data-id="${esc(r.id)}"><div class="dot" style="background:${COLORS[level(r)]}"></div><div><b>${esc(r.title)}</b><span>${esc(level(r))} (${esc(r.riskScore)}) | ${esc(r.status)}<br>${esc(r.ward)}</span></div></div>`).join('') || '<p class="hint">No reports here.</p>';
+  document.querySelectorAll('.item').forEach(el => el.onclick = () => { const r = reports.find(x => x.id === el.dataset.id); map.flyTo([r.lat, r.lng], 17); markers[r.id].openPopup(); });
+}
+function setPicked(lat, lng){
+  const [s,w,n,e] = cfg.bounds, p = document.getElementById('picked');
+  if (lat < s || lat > n || lng < w || lng > e){ picked = null; p.className=''; p.textContent = 'That spot is outside Duhai. Please choose a place inside the dashed boundary.'; return; }
+  picked = {lat, lng}; p.className = 'ok'; p.textContent = `Location chosen: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  if (pickMarker) pickMarker.setLatLng([lat,lng]); else pickMarker = L.marker([lat,lng], {draggable:true, opacity:.9}).addTo(map).on('dragend', ev => { const q = ev.target.getLatLng(); setPicked(q.lat, q.lng); });
+}
+function say(t, ok){ const m = document.getElementById('msg'); m.className = ok ? 'ok' : 'err'; m.textContent = t; }
+
+async function init(){
+  cfg = await (await fetch(API + '/api/config')).json();
+  const [s,w,n,e] = cfg.bounds;
+  map = L.map('map', {minZoom:13, maxBounds:[[s-.02,w-.02],[n+.02,e+.02]]}).setView(cfg.center, 15);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+  L.rectangle([[s,w],[n,e]], {color:'#1e3a8a', weight:2, dashArray:'6 6', fill:false}).addTo(map);
+  const lg = L.control({position:'bottomleft'});
+  lg.onAdd = () => { const d = L.DomUtil.create('div','legend'); d.innerHTML = '<b>Urgency</b><br><i style="background:#dc2626"></i>High (60+)<br><i style="background:#f59e0b"></i>Medium (40-59)<br><i style="background:#16a34a"></i>Low (under 40)<br><i style="background:#94a3b8"></i>Resolved'; return d; };
+  lg.addTo(map);
+  map.on('click', ev => setPicked(ev.latlng.lat, ev.latlng.lng));
+  document.getElementById('category').innerHTML = cfg.categories.map(c => `<option>${esc(c)}</option>`).join('');
+  document.getElementById('chips').innerHTML = ['All','High','Medium','Low','Resolved'].map(f => `<span class="chip ${f==='All'?'on':''}" data-f="${f}">${f}</span>`).join('');
+  document.querySelectorAll('.chip').forEach(c => c.onclick = () => { filter = c.dataset.f; document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c)); render(); });
+  reports = await (await fetch(API + '/api/reports')).json();
+  reports.forEach(r => addMarker(r)); render();
+}
+document.getElementById('gps').onclick = () => {
+  if (!navigator.geolocation) return say('Your browser does not support GPS. Tap the map instead.');
+  navigator.geolocation.getCurrentPosition(p => { setPicked(p.coords.latitude, p.coords.longitude); if (picked) map.flyTo([picked.lat, picked.lng], 17); },
+    () => say('Could not get your GPS location. Tap the map instead.'), {enableHighAccuracy:true, timeout:10000});
+};
+document.getElementById('submit').onclick = async ev => {
+  if (!picked) return say('Choose the issue location on the map first.');
+  const btn = ev.target, fd = new FormData();
+  fd.append('category', document.getElementById('category').value);
+  fd.append('description', document.getElementById('description').value);
+  fd.append('location', document.getElementById('location').value);
+  fd.append('lat', picked.lat); fd.append('lng', picked.lng);
+  const f = document.getElementById('photo').files[0]; if (f) fd.append('image', f);
+  btn.disabled = true; btn.textContent = 'Checking urgency...';
+  try {
+    const res = await fetch(API + '/api/reports', {method:'POST', body:fd}), d = await res.json();
+    if (!res.ok) throw new Error(d.error || 'Could not submit the report.');
+    reports.push(d); addMarker(d, d.urgencyReasons); render();
+    if (pickMarker){ map.removeLayer(pickMarker); pickMarker = null; } picked = null;
+    document.getElementById('picked').className=''; document.getElementById('picked').textContent='No location chosen yet. Tap the map where the issue is.';
+    document.getElementById('description').value=''; document.getElementById('location').value=''; document.getElementById('photo').value='';
+    map.flyTo([d.lat, d.lng], 17); markers[d.id].openPopup();
+    say(`Report ${d.id} submitted. Urgency: ${d.priority} (${d.riskScore}). The ward officer has been notified.`, true);
+  } catch (e) { say(e.message); }
+  btn.disabled = false; btn.textContent = 'Submit report';
+};
+init().catch(() => say('Could not reach the server. Is the backend running?'));
+</script>
+</body>
+</html>

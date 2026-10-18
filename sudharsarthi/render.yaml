@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: sudharsarthi
+    runtime: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ALLOW_DEMO_RESET
+        value: "0"
