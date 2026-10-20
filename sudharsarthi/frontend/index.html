@@ -1,0 +1,3751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUDHARSARTHI | Duhai Civic Issue & Road Safety Monitor</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --primary: #1e3a8a;
+  --primary-light: #2563eb;
+  --primary-subtle: #eff6ff;
+  --teal: #0ea5a4;
+  --teal-dark: #0f766e;
+  --teal-subtle: #f0fdfa;
+  --high: #dc2626;
+  --high-bg: #fef2f2;
+  --high-border: #fecaca;
+  --med: #f59e0b;
+  --med-bg: #fffbeb;
+  --med-border: #fde68a;
+  --low: #16a34a;
+  --low-bg: #f0fdf4;
+  --low-border: #bbf7d0;
+  --done: #64748b;
+  --done-bg: #f8fafc;
+  --done-border: #cbd5e1;
+  --bg-page: #f8fafc;
+  --card-bg: #ffffff;
+  --ink: #0f172a;
+  --ink-secondary: #334155;
+  --mut: #64748b;
+  --border-color: #e2e8f0;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04);
+  --shadow-lg: 0 12px 28px rgba(15,23,42,0.12), 0 4px 10px rgba(15,23,42,0.06);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-page);
+  color: var(--ink);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* HEADER */
+header {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.brand img { height: 42px; width: auto; }
+.brand-text b {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+  display: block;
+  line-height: 1.1;
+}
+.brand-text b span { color: var(--teal); }
+.brand-text small {
+  display: block;
+  color: var(--mut);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #334155;
+}
+.header-badge .live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #16a34a;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25);
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+/* NAV TABS */
+.nav-tabs {
+  display: flex;
+  gap: 6px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+.nav-btn {
+  border: 0;
+  background: transparent;
+  color: var(--mut);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.2s ease;
+}
+.nav-btn:hover { color: var(--ink); background: rgba(255,255,255,0.6); }
+.nav-btn.active {
+  background: #ffffff;
+  color: var(--primary);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.nav-btn .badge {
+  background: var(--primary-subtle);
+  color: var(--primary);
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+/* HEADER ACTIONS */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.btn-report-quick {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0ea5a4 100%);
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(14,165,164,0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-report-quick:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(14,165,164,0.45);
+}
+
+/* MAIN VIEWPORT */
+main {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+.tab-content {
+  position: absolute;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+}
+.tab-content.active {
+  display: flex;
+}
+
+/* TAB 1: MAP & ISSUES */
+#tab-map.active {
+  display: grid;
+  grid-template-columns: 410px 1fr;
+  height: 100%;
+}
+.sidebar-panel {
+  background: #ffffff;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  z-index: 20;
+}
+.sidebar-header {
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border-color);
+  background: #ffffff;
+}
+.sidebar-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.sidebar-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar-stats-pill {
+  font-size: 12px;
+  padding: 3px 9px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  color: #475569;
+  font-weight: 600;
+}
+.search-box {
+  position: relative;
+  margin-bottom: 10px;
+}
+.search-box input {
+  width: 100%;
+  padding: 9px 12px 9px 34px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 13px;
+  background: #f8fafc;
+  transition: all 0.2s;
+}
+.search-box input:focus {
+  background: #fff;
+  border-color: var(--primary-light);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+}
+.search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+/* FILTER CHIPS */
+.filter-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-chip {
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s;
+  color: #475569;
+}
+.filter-chip:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+.filter-chip.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.filter-chip.active.chip-high { background: var(--high); border-color: var(--high); }
+.filter-chip.active.chip-med { background: var(--med); border-color: var(--med); }
+.filter-chip.active.chip-low { background: var(--low); border-color: var(--low); }
+.filter-chip.active.chip-done { background: var(--done); border-color: var(--done); }
+.chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ADVANCED FILTER EXPAND */
+.filter-secondary {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.filter-secondary select {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 11px;
+  background: #fff;
+  color: #475569;
+}
+
+/* ISSUE LIST */
+.issues-scroll-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  background: #f8fafc;
+}
+.issue-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  position: relative;
+  overflow: hidden;
+}
+.issue-card:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd;
+  box-shadow: var(--shadow-md);
+}
+.issue-card.selected {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.25), var(--shadow-md);
+  background: #fbfdff;
+}
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.card-category {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--teal-dark);
+  background: #ccfbf1;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.card-urgency {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.urgency-High { background: #fee2e2; color: #b91c1c; }
+.urgency-Medium { background: #fef3c7; color: #b45309; }
+.urgency-Low { background: #dcfce7; color: #15803d; }
+.urgency-Resolved { background: #f1f5f9; color: #475569; }
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+.card-meta {
+  font-size: 12px;
+  color: var(--mut);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-meta-row svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.card-thumb-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.card-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+}
+.card-preview-text {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.status-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  color: #334155;
+}
+.status-pill.status-Reported { background: #e0f2fe; color: #0369a1; }
+.status-pill.status-Under-Review { background: #fef3c7; color: #b45309; }
+.status-pill.status-Repair-in-Progress { background: #ffedd5; color: #c2410c; }
+.status-pill.status-Resolved { background: #dcfce7; color: #15803d; }
+
+/* MAP CONTAINER & CONTROLS */
+.map-wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+#map {
+  height: 100%;
+  width: 100%;
+  background: #0f172a;
+}
+
+/* DUHAI MAP OVERLAY HEADER */
+.duhai-map-bar {
+  position: absolute;
+  top: 14px;
+  left: 60px;
+  right: 14px;
+  z-index: 800;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+.duhai-landmark-pills {
+  pointer-events: auto;
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 6px 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  overflow-x: auto;
+  max-width: calc(100% - 240px);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.duhai-landmark-pills::-webkit-scrollbar { display: none; }
+.landmark-btn {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s;
+}
+.landmark-btn:hover {
+  background: var(--primary-subtle);
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+.duhai-tag-badge {
+  pointer-events: auto;
+  background: rgba(15, 23, 42, 0.88);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.duhai-tag-badge span { color: #38bdf8; }
+
+/* MAP CONTROLS FLOATING */
+.map-floating-controls {
+  position: absolute;
+  bottom: 24px;
+  right: 16px;
+  z-index: 800;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.map-ctrl-btn {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  color: #334155;
+  transition: all 0.2s;
+}
+.map-ctrl-btn:hover {
+  background: #f8fafc;
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+.map-ctrl-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* MAP LEGEND */
+.duhai-legend {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(6px);
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  font-size: 11px;
+  line-height: 1.8;
+  color: #1e293b;
+}
+.duhai-legend b {
+  font-size: 12px;
+  display: block;
+  margin-bottom: 3px;
+  color: var(--ink);
+}
+.duhai-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* LEAFLET CUSTOM MARKERS */
+.pin-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+.pin-wrapper svg {
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+  transition: transform 0.2s ease;
+}
+.pin-wrapper:hover svg {
+  transform: scale(1.15) translateY(-3px);
+}
+.pin-wrapper.pin-high::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 34px;
+  width: 18px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.6);
+  animation: radar-pulse 1.5s infinite;
+}
+@keyframes radar-pulse {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+/* PICK LOCATION CROSSHAIR */
+.picking-mode-banner {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e3a8a;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(30, 58, 138, 0.4);
+  z-index: 850;
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+/* POPUP STYLES */
+.leaflet-popup-content-wrapper {
+  border-radius: 14px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+}
+.leaflet-popup-content {
+  margin: 0;
+  width: 290px !important;
+}
+.popup-box {
+  padding: 14px 16px;
+}
+.popup-img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.popup-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 4px;
+}
+.popup-tag-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.popup-meta {
+  font-size: 11px;
+  color: var(--mut);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.popup-bars {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+.popup-bar-item {
+  margin-bottom: 4px;
+}
+.popup-bar-item:last-child { margin-bottom: 0; }
+.popup-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 2px;
+}
+.popup-meter {
+  height: 5px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.popup-meter-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--teal);
+}
+.popup-action-btn {
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.popup-action-btn:hover { background: var(--primary-light); }
+
+/* TAB 2: REPORT FORM */
+#tab-report {
+  overflow-y: auto;
+  padding: 24px;
+  background: #f1f5f9;
+  justify-content: center;
+}
+.report-container {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+.report-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.report-title-area {
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 14px;
+}
+.report-title-area h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.report-title-area p {
+  color: var(--mut);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.form-full { grid-column: span 2; }
+.form-group {
+  margin-bottom: 16px;
+}
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-label span {
+  color: var(--high);
+}
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  background: #ffffff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-control:focus {
+  border-color: var(--primary-light);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+}
+textarea.form-control {
+  resize: vertical;
+  min-height: 85px;
+}
+
+/* CATEGORY SELECTOR CARDS */
+.cat-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+}
+.cat-card-opt {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: all 0.15s;
+}
+.cat-card-opt:hover {
+  border-color: var(--teal);
+  background: #f0fdfa;
+}
+.cat-card-opt.selected {
+  border-color: var(--primary);
+  background: var(--primary-subtle);
+  color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.2);
+}
+.cat-icon {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 4px;
+}
+.cat-name {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* LOCATION PICKER IN REPORT FORM */
+.loc-picker-box {
+  background: #f8fafc;
+  border: 1px dashed #94a3b8;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 6px;
+}
+.loc-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.loc-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.loc-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+.loc-btn.primary {
+  background: var(--teal);
+  color: #fff;
+  border-color: var(--teal);
+}
+.loc-btn.primary:hover {
+  background: var(--teal-dark);
+}
+.loc-display-pill {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.loc-display-pill.valid {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #166534;
+}
+.quick-loc-shortcuts {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.quick-loc-shortcuts span {
+  font-size: 11px;
+  color: var(--mut);
+}
+.quick-loc-btn {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  color: #475569;
+}
+.quick-loc-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+
+/* PHOTO UPLOAD BOX */
+.upload-dropzone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  background: #f8fafc;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+.upload-dropzone:hover {
+  border-color: var(--primary-light);
+  background: #f1f5f9;
+}
+.upload-dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.upload-preview-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+.upload-preview-img {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* AI LIVE SCANNER */
+.ai-prescan-box {
+  background: #f0fdfa;
+  border: 1px solid #99f6e4;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  display: none;
+}
+.ai-prescan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.ai-prescan-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--teal-dark);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* SUBMIT BUTTON */
+.btn-submit-report {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  color: #fff;
+  border: 0;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  width: 100%;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(30, 58, 138, 0.3);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.btn-submit-report:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+}
+.btn-submit-report:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* TAB 3: CIVIC ANALYTICS */
+#tab-analytics {
+  overflow-y: auto;
+  padding: 24px;
+  background: #f8fafc;
+  flex-direction: column;
+  gap: 20px;
+}
+.analytics-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+.kpi-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.kpi-value {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+}
+.kpi-sub {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 6px;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.chart-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+}
+.chart-card h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ward-leaderboard-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+}
+.ward-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 10px;
+}
+.ward-table th {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 2px solid #e2e8f0;
+  color: var(--mut);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.ward-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--ink);
+}
+.progress-bar-container {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  width: 100%;
+  min-width: 90px;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #0ea5a4);
+  border-radius: 999px;
+}
+
+/* TAB 4: BUDGET OPTIMIZER */
+#tab-budget {
+  overflow-y: auto;
+  padding: 24px;
+  background: #f8fafc;
+  flex-direction: column;
+}
+.budget-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+.budget-header-card {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f766e 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 20px;
+}
+.budget-header-card h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.budget-ctrl-panel {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+.budget-input-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.budget-preset-chips {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.preset-chip {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #334155;
+}
+.preset-chip:hover {
+  background: #e2e8f0;
+}
+.btn-optimize {
+  background: var(--teal);
+  color: #fff;
+  border: 0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-optimize:hover {
+  background: var(--teal-dark);
+}
+
+.budget-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.budget-stat-box {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+}
+.budget-stat-box b {
+  display: block;
+  font-size: 22px;
+  font-family: 'Poppins', sans-serif;
+  color: var(--ink);
+  margin-top: 4px;
+}
+
+/* TAB 5: DUHAI WARDS & SLA */
+#tab-wards {
+  overflow-y: auto;
+  padding: 24px;
+  background: #f8fafc;
+  flex-direction: column;
+}
+.wards-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+.wards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.ward-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.ward-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ward-zone-badge {
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+/* ISSUE DETAIL MODAL */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-dialog {
+  background: #ffffff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  animation: modal-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modal-pop {
+  0% { transform: scale(0.94); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-header h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.modal-close-btn {
+  background: #f1f5f9;
+  border: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-close-btn:hover { background: #e2e8f0; }
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+.modal-img-wrapper {
+  width: 100%;
+  height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background: #0f172a;
+}
+.modal-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.modal-score-banner {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.score-circle-big {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.score-circle-big small { font-size: 9px; font-weight: 600; text-transform: uppercase; }
+
+.modal-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 14px 0 8px;
+}
+.modal-status-changer {
+  display: flex;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 6px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+.status-change-btn {
+  flex: 1;
+  padding: 8px 10px;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #475569;
+  transition: all 0.15s;
+}
+.status-change-btn.current {
+  background: #ffffff;
+  color: var(--primary);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+/* TOAST ALERTS */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  background: #1e293b;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: toast-in 0.25s ease-out;
+}
+.toast.success { background: #166534; }
+.toast.warning { background: #b45309; }
+.toast.error { background: #991b1b; }
+@keyframes toast-in {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  #tab-map {
+    grid-template-columns: 1fr;
+    grid-template-rows: 45vh 1fr;
+  }
+  .map-wrapper { order: -1; }
+  .duhai-landmark-pills { max-width: 100%; }
+  .charts-grid { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-full { grid-column: span 1; }
+  header { flex-wrap: wrap; }
+  .nav-tabs { order: 3; width: 100%; justify-content: space-around; margin-top: 8px; }
+}
+
+/* =====================================================================
+   MINECRAFT UI, INTERACTIVE HOVER BARS & AUTO POPUPS, ZOOM CONTROLS
+   ===================================================================== */
+
+/* ZOOM CONTROLS IN FLOATING CONTROLS */
+.zoom-btn {
+  font-size: 16px;
+  font-weight: 900;
+  color: #1e3a8a;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.zoom-btn:hover {
+  background: #0ea5a4;
+  color: #ffffff;
+  border-color: #0f766e;
+  transform: scale(1.12);
+  box-shadow: 0 4px 14px rgba(14, 165, 164, 0.45);
+}
+
+/* MINECRAFT HEADER TOGGLE */
+.mc-toggle-btn {
+  background: #262626;
+  color: #55ff55;
+  border: 2px solid #000;
+  box-shadow: inset -2px -2px 0px 0px #111, inset 2px 2px 0px 0px #666;
+  padding: 6px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 0;
+  transition: all 0.15s ease;
+  text-shadow: 1px 1px 0 #000;
+  user-select: none;
+}
+.mc-toggle-btn:hover {
+  background: #3b3b3b;
+  color: #ffff55;
+  box-shadow: inset -2px -2px 0px 0px #181818, inset 2px 2px 0px 0px #aaa;
+  transform: translateY(-1px);
+}
+.mc-toggle-btn.active {
+  background: #1b4d1b;
+  color: #55ff55;
+  border-color: #55ff55;
+  box-shadow: inset -2px -2px 0px 0px #0a240a, inset 2px 2px 0px 0px #70db4f, 0 0 12px rgba(85,255,85,0.4);
+}
+
+/* INTERACTIVE BARS: CHANGE COLOR ON HOVER & AUTO POPUP */
+.interactive-bar {
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+/* Duhai Map Bar Color Change & Auto Popup */
+.duhai-map-bar.interactive-bar {
+  pointer-events: auto;
+  border-radius: 12px;
+  padding: 2px 6px;
+  transition: all 0.3s ease;
+}
+.duhai-map-bar.interactive-bar:hover {
+  background: linear-gradient(135deg, rgba(14, 165, 164, 0.95), rgba(30, 58, 138, 0.95));
+  box-shadow: 0 8px 24px rgba(14, 165, 164, 0.35), 0 0 16px rgba(56, 189, 248, 0.4);
+}
+.duhai-map-bar.interactive-bar .bar-auto-popup {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 20px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  border: 1px solid #38bdf8;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1000;
+  white-space: nowrap;
+}
+.duhai-map-bar.interactive-bar:hover .bar-auto-popup {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Card Urgency Interactive Bar */
+.card-bar-interactive {
+  position: relative;
+  margin-top: 8px;
+  cursor: pointer;
+  padding: 2px 0;
+}
+.card-bar-track {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+.card-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+}
+.card-bar-fill.fill-high { background: #dc2626; }
+.card-bar-fill.fill-medium { background: #f59e0b; }
+.card-bar-fill.fill-low { background: #16a34a; }
+.card-bar-fill.fill-resolved { background: #64748b; }
+
+/* When cursor hovers above the card bar: COLOR CHANGE! */
+.card-bar-interactive:hover .card-bar-track {
+  height: 10px;
+  background: #cbd5e1;
+}
+.card-bar-interactive:hover .card-bar-fill {
+  filter: brightness(1.25);
+  background: linear-gradient(90deg, #06b6d4, #a855f7, #ec4899, #10b981);
+  background-size: 250% 100%;
+  animation: mc-rainbow-shift 2s infinite linear;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+}
+
+/* Card Bar Auto Popup */
+.card-bar-popup {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 200;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  border: 1px solid #38bdf8;
+}
+.card-bar-interactive:hover .card-bar-popup {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Popup Meter Interactive Bar (in modals and popup) */
+.popup-bar-item.interactive-bar {
+  cursor: pointer;
+}
+.popup-bar-item.interactive-bar:hover .popup-meter-fill {
+  background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+  transform: scaleY(1.3);
+}
+.popup-bar-item.interactive-bar .bar-auto-popup {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #0f172a;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 100;
+  border: 1px solid #38bdf8;
+}
+.popup-bar-item.interactive-bar:hover .bar-auto-popup {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Card action buttons */
+.btn-card-zoom, .btn-card-detail {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+.btn-card-zoom:hover {
+  background: #0ea5a4;
+  color: #fff;
+  border-color: #0f766e;
+  transform: translateY(-1px);
+}
+.btn-card-detail:hover {
+  background: #1e3a8a;
+  color: #fff;
+  border-color: #1e3a8a;
+  transform: translateY(-1px);
+}
+
+/* Popup zoom button */
+.popup-zoom-btn {
+  background: #0ea5a4;
+  color: #fff;
+  border: 0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.popup-zoom-btn:hover {
+  background: #0f766e;
+  transform: scale(1.02);
+}
+
+/* MINECRAFT HUD & EXP BAR */
+.mc-hud-container {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  pointer-events: auto;
+}
+.mc-exp-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+.mc-exp-level {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: #80ff00;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+.mc-exp-bar-track {
+  width: 360px;
+  max-width: 88vw;
+  height: 8px;
+  background: #181818;
+  border: 2px solid #000;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+  border-radius: 1px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.mc-exp-bar-fill {
+  height: 100%;
+  background: #55ff55;
+  box-shadow: 0 0 8px #55ff55;
+  transition: width 0.4s ease, background 0.3s ease;
+}
+/* When cursor is above the MC EXP bar: COLOR CHANGE & AUTO POPUP */
+.mc-exp-wrapper:hover .mc-exp-bar-track {
+  border-color: #00e5ff;
+  transform: scaleY(1.5);
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.6);
+}
+.mc-exp-wrapper:hover .mc-exp-bar-fill {
+  background: linear-gradient(90deg, #00e5ff, #a855f7, #ec4899, #55ff55, #ffd700);
+  background-size: 300% 100%;
+  animation: mc-rainbow-shift 1.5s infinite linear;
+  box-shadow: 0 0 14px #00e5ff, 0 0 20px #55ff55;
+}
+.mc-exp-wrapper .bar-auto-popup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: #100010;
+  border: 2px solid #5500aa;
+  box-shadow: 0 0 14px rgba(85, 0, 170, 0.5), inset 0 0 8px rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 4px;
+  min-width: 300px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1200;
+  text-align: center;
+}
+.mc-exp-wrapper:hover .bar-auto-popup {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+.mc-popup-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: #ffff55;
+  margin-bottom: 4px;
+}
+.mc-popup-desc {
+  font-size: 11px;
+  color: #e2e8f0;
+  line-height: 1.4;
+}
+
+@keyframes mc-rainbow-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* MINECRAFT HOTBAR */
+.mc-hotbar {
+  display: flex;
+  background: rgba(26, 26, 26, 0.94);
+  border: 3px solid #000;
+  box-shadow: inset -3px -3px 0 #111, inset 3px 3px 0 #555, 0 8px 24px rgba(0,0,0,0.5);
+  padding: 3px;
+  gap: 3px;
+}
+.mc-slot {
+  width: 38px;
+  height: 38px;
+  background: #8b8b8b;
+  border: 2px solid #373737;
+  box-shadow: inset 2px 2px 0 #373737, inset -2px -2px 0 #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s;
+}
+.mc-slot:hover {
+  transform: scale(1.08);
+  background: #a0a0a0;
+}
+.mc-slot.active {
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 0 10px #ffffff, inset 2px 2px 0 #ffffff;
+  transform: scale(1.12);
+  z-index: 2;
+}
+.mc-item-icon {
+  font-size: 18px;
+  filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.6));
+}
+.mc-slot-num {
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.mc-stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 360px;
+  max-width: 88vw;
+  font-size: 11px;
+  text-shadow: 1px 1px #000;
+  color: #fff;
+}
+.mc-hud-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: #aaa;
+  letter-spacing: 0.5px;
+}
+
+/* MINECRAFT MODE COMPLETE RETRO STYLING */
+body.minecraft-mode {
+  font-family: 'Silkscreen', 'Press Start 2P', monospace !important;
+  background: #252525 !important;
+  color: #f1f5f9;
+}
+body.minecraft-mode header {
+  background: #373737 !important;
+  border-bottom: 3px solid #1a1a1a !important;
+}
+body.minecraft-mode .brand-text b {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: #55ff55 !important;
+  text-shadow: 2px 2px #000;
+}
+body.minecraft-mode .brand-text b span { color: #00e5ff !important; }
+body.minecraft-mode .brand-text small {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: #aaaaaa;
+}
+body.minecraft-mode .nav-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  border-radius: 0;
+  background: #4a4a4a;
+  color: #fff;
+  border: 2px solid #000;
+  box-shadow: inset -2px -2px 0 #222, inset 2px 2px 0 #777;
+}
+body.minecraft-mode .nav-btn.active {
+  background: #1b4d1b;
+  color: #55ff55;
+  border-color: #55ff55;
+  box-shadow: inset -2px -2px 0 #0d260d, inset 2px 2px 0 #4ade80;
+}
+body.minecraft-mode .btn-report-quick {
+  border-radius: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  background: #15803d;
+  border: 2px solid #000;
+  box-shadow: inset -2px -2px 0 #0f4d25, inset 2px 2px 0 #4ade80;
+}
+body.minecraft-mode .sidebar-panel {
+  background: #292929 !important;
+  border-right: 3px solid #141414 !important;
+}
+body.minecraft-mode .sidebar-header {
+  background: #333333 !important;
+  border-bottom: 2px solid #141414;
+}
+body.minecraft-mode .sidebar-title span {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: #55ff55;
+}
+body.minecraft-mode .issue-card {
+  background: #383838 !important;
+  border: 2px solid #1a1a1a !important;
+  border-radius: 0 !important;
+  box-shadow: inset -2px -2px 0 #1c1c1c, inset 2px 2px 0 #555 !important;
+}
+body.minecraft-mode .issue-card:hover {
+  background: #454545 !important;
+  border-color: #55ff55 !important;
+  box-shadow: inset -2px -2px 0 #1c1c1c, inset 2px 2px 0 #777, 0 0 12px rgba(85,255,85,0.3) !important;
+}
+body.minecraft-mode .card-title {
+  color: #ffffff !important;
+}
+body.minecraft-mode .card-meta {
+  color: #cbd5e1 !important;
+}
+body.minecraft-mode .map-ctrl-btn {
+  border-radius: 0 !important;
+  background: #3f3f3f !important;
+  color: #55ff55 !important;
+  border: 2px solid #000 !important;
+  box-shadow: inset -2px -2px 0 #1f1f1f, inset 2px 2px 0 #666 !important;
+}
+body.minecraft-mode .leaflet-popup-content-wrapper {
+  background: #140014 !important;
+  border: 3px solid #5500aa !important;
+  box-shadow: 0 0 16px rgba(85, 0, 170, 0.6) !important;
+  border-radius: 0 !important;
+  color: #ffffff !important;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+}
+body.minecraft-mode .leaflet-popup-tip {
+  background: #5500aa !important;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand" onclick="switchTab('map')">
+    <img src="assets/logo-icon.svg" alt="SUDHARSARTHI Logo">
+    <div class="brand-text">
+      <b>SUDHAR<span>SARTHI</span></b>
+      <small>DUHAI CIVIC MONITOR &bull; GHAZIABAD</small>
+    </div>
+  </div>
+
+  <nav class="nav-tabs">
+    <button class="nav-btn active" data-tab="map" onclick="switchTab('map')">
+      🗺️ Duhai Map
+    </button>
+    <button class="nav-btn" data-tab="report" onclick="switchTab('report')">
+      ➕ Report Issue
+    </button>
+    <button class="nav-btn" data-tab="analytics" onclick="switchTab('analytics')">
+      📊 Analytics
+    </button>
+    <button class="nav-btn" data-tab="budget" onclick="switchTab('budget')">
+      💰 Budget AI
+    </button>
+    <button class="nav-btn" data-tab="wards" onclick="switchTab('wards')">
+      👮 Duhai Wards
+    </button>
+  </nav>
+
+  <div class="header-right">
+    <div class="header-badge">
+      <span class="live-dot"></span>
+      <span id="header-stats-text">Duhai Jurisdiction</span>
+    </div>
+    <button class="mc-toggle-btn" id="btn-mc-mode" onclick="toggleMinecraftMode()" title="Toggle Minecraft UI Mode (Hotkey: M)">
+      ⛏️ <span id="mc-mode-label">Craft Mode: OFF</span>
+    </button>
+    <button class="btn-report-quick" onclick="startReportFromMap()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Report Pothole / Hazard
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- TAB 1: DUHAI MAP & INCIDENT EXPLORER -->
+  <section id="tab-map" class="tab-content active">
+    <aside class="sidebar-panel">
+      <div class="sidebar-header">
+        <div class="sidebar-title-row">
+          <div class="sidebar-title">
+            <span>Duhai Issues</span>
+            <span class="sidebar-stats-pill" id="issues-count-pill">Loading...</span>
+          </div>
+          <button class="quick-loc-btn" title="Refresh reports" onclick="reloadReports()">🔄 Refresh</button>
+        </div>
+
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Search pothole, road, RRTS gate, ward..." oninput="handleSearch()">
+        </div>
+
+        <div class="filter-row" id="priority-chips">
+          <span class="filter-chip active" data-filter="All" onclick="setPriorityFilter('All')">All</span>
+          <span class="filter-chip chip-high" data-filter="High" onclick="setPriorityFilter('High')"><span class="chip-dot" style="background:#dc2626"></span>High Urgency</span>
+          <span class="filter-chip chip-med" data-filter="Medium" onclick="setPriorityFilter('Medium')"><span class="chip-dot" style="background:#f59e0b"></span>Medium</span>
+          <span class="filter-chip chip-low" data-filter="Low" onclick="setPriorityFilter('Low')"><span class="chip-dot" style="background:#16a34a"></span>Low</span>
+          <span class="filter-chip chip-done" data-filter="Resolved" onclick="setPriorityFilter('Resolved')"><span class="chip-dot" style="background:#64748b"></span>Resolved</span>
+        </div>
+
+        <div class="filter-secondary">
+          <select id="cat-filter" onchange="renderFilteredReports()">
+            <option value="All">All Categories</option>
+          </select>
+          <select id="ward-filter" onchange="renderFilteredReports()">
+            <option value="All">All Duhai Wards</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="issues-scroll-list" id="reports-list">
+        <!-- Rendered items -->
+      </div>
+    </aside>
+
+    <div class="map-wrapper">
+      <div id="map"></div>
+
+      <!-- DUHAI QUICK NAVIGATION BAR -->
+      <div class="duhai-map-bar interactive-bar" id="duhai-map-header-bar">
+        <!-- AUTO POPUP ON HOVER -->
+        <div class="bar-auto-popup">
+          ⚡ <b>Duhai Civic Radar:</b> Live jurisdiction active. All citizen reports auto-dispatch to <u>awasthishailendra59@gmail.com</u>.
+        </div>
+        <div class="duhai-landmark-pills">
+          <span style="font-size:11px;font-weight:700;color:#0369a1;padding:4px 2px;">📍 DUHAI:</span>
+          <button class="landmark-btn" onclick="flyToDuhai(28.7273, 77.4718, 17, 'Duhai RRTS Station')">🚉 RRTS Station</button>
+          <button class="landmark-btn" onclick="flyToDuhai(28.7360, 77.4815, 16.5, 'Duhai RRTS Depot')">🚆 Duhai Depot</button>
+          <button class="landmark-btn" onclick="flyToDuhai(28.7304, 77.4759, 17, 'Duhai Village Chowk')">🏘️ Village Chowk</button>
+          <button class="landmark-btn" onclick="flyToDuhai(28.7285, 77.4740, 16, 'Delhi-Meerut Road (NH-34)')">🛣️ NH-34 Meerut Rd</button>
+          <button class="landmark-btn" onclick="flyToDuhai(28.7130, 77.4730, 16, 'Morti / South Duhai')">🌳 Morti Link</button>
+          <button class="landmark-btn" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;" onclick="resetDuhaiBounds()">🎯 Full Duhai</button>
+        </div>
+
+        <div class="duhai-tag-badge">
+          <span>Boundary Locked:</span> Duhai Civic Area
+        </div>
+      </div>
+
+      <!-- PICKING MODE BANNER -->
+      <div class="picking-mode-banner" id="pick-mode-banner">
+        <span>📍 Click anywhere inside Duhai on the map to set report location</span>
+        <button onclick="cancelPickingMode()" style="background:#fff;color:#1e3a8a;border:0;padding:2px 8px;border-radius:6px;cursor:pointer;font-weight:600;font-size:11px;">Cancel</button>
+      </div>
+
+      <!-- MAP FLOATING ACTION CONTROLS -->
+      <div class="map-floating-controls">
+        <button class="map-ctrl-btn zoom-btn" id="btn-map-zoom-in" title="Zoom In onto Map (+)" onclick="zoomInMap()">➕</button>
+        <button class="map-ctrl-btn zoom-btn" id="btn-map-zoom-out" title="Zoom Out from Map (-)" onclick="zoomOutMap()">➖</button>
+        <button class="map-ctrl-btn" id="btn-toggle-satellite" title="Toggle Satellite Aerial View" onclick="toggleSatelliteView()">🛰️</button>
+        <button class="map-ctrl-btn" id="btn-toggle-wards" title="Toggle Duhai Ward Zones" onclick="toggleWardLayer()">🏛️</button>
+        <button class="map-ctrl-btn" title="Center Map on Duhai" onclick="resetDuhaiBounds()">🎯</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: CITIZEN REPORT FORM -->
+  <section id="tab-report" class="tab-content">
+    <div class="report-container">
+      <div class="report-card">
+        <div class="report-title-area">
+          <h2>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Report a Civic Issue in Duhai
+          </h2>
+          <p>Citizen reports are analyzed by our AI urgency engine. Urgent hazards alert the local Duhai ward junior engineer automatically.</p>
+        </div>
+
+        <!-- AUTOMATED EMAIL DISPATCH NOTICE -->
+        <div style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:12px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;">
+          <span style="font-size:24px;">📧</span>
+          <div style="font-size:12.5px;color:#1e3a8a;line-height:1.45;">
+            <b>Automated Dispatch Active:</b> Any report lodged is automatically delivered with GPS coordinates, photos & AI urgency metrics to <b>awasthishailendra59@gmail.com</b>.
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <!-- CATEGORY PICKER -->
+          <div class="form-group form-full">
+            <label class="form-label">Select Issue Category <span>*</span></label>
+            <div class="cat-picker-grid" id="category-cards">
+              <!-- Rendered via JS -->
+            </div>
+            <input type="hidden" id="form-category" value="Pothole">
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div class="form-group form-full">
+            <label class="form-label">Describe the Issue <span>*</span></label>
+            <textarea id="form-description" class="form-control" placeholder="Explain the hazard in detail (e.g. Deep 15cm pothole on the fast lane outside Duhai RRTS station gate; two-wheelers slipping in darkness)."></textarea>
+          </div>
+
+          <!-- PHOTO UPLOAD & PREVIEW -->
+          <div class="form-group">
+            <label class="form-label">Photo of the Problem (AI Urgency Analysis)</label>
+            <div class="upload-dropzone" id="upload-zone">
+              <input type="file" id="form-photo" accept="image/*" onchange="handlePhotoSelect(event)">
+              <div style="font-size:26px;margin-bottom:6px;">📸</div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b;">Click or drag photo here</div>
+              <div style="font-size:11px;color:#64748b;margin-top:2px;">Supports JPG, PNG, WebP (up to 5MB)</div>
+            </div>
+
+            <div class="upload-preview-area" id="upload-preview" style="display:none;">
+              <img id="preview-img" class="upload-preview-img" src="" alt="Issue Preview">
+              <div style="flex:1;">
+                <div id="preview-filename" style="font-size:12px;font-weight:600;color:#1e293b;">photo.jpg</div>
+                <div style="font-size:11px;color:#64748b;">Image attached for AI vision check</div>
+                <button type="button" onclick="removePhoto()" style="background:none;border:0;color:#dc2626;font-size:11px;font-weight:600;cursor:pointer;padding:0;margin-top:4px;">Remove</button>
+              </div>
+              <button type="button" class="loc-btn primary" onclick="runAIPrescan()" id="btn-prescan">⚡ Pre-scan AI</button>
+            </div>
+
+            <!-- AI PRE-SCAN RESULT -->
+            <div class="ai-prescan-box" id="ai-prescan-box">
+              <div class="ai-prescan-header">
+                <span class="ai-prescan-title">⚡ AI Vision Pre-Assessment</span>
+                <span id="prescan-score-badge" class="card-urgency urgency-High">High Urgency</span>
+              </div>
+              <div id="prescan-details" style="font-size:12px;color:#0f766e;line-height:1.4;"></div>
+            </div>
+          </div>
+
+          <!-- LOCATION SELECTION -->
+          <div class="form-group">
+            <label class="form-label">Location in Duhai <span>*</span></label>
+            <div class="loc-picker-box">
+              <div class="loc-actions">
+                <button type="button" class="loc-btn primary" onclick="pickLocationOnMap()">📍 Pick on Duhai Map</button>
+                <button type="button" class="loc-btn" onclick="useCurrentGPS()">📡 Use GPS</button>
+              </div>
+
+              <div class="loc-display-pill" id="location-status-pill">
+                <span id="loc-status-text">No location selected yet. Tap the button above or pick on Duhai map.</span>
+              </div>
+
+              <div class="quick-loc-shortcuts">
+                <span>Quick Duhai Spots:</span>
+                <button type="button" class="quick-loc-btn" onclick="setQuickLocation(28.7276, 77.4724, 'Duhai RRTS Station Gate', 'Zone 2 (Duhai RRTS Station)')">RRTS Station</button>
+                <button type="button" class="quick-loc-btn" onclick="setQuickLocation(28.7310, 77.4768, 'Duhai Village Main Road', 'Zone 1 (Duhai Village)')">Village Road</button>
+                <button type="button" class="quick-loc-btn" onclick="setQuickLocation(28.7360, 77.4815, 'Duhai Depot Entrance', 'Zone 5 (East Duhai)')">RRTS Depot</button>
+                <button type="button" class="quick-loc-btn" onclick="setQuickLocation(28.7285, 77.4740, 'Meerut Road NH-34 Junction', 'Zone 2 (Duhai RRTS Station)')">NH-34</button>
+              </div>
+            </div>
+
+            <div style="margin-top:10px;">
+              <label class="form-label">Landmark / Place Name</label>
+              <input type="text" id="form-landmark" class="form-control" placeholder="E.g. Near RRTS Gate 2, opposite temple">
+            </div>
+          </div>
+
+          <!-- REPORTER NAME -->
+          <div class="form-group form-full">
+            <label class="form-label">Your Name / Contact (Optional)</label>
+            <input type="text" id="form-reporter" class="form-control" placeholder="Citizen (or leave blank for anonymous report)">
+          </div>
+
+          <!-- SUBMIT BUTTON -->
+          <div class="form-group form-full">
+            <button type="button" class="btn-submit-report" id="btn-submit" onclick="submitReportForm()">
+              <span>Submit Civic Report to Duhai Ward Officer</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: CIVIC ANALYTICS -->
+  <section id="tab-analytics" class="tab-content">
+    <div class="analytics-container">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+          <h2 style="font-family:'Poppins',sans-serif;font-size:22px;color:var(--primary);">Duhai Civic Analytics & Performance</h2>
+          <p style="font-size:13px;color:var(--mut);">Real-time municipal performance metrics and resolution rates for Duhai, Ghaziabad.</p>
+        </div>
+        <button class="quick-loc-btn" style="padding:8px 14px;font-weight:600;" onclick="loadAnalyticsData()">🔄 Refresh Analytics</button>
+      </div>
+
+      <!-- KPI METRICS -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-title">Total Reports</span>
+          <b class="kpi-value" id="kpi-total">0</b>
+          <span class="kpi-sub">Lifetime logged in Duhai</span>
+        </div>
+        <div class="kpi-card" style="border-left:4px solid var(--high);">
+          <span class="kpi-title" style="color:var(--high);">Critical / High</span>
+          <b class="kpi-value" style="color:var(--high);" id="kpi-high">0</b>
+          <span class="kpi-sub">Priority hazards open</span>
+        </div>
+        <div class="kpi-card" style="border-left:4px solid var(--med);">
+          <span class="kpi-title" style="color:var(--med);">Pending Repairs</span>
+          <b class="kpi-value" style="color:var(--med);" id="kpi-pending">0</b>
+          <span class="kpi-sub">Under active works</span>
+        </div>
+        <div class="kpi-card" style="border-left:4px solid var(--low);">
+          <span class="kpi-title" style="color:var(--low);">Resolved Issues</span>
+          <b class="kpi-value" style="color:var(--low);" id="kpi-resolved">0</b>
+          <span class="kpi-sub">Citizen verified repairs</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Avg Resolution</span>
+          <b class="kpi-value" id="kpi-avg-days">--</b>
+          <span class="kpi-sub">Days from report to fix</span>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Issues by Category</h3>
+          <div style="height:240px;position:relative;">
+            <canvas id="chart-categories"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>Monthly Trend (Reported vs Fixed)</h3>
+          <div style="height:240px;position:relative;">
+            <canvas id="chart-trend"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- DUHAI WARD RESOLUTION TABLE -->
+      <div class="ward-leaderboard-card">
+        <h3 style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:6px;">Duhai Ward Performance Leaderboard</h3>
+        <p style="font-size:12px;color:var(--mut);margin-bottom:12px;">Resolution rate and speed across all 6 Duhai municipal zones.</p>
+        <table class="ward-table">
+          <thead>
+            <tr>
+              <th>Zone / Ward Name</th>
+              <th>Total Issues</th>
+              <th>Resolved</th>
+              <th>Resolution Rate</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="ward-leaderboard-body">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: MUNICIPAL BUDGET OPTIMIZER -->
+  <section id="tab-budget" class="tab-content">
+    <div class="budget-container">
+      <div class="budget-header-card">
+        <h2>💰 Municipal Road Budget Optimizer</h2>
+        <p style="font-size:13px;opacity:0.9;">Solves the true 0/1 knapsack problem to maximize hazard elimination for Duhai's civic repair funds.</p>
+      </div>
+
+      <div class="budget-ctrl-panel">
+        <div class="budget-input-row">
+          <div style="flex:1;min-width:240px;">
+            <label class="form-label">Available Repair Budget (₹ Rupees)</label>
+            <input type="number" id="budget-amount" class="form-control" value="250000" step="10000" min="10000">
+            <div class="budget-preset-chips">
+              <span class="preset-chip" onclick="setPresetBudget(100000)">₹ 1.0 Lakh</span>
+              <span class="preset-chip" onclick="setPresetBudget(250000)">₹ 2.5 Lakhs</span>
+              <span class="preset-chip" onclick="setPresetBudget(500000)">₹ 5.0 Lakhs</span>
+              <span class="preset-chip" onclick="setPresetBudget(1000000)">₹ 10.0 Lakhs</span>
+            </div>
+          </div>
+
+          <div style="min-width:200px;">
+            <label class="form-label">Optimization Strategy</label>
+            <select id="budget-strategy" class="form-control">
+              <option value="balanced">Balanced (Risk + Value)</option>
+              <option value="priority">Critical Safety First</option>
+              <option value="coverage">Maximum Road Coverage</option>
+            </select>
+          </div>
+
+          <button class="btn-optimize" onclick="runBudgetOptimization()">⚡ Run AI Optimization</button>
+        </div>
+      </div>
+
+      <div class="budget-stats-grid" id="budget-stats-grid" style="display:none;">
+        <div class="budget-stat-box">
+          <span style="font-size:12px;color:var(--mut);">Allocated Spend</span>
+          <b id="b-stat-allocated" style="color:var(--primary);">₹ 0</b>
+        </div>
+        <div class="budget-stat-box">
+          <span style="font-size:12px;color:var(--mut);">Surplus / Reserve</span>
+          <b id="b-stat-remaining" style="color:var(--teal-dark);">₹ 0</b>
+        </div>
+        <div class="budget-stat-box">
+          <span style="font-size:12px;color:var(--mut);">Critical Hazards Fixed</span>
+          <b id="b-stat-critical" style="color:var(--high);">0 / 0</b>
+        </div>
+        <div class="budget-stat-box">
+          <span style="font-size:12px;color:var(--mut);">Total Works Scheduled</span>
+          <b id="b-stat-count" style="color:#16a34a;">0</b>
+        </div>
+      </div>
+
+      <div id="budget-results-tables" style="display:none;">
+        <div class="ward-leaderboard-card" style="margin-bottom:20px;">
+          <h3 style="font-family:'Poppins',sans-serif;font-size:15px;color:#16a34a;margin-bottom:10px;">✅ Approved Immediate Works (Under Budget)</h3>
+          <table class="ward-table">
+            <thead>
+              <tr>
+                <th>Issue ID</th>
+                <th>Project Title</th>
+                <th>Ward</th>
+                <th>Urgency Score</th>
+                <th>Estimated Cost</th>
+              </tr>
+            </thead>
+            <tbody id="budget-approved-body"></tbody>
+          </table>
+        </div>
+
+        <div class="ward-leaderboard-card">
+          <h3 style="font-family:'Poppins',sans-serif;font-size:15px;color:#dc2626;margin-bottom:10px;">⏳ Deferred To Next Funding Tranche</h3>
+          <table class="ward-table">
+            <thead>
+              <tr>
+                <th>Issue ID</th>
+                <th>Project Title</th>
+                <th>Ward</th>
+                <th>Urgency Score</th>
+                <th>Estimated Cost</th>
+              </tr>
+            </thead>
+            <tbody id="budget-deferred-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 5: DUHAI WARDS & SLA -->
+  <section id="tab-wards" class="tab-content">
+    <div class="wards-container">
+      <h2 style="font-family:'Poppins',sans-serif;font-size:22px;color:var(--primary);">Duhai Municipal Wards & Officer Directory</h2>
+      <p style="font-size:13px;color:var(--mut);">SUDHARSARTHI monitors the 6 municipal zones of Duhai, Ghaziabad. High urgency alerts notify the assigned engineer directly.</p>
+
+      <div class="wards-grid" id="wards-cards-list">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+<!-- MINECRAFT HUD & HOTBAR -->
+<div class="mc-hud-container" id="mc-hud-container">
+  <!-- MINECRAFT EXPERIENCE / CIVIC LEVEL BAR -->
+  <div class="mc-exp-wrapper interactive-bar" id="mc-exp-bar" title="Duhai Civic Experience (Hover to inspect)">
+    <div class="mc-exp-level" id="mc-exp-level-text">42</div>
+    <div class="mc-exp-bar-track">
+      <div class="mc-exp-bar-fill" id="mc-exp-fill" style="width: 82%;"></div>
+    </div>
+    <!-- AUTO POPUP ON HOVER -->
+    <div class="bar-auto-popup">
+      <div class="mc-popup-title">⛏️ CIVIC CRAFT EXP LEVEL 42</div>
+      <div class="mc-popup-desc">Infrastructure Health: 82% • Reports auto-forward to <b>awasthishailendra59@gmail.com</b></div>
+    </div>
+  </div>
+
+  <!-- MINECRAFT 9-SLOT HOTBAR -->
+  <div class="mc-hotbar" id="mc-hotbar">
+    <div class="mc-slot active" data-slot="1" onclick="selectHotbarSlot(1)" title="[1] Duhai Map (Press 1)"><span class="mc-item-icon">🗺️</span><span class="mc-slot-num">1</span></div>
+    <div class="mc-slot" data-slot="2" onclick="selectHotbarSlot(2)" title="[2] Report Hazard (Press 2)"><span class="mc-item-icon">⛏️</span><span class="mc-slot-num">2</span></div>
+    <div class="mc-slot" data-slot="3" onclick="selectHotbarSlot(3)" title="[3] Civic Analytics (Press 3)"><span class="mc-item-icon">📊</span><span class="mc-slot-num">3</span></div>
+    <div class="mc-slot" data-slot="4" onclick="selectHotbarSlot(4)" title="[4] Budget AI (Press 4)"><span class="mc-item-icon">💰</span><span class="mc-slot-num">4</span></div>
+    <div class="mc-slot" data-slot="5" onclick="selectHotbarSlot(5)" title="[5] Duhai Wards (Press 5)"><span class="mc-item-icon">🛡️</span><span class="mc-slot-num">5</span></div>
+    <div class="mc-slot" data-slot="6" onclick="selectHotbarSlot(6)" title="[6] Zoom In Map (Press 6)"><span class="mc-item-icon">➕</span><span class="mc-slot-num">6</span></div>
+    <div class="mc-slot" data-slot="7" onclick="selectHotbarSlot(7)" title="[7] Zoom Out Map (Press 7)"><span class="mc-item-icon">➖</span><span class="mc-slot-num">7</span></div>
+    <div class="mc-slot" data-slot="8" onclick="selectHotbarSlot(8)" title="[8] Urgency Radar (Press 8)"><span class="mc-item-icon">💎</span><span class="mc-slot-num">8</span></div>
+    <div class="mc-slot" data-slot="9" onclick="selectHotbarSlot(9)" title="[9] Auto-Email: awasthishailendra59@gmail.com (Press 9)"><span class="mc-item-icon">✉️</span><span class="mc-slot-num">9</span></div>
+  </div>
+
+  <!-- MINECRAFT HEARTS & HUNGER ROW -->
+  <div class="mc-stats-row">
+    <div class="mc-hearts" title="Road Safety Rating: 10/10 HP">❤️❤️❤️❤️❤️</div>
+    <div class="mc-hud-label">DUHAI CIVIC CRAFT</div>
+    <div class="mc-hunger" title="Municipal Response Readiness: Full">🍗🍗🍗🍗🍗</div>
+  </div>
+</div>
+
+</main>
+
+<!-- ISSUE DETAIL MODAL -->
+<div class="modal-backdrop" id="issue-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <div>
+        <h3 id="m-title">Issue Title</h3>
+        <span style="font-size:11px;color:var(--mut);" id="m-id-date">NS-2026-1042 &bull; 2026-10-14</span>
+      </div>
+      <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-img-wrapper" id="m-img-wrapper">
+        <img id="m-image" src="" alt="Issue Photo">
+      </div>
+
+      <div class="modal-score-banner">
+        <div class="score-circle-big" id="m-score-circle" style="background:#dc2626;">
+          <span id="m-score-val">92</span>
+          <small>Score</small>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <b id="m-priority-label" style="font-size:15px;color:#dc2626;">High Urgency</b>
+            <span id="m-status-tag" class="status-pill status-Reported">Reported</span>
+          </div>
+          <div style="font-size:12px;color:#475569;" id="m-category-location">Pothole &bull; Near Duhai RRTS Gate</div>
+        </div>
+      </div>
+
+      <div class="modal-section-title">Urgency Score Breakdown (AI Weighted Formula)</div>
+      <div class="popup-bars" id="m-breakdown-bars">
+        <!-- Bars rendered by JS -->
+      </div>
+
+      <div class="modal-section-title">AI Vision Inspection Analysis</div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;font-size:12px;line-height:1.6;" id="m-ai-analysis">
+        <!-- AI details -->
+      </div>
+
+      <div class="modal-section-title">Ward Officer & Repair Status Action</div>
+      <div style="background:#f1f5f9;border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+          <span><b>Assigned Ward:</b> <span id="m-ward">Zone 2</span></span>
+          <span><b>Cost Estimate:</b> <span id="m-cost">₹ 35,000</span></span>
+        </div>
+        <div style="font-size:12px;color:#475569;">
+          <span><b>Officer:</b> <span id="m-officer">Junior Engineer</span></span>
+        </div>
+      </div>
+
+      <div class="modal-section-title">Update Repair Status (Officer Action)</div>
+      <div class="modal-status-changer">
+        <button class="status-change-btn" data-st="Reported" onclick="updateCurrentReportStatus('Reported')">Reported</button>
+        <button class="status-change-btn" data-st="Under Review" onclick="updateCurrentReportStatus('Under Review')">Under Review</button>
+        <button class="status-change-btn" data-st="Repair in Progress" onclick="updateCurrentReportStatus('Repair in Progress')">In Progress</button>
+        <button class="status-change-btn" data-st="Resolved" onclick="updateCurrentReportStatus('Resolved')">Resolved</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* =====================================================================
+   SUDHARSARTHI - DUHAI CIVIC MONITOR FRONTEND LOGIC
+   ===================================================================== */
+const API = window.API_BASE || '';
+const DUHAI_CENTER = [28.7285, 77.4740];
+// South, West, North, East (roughly 6.5 km square strictly bounding Duhai)
+const DUHAI_BOUNDS = [[28.700, 77.440], [28.760, 77.510]];
+
+const COLORS = {
+  High: '#dc2626',
+  Medium: '#f59e0b',
+  Low: '#16a34a',
+  Resolved: '#64748b'
+};
+
+const CATEGORY_ICONS = {
+  'Pothole': '🕳️',
+  'Road Crack': '⚡',
+  'Surface Damage': '⚠️',
+  'Waterlogging': '🌊',
+  'Fallen Tree': '🌳',
+  'Garbage': '🗑️',
+  'Other': '❓'
+};
+
+let map = null;
+let tileLayerOsm = null;
+let tileLayerSat = null;
+let isSatellite = false;
+let boundaryPolygon = null;
+let wardLayerGroup = null;
+let showWards = false;
+
+let cfg = null;
+let reports = [];
+let markers = {};
+let currentFilter = 'All';
+let currentSearch = '';
+let selectedReport = null;
+
+let isPickingLocation = false;
+let pickedLocation = null;
+let pickMarker = null;
+
+let categoryChartInstance = null;
+let trendChartInstance = null;
+
+/* Toast helper */
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    setTimeout(() => toast.remove(), 250);
+  }, 3500);
+}
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------------------------------------------------------------------
+   INITIALIZATION
+   --------------------------------------------------------------------- */
+async function initApp() {
+  try {
+    cfg = await (await fetch(API + '/api/config')).json();
+  } catch (err) {
+    showToast('Failed to reach backend API. Make sure Flask is running.', 'error');
+    cfg = {
+      area: 'Duhai, Ghaziabad',
+      center: DUHAI_CENTER,
+      bounds: [28.700, 77.440, 28.760, 77.510],
+      categories: ['Pothole', 'Road Crack', 'Surface Damage', 'Waterlogging', 'Fallen Tree', 'Garbage', 'Other'],
+      wards: [
+        'Zone 1 (Duhai Village)',
+        'Zone 2 (Duhai RRTS Station)',
+        'Zone 3 (North Duhai)',
+        'Zone 4 (South Duhai)',
+        'Zone 5 (East Duhai)',
+        'Zone 6 (West Duhai)'
+      ]
+    };
+  }
+
+  initDuhaiMap();
+  initFormCategories();
+  initFilters();
+  await reloadReports();
+  renderWardsDirectory();
+  checkUrlRouting();
+  window.addEventListener('hashchange', checkUrlRouting);
+}
+
+function checkUrlRouting() {
+  const hash = window.location.hash.replace('#', '');
+  if (['map', 'report', 'analytics', 'budget', 'wards'].includes(hash)) {
+    switchTab(hash, false);
+  }
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('sat') === '1') {
+    setTimeout(() => toggleSatelliteView(), 300);
+  }
+  if (params.get('wards') === '1') {
+    setTimeout(() => toggleWardLayer(), 400);
+  }
+  const reportId = params.get('report') || params.get('modal');
+  if (reportId) {
+    setTimeout(() => openReportModal(reportId), 400);
+  }
+}
+
+/* ---------------------------------------------------------------------
+   DUHAI MAP ENGINE - STRICTLY CONSTRAINED TO DUHAI, GHAZIABAD
+   --------------------------------------------------------------------- */
+function initDuhaiMap() {
+  const [s, w, n, e] = cfg.bounds || [28.700, 77.440, 28.760, 77.510];
+  const southWest = L.latLng(s, w);
+  const northEast = L.latLng(n, e);
+  const bounds = L.latLngBounds(southWest, northEast);
+
+  // Initialize Map with strict bounding constraints
+  map = L.map('map', {
+    minZoom: 13.2,
+    maxZoom: 19,
+    maxBounds: bounds,
+    maxBoundsViscosity: 1.0, // Hard stop: cannot pan outside Duhai boundary!
+    zoomControl: true
+  }).fitBounds(bounds, { padding: [15, 15] });
+
+  // Standard Street Layer
+  tileLayerOsm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  // High-Resolution Satellite Layer (Esri)
+  tileLayerSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+    attribution: '&copy; Esri World Imagery'
+  });
+
+  /* MASK OUTSIDE DUHAI (Inverted Polygon Spotlight):
+     Darkens the entire world EXCEPT Duhai, spotlighting Duhai! */
+  const outerWorld = [
+    [-90, -180],
+    [-90, 180],
+    [90, 180],
+    [90, -180]
+  ];
+  // Clockwise winding for inner hole cutout:
+  const duhaiCutout = [
+    [s, w],
+    [n, w],
+    [n, e],
+    [s, e]
+  ];
+  
+  L.polygon([outerWorld, duhaiCutout], {
+    fillColor: '#070d1e',
+    fillOpacity: 0.65,
+    weight: 1,
+    color: '#0284c7',
+    interactive: true
+  }).on('click', () => {
+    showToast('⚠️ Clicked outside Duhai jurisdiction. Please choose a location inside the active Duhai boundary.', 'warning');
+  }).addTo(map);
+
+  /* Glowing Duhai Boundary Stroke */
+  boundaryPolygon = L.rectangle([[s, w], [n, e]], {
+    color: '#0284c7',
+    weight: 3,
+    dashArray: '8, 8',
+    fill: false,
+    interactive: false
+  }).addTo(map);
+
+  // Map Click Handler
+  map.on('click', ev => {
+    if (isPickingLocation) {
+      handlePickedLocation(ev.latlng.lat, ev.latlng.lng);
+    }
+  });
+
+  // Duhai Legend
+  const legend = L.control({ position: 'bottomleft' });
+  legend.onAdd = () => {
+    const div = L.DomUtil.create('div', 'duhai-legend');
+    div.innerHTML = `
+      <b>Duhai Hazard Legend</b>
+      <div class="duhai-legend-item"><span class="legend-dot" style="background:#dc2626"></span> High Urgency (60+)</div>
+      <div class="duhai-legend-item"><span class="legend-dot" style="background:#f59e0b"></span> Medium Urgency (40-59)</div>
+      <div class="duhai-legend-item"><span class="legend-dot" style="background:#16a34a"></span> Low Urgency (&lt;40)</div>
+      <div class="duhai-legend-item"><span class="legend-dot" style="background:#64748b"></span> Resolved Issue</div>
+    `;
+    return div;
+  };
+  legend.addTo(map);
+
+  initWardLayers();
+}
+
+/* DUHAI WARD OVERLAYS */
+function initWardLayers() {
+  wardLayerGroup = L.layerGroup();
+  const wardDetails = cfg.wardDetails || [
+    { name: "Zone 1 (Duhai Village)", lat: 28.7304, lng: 77.4759, officer: "Zone 1 Officer" },
+    { name: "Zone 2 (Duhai RRTS Station)", lat: 28.7273, lng: 77.4718, officer: "Zone 2 Officer" },
+    { name: "Zone 3 (North Duhai)", lat: 28.7420, lng: 77.4730, officer: "Zone 3 Officer" },
+    { name: "Zone 4 (South Duhai)", lat: 28.7130, lng: 77.4730, officer: "Zone 4 Officer" },
+    { name: "Zone 5 (East Duhai)", lat: 28.7290, lng: 77.4930, officer: "Zone 5 Officer" },
+    { name: "Zone 6 (West Duhai)", lat: 28.7290, lng: 77.4550, officer: "Zone 6 Officer" }
+  ];
+
+  wardDetails.forEach((w, idx) => {
+    // Circle representing ward influence
+    const circle = L.circle([w.lat, w.lng], {
+      radius: 700,
+      color: '#3b82f6',
+      fillColor: '#60a5fa',
+      fillOpacity: 0.12,
+      weight: 1.5,
+      dashArray: '4, 4'
+    });
+
+    const marker = L.circleMarker([w.lat, w.lng], {
+      radius: 6,
+      fillColor: '#1e3a8a',
+      color: '#ffffff',
+      weight: 2,
+      fillOpacity: 0.9
+    }).bindTooltip(`<b>${esc(w.name)}</b><br><small>Officer: ${esc(w.officer)}</small>`, {
+      permanent: false,
+      direction: 'top'
+    });
+
+    circle.addTo(wardLayerGroup);
+    marker.addTo(wardLayerGroup);
+  });
+}
+
+function toggleWardLayer() {
+  showWards = !showWards;
+  const btn = document.getElementById('btn-toggle-wards');
+  if (showWards) {
+    wardLayerGroup.addTo(map);
+    btn.classList.add('active');
+    showToast('🏛️ Showing Duhai Ward Jurisdictions', 'info');
+  } else {
+    map.removeLayer(wardLayerGroup);
+    btn.classList.remove('active');
+  }
+}
+
+function toggleSatelliteView() {
+  isSatellite = !isSatellite;
+  const btn = document.getElementById('btn-toggle-satellite');
+  if (isSatellite) {
+    map.removeLayer(tileLayerOsm);
+    tileLayerSat.addTo(map);
+    btn.classList.add('active');
+    showToast('🛰️ Switched to High-Res Duhai Satellite View', 'info');
+  } else {
+    map.removeLayer(tileLayerSat);
+    tileLayerOsm.addTo(map);
+    btn.classList.remove('active');
+    showToast('🗺️ Switched to Duhai Street View', 'info');
+  }
+}
+
+function flyToDuhai(lat, lng, zoom = 16.5, name = '') {
+  map.flyTo([lat, lng], zoom, { duration: 1.2 });
+  if (name) showToast(`📍 Focused on ${name}`, 'info');
+}
+
+function resetDuhaiBounds() {
+  const [s, w, n, e] = cfg.bounds || [28.700, 77.440, 28.760, 77.510];
+  map.fitBounds([[s, w], [n, e]], { padding: [20, 20], maxZoom: 15.5 });
+  showToast('🎯 Centered on Duhai, Ghaziabad', 'info');
+}
+
+/* ---------------------------------------------------------------------
+   REPORTS LOADING & MARKER MANAGEMENT
+   --------------------------------------------------------------------- */
+async function reloadReports() {
+  try {
+    const res = await fetch(API + '/api/reports');
+    reports = await res.json();
+    renderMarkers();
+    renderFilteredReports();
+    updateHeaderCounters();
+  } catch (err) {
+    showToast('Could not load reports from server.', 'error');
+  }
+}
+
+function createMarkerIcon(r) {
+  const level = r.status === 'Resolved' ? 'Resolved' : r.priority;
+  const color = COLORS[level] || COLORS.Low;
+  const isHigh = level === 'High';
+
+  return L.divIcon({
+    className: '',
+    iconSize: [32, 42],
+    iconAnchor: [16, 42],
+    popupAnchor: [0, -36],
+    html: `
+      <div class="pin-wrapper ${isHigh ? 'pin-high' : ''}">
+        <svg width="32" height="42" viewBox="0 0 30 40">
+          <path d="M15 1C7.3 1 1 7.2 1 14.8 1 25 15 39 15 39s14-14 14-24.2C29 7.2 22.7 1 15 1z" fill="${color}" stroke="#ffffff" stroke-width="2"/>
+          <circle cx="15" cy="15" r="5.5" fill="#ffffff"/>
+        </svg>
+      </div>`
+  });
+}
+
+function createPopupContent(r) {
+  const level = r.status === 'Resolved' ? 'Resolved' : r.priority;
+  const b = r.scoreBreakdown || {};
+  const img = r.imageUrl ? `<img src="${esc(r.imageUrl)}" class="popup-img" alt="Defect Photo" loading="lazy">` : '';
+
+  return `
+    <div class="popup-box">
+      ${img}
+      <div class="popup-title">${esc(r.title)}</div>
+      <div class="popup-tag-row">
+        <span class="card-urgency urgency-${level}">${esc(level)} Urgency (${esc(r.riskScore)})</span>
+        <span class="status-pill status-${(r.status||'').replace(/\s+/g,'-')}">${esc(r.status)}</span>
+      </div>
+      <div class="popup-meta">
+        <b>📍 ${esc(r.location)}</b><br>
+        🏛️ ${esc(r.ward)}
+        <div style="font-size:10.5px;color:#0ea5a4;font-weight:600;margin-top:3px;">✉️ Alert sent to: awasthishailendra59@gmail.com</div>
+      </div>
+      <div class="popup-bars">
+        <div class="popup-bar-item interactive-bar" title="Severity Factor">
+          <div class="popup-bar-label"><span>Severity</span><span>${b.severity || 0}/40</span></div>
+          <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100, ((b.severity||0)/40)*100)}%"></div></div>
+          <div class="bar-auto-popup"><span>Severity: ${b.severity || 0}/40 pts</span></div>
+        </div>
+        <div class="popup-bar-item interactive-bar" title="Traffic Exposure">
+          <div class="popup-bar-label"><span>Traffic Exposure</span><span>${b.trafficVolume || 0}/25</span></div>
+          <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100, ((b.trafficVolume||0)/25)*100)}%"></div></div>
+          <div class="bar-auto-popup"><span>Traffic: ${b.trafficVolume || 0}/25 pts</span></div>
+        </div>
+      </div>
+      <button class="popup-zoom-btn" onclick="zoomInOnReport('${r.id}', event)">🔍 Zoom In Closer (18.5x)</button>
+      <button class="popup-action-btn" onclick="openReportModal('${r.id}')">Inspect Full Analysis & Actions</button>
+    </div>
+  `;
+}
+
+function renderMarkers() {
+  // Clear old markers
+  Object.values(markers).forEach(m => map.removeLayer(m));
+  markers = {};
+
+  reports.forEach(r => {
+    const marker = L.marker([r.lat, r.lng], {
+      icon: createMarkerIcon(r)
+    }).bindPopup(createPopupContent(r), { maxWidth: 300 });
+
+    marker.on('click', () => {
+      highlightSidebarCard(r.id);
+    });
+
+    // Auto pop up when cursor is above marker
+    marker.on('mouseover', () => {
+      marker.openPopup();
+      highlightSidebarCard(r.id);
+    });
+
+    markers[r.id] = marker;
+    marker.addTo(map);
+  });
+}
+
+/* ---------------------------------------------------------------------
+   SIDEBAR & FILTERING
+   --------------------------------------------------------------------- */
+function initFilters() {
+  const catFilter = document.getElementById('cat-filter');
+  catFilter.innerHTML = '<option value="All">All Categories</option>' +
+    (cfg.categories || []).map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+
+  const wardFilter = document.getElementById('ward-filter');
+  wardFilter.innerHTML = '<option value="All">All Duhai Wards</option>' +
+    (cfg.wards || []).map(w => `<option value="${esc(w)}">${esc(w)}</option>`).join('');
+}
+
+function setPriorityFilter(filterName) {
+  currentFilter = filterName;
+  document.querySelectorAll('#priority-chips .filter-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.filter === filterName);
+  });
+  renderFilteredReports();
+}
+
+function handleSearch() {
+  currentSearch = document.getElementById('search-input').value.toLowerCase().trim();
+  renderFilteredReports();
+}
+
+function renderFilteredReports() {
+  const selectedCat = document.getElementById('cat-filter').value;
+  const selectedWard = document.getElementById('ward-filter').value;
+
+  const filtered = reports.filter(r => {
+    const level = r.status === 'Resolved' ? 'Resolved' : r.priority;
+    if (currentFilter !== 'All' && level !== currentFilter) return false;
+    if (selectedCat !== 'All' && r.category !== selectedCat) return false;
+    if (selectedWard !== 'All' && r.ward !== selectedWard) return false;
+
+    if (currentSearch) {
+      const q = currentSearch;
+      const match = (r.title || '').toLowerCase().includes(q) ||
+                    (r.location || '').toLowerCase().includes(q) ||
+                    (r.landmark || '').toLowerCase().includes(q) ||
+                    (r.description || '').toLowerCase().includes(q) ||
+                    (r.id || '').toLowerCase().includes(q);
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  // Sync visible markers on map
+  Object.entries(markers).forEach(([id, marker]) => {
+    const isVisible = filtered.some(r => r.id === id);
+    if (isVisible && !map.hasLayer(marker)) marker.addTo(map);
+    if (!isVisible && map.hasLayer(marker)) map.removeLayer(marker);
+  });
+
+  // Render Sidebar List
+  const listEl = document.getElementById('reports-list');
+  document.getElementById('issues-count-pill').textContent = `${filtered.length} issues`;
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--mut);">
+        <div style="font-size:32px;margin-bottom:8px;">🔍</div>
+        <b>No matching reports found</b>
+        <p style="font-size:12px;margin-top:4px;">Try clearing search or changing the urgency filters.</p>
+      </div>`;
+    return;
+  }
+
+  // Sort: High urgency first, then newest
+  const sorted = [...filtered].sort((a, b) => (b.riskScore || 0) - (a.riskScore || 0));
+
+  listEl.innerHTML = sorted.map(r => {
+    const level = r.status === 'Resolved' ? 'Resolved' : r.priority;
+    const catIcon = CATEGORY_ICONS[r.category] || '📍';
+    const hasThumb = Boolean(r.imageUrl);
+
+    return `
+      <div class="issue-card" id="card-${esc(r.id)}" onclick="focusReportOnMap('${esc(r.id)}')" onmouseenter="previewReportMarker('${esc(r.id)}')">
+        <div class="card-top">
+          <span class="card-category">${catIcon} ${esc(r.category)}</span>
+          <span class="card-urgency urgency-${level}">${esc(level)} (${esc(r.riskScore)})</span>
+        </div>
+
+        <div class="card-title">${esc(r.title)}</div>
+
+        <div class="card-meta">
+          <div class="card-meta-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>${esc(r.location)}</span>
+          </div>
+          <div class="card-meta-row" style="justify-content:space-between;margin-top:4px;">
+            <span style="font-size:11px;">🏛️ ${esc(r.ward)}</span>
+            <span class="status-pill status-${(r.status||'').replace(/\s+/g,'-')}">${esc(r.status)}</span>
+          </div>
+        </div>
+
+        <!-- THE INTERACTIVE URGENCY BAR: COLOR CHANGE ON HOVER & AUTO POPUP -->
+        <div class="card-bar-interactive" title="Urgency Meter">
+          <div class="card-bar-track">
+            <div class="card-bar-fill fill-${level.toLowerCase()}" style="width: ${Math.min(100, Math.max(15, r.riskScore || 20))}%;"></div>
+          </div>
+          <div class="card-bar-popup">
+            <span>⚡ Urgency: <b>${esc(r.riskScore)}/100</b> (${esc(level)}) • Email: <u>awasthishailendra59@gmail.com</u></span>
+          </div>
+        </div>
+
+        ${hasThumb ? `
+          <div class="card-thumb-row">
+            <img src="${esc(r.imageUrl)}" class="card-thumb" alt="Photo" loading="lazy">
+            <div class="card-preview-text">${esc(r.description || 'No description provided.')}</div>
+          </div>
+        ` : `
+          <div style="font-size:12px;color:#64748b;margin-top:6px;line-height:1.4;">${esc(r.description || '')}</div>
+        `}
+
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button class="btn-card-zoom" onclick="zoomInOnReport('${esc(r.id)}', event)" title="Zoom in onto this defect on map">🔍 Zoom In</button>
+          <button class="btn-card-detail" onclick="openReportModal('${esc(r.id)}'); event.stopPropagation();" title="Inspect Full Report Details">📋 Details</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function focusReportOnMap(id) {
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+
+  highlightSidebarCard(id);
+  map.flyTo([r.lat, r.lng], 17.5, { duration: 1.0 });
+
+  if (markers[id]) {
+    setTimeout(() => markers[id].openPopup(), 400);
+  }
+}
+
+function highlightSidebarCard(id) {
+  document.querySelectorAll('.issue-card').forEach(c => c.classList.remove('selected'));
+  const card = document.getElementById(`card-${id}`);
+  if (card) {
+    card.classList.add('selected');
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function updateHeaderCounters() {
+  const openReports = reports.filter(r => r.status !== 'Resolved');
+  const highPriority = openReports.filter(r => r.priority === 'High').length;
+  document.getElementById('header-stats-text').textContent = `${openReports.length} Active in Duhai • ${highPriority} Critical`;
+}
+
+/* ---------------------------------------------------------------------
+   TAB NAVIGATION SYSTEM
+   --------------------------------------------------------------------- */
+function switchTab(tabId, updateHash = true) {
+  if (updateHash && window.location.hash !== `#${tabId}`) {
+    window.location.hash = tabId;
+  }
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+  const targetTab = document.getElementById(`tab-${tabId}`);
+  const targetBtn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
+
+  if (targetTab) targetTab.classList.add('active');
+  if (targetBtn) targetBtn.classList.add('active');
+
+  if (tabId === 'map') {
+    setTimeout(() => { if (map) map.invalidateSize(); }, 150);
+  } else if (tabId === 'analytics') {
+    loadAnalyticsData();
+  } else if (tabId === 'budget') {
+    runBudgetOptimization();
+  }
+}
+
+function startReportFromMap() {
+  switchTab('report');
+  showToast('📝 Describe the issue and tap on the Duhai map or use GPS.', 'info');
+}
+
+/* ---------------------------------------------------------------------
+   TAB 2: REPORT ISSUE FORM & LOCATION PICKING
+   --------------------------------------------------------------------- */
+function initFormCategories() {
+  const categories = cfg.categories || ['Pothole', 'Road Crack', 'Surface Damage', 'Waterlogging', 'Fallen Tree', 'Garbage', 'Other'];
+  const grid = document.getElementById('category-cards');
+  grid.innerHTML = categories.map((cat, idx) => `
+    <div class="cat-card-opt ${idx === 0 ? 'selected' : ''}" data-cat="${esc(cat)}" onclick="selectCategory('${esc(cat)}')">
+      <span class="cat-icon">${CATEGORY_ICONS[cat] || '📍'}</span>
+      <span class="cat-name">${esc(cat)}</span>
+    </div>
+  `).join('');
+}
+
+function selectCategory(cat) {
+  document.getElementById('form-category').value = cat;
+  document.querySelectorAll('.cat-card-opt').forEach(el => {
+    el.classList.toggle('selected', el.dataset.cat === cat);
+  });
+}
+
+function pickLocationOnMap() {
+  switchTab('map');
+  isPickingLocation = true;
+  document.getElementById('pick-mode-banner').style.display = 'flex';
+  showToast('🎯 Map Picking Mode: Click the exact spot of the defect inside Duhai.', 'info');
+}
+
+function cancelPickingMode() {
+  isPickingLocation = false;
+  document.getElementById('pick-mode-banner').style.display = 'none';
+}
+
+function handlePickedLocation(lat, lng) {
+  const [s, w, n, e] = cfg.bounds || [28.700, 77.440, 28.760, 77.510];
+
+  if (lat < s || lat > n || lng < w || lng > e) {
+    showToast('⚠️ That spot is outside Duhai. Please choose a location inside the blue boundary.', 'warning');
+    return;
+  }
+
+  pickedLocation = { lat, lng };
+  cancelPickingMode();
+
+  // Update or create draggable pick marker
+  if (pickMarker) {
+    pickMarker.setLatLng([lat, lng]);
+  } else {
+    pickMarker = L.marker([lat, lng], { draggable: true, zIndexOffset: 1000 }).addTo(map);
+    pickMarker.on('dragend', ev => {
+      const q = ev.target.getLatLng();
+      handlePickedLocation(q.lat, q.lng);
+    });
+  }
+
+  // Update UI pill in report form
+  const pill = document.getElementById('location-status-pill');
+  pill.className = 'loc-display-pill valid';
+  pill.innerHTML = `<span>📍 Selected: <b>${lat.toFixed(5)}, ${lng.toFixed(5)}</b> (Duhai)</span>`;
+
+  showToast(`✅ Duhai location selected: ${lat.toFixed(4)}, ${lng.toFixed(4)}`, 'success');
+  switchTab('report');
+}
+
+function setQuickLocation(lat, lng, landmarkName, wardName) {
+  handlePickedLocation(lat, lng);
+  document.getElementById('form-landmark').value = landmarkName;
+  showToast(`📍 Set location to ${landmarkName}`, 'info');
+}
+
+function useCurrentGPS() {
+  if (!navigator.geolocation) {
+    showToast('Your browser does not support GPS geolocation. Tap on the Duhai map instead.', 'error');
+    return;
+  }
+  showToast('📡 Requesting GPS fix...', 'info');
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude, longitude } = pos.coords;
+      const [s, w, n, e] = cfg.bounds || [28.700, 77.440, 28.760, 77.510];
+
+      if (latitude < s || latitude > n || longitude < w || longitude > e) {
+        showToast(`GPS location (${latitude.toFixed(4)}, ${longitude.toFixed(4)}) is outside Duhai. SUDHARSARTHI only serves Duhai, Ghaziabad.`, 'warning');
+        return;
+      }
+      handlePickedLocation(latitude, longitude);
+    },
+    err => {
+      showToast('Could not acquire GPS position. Please pick your location directly on the Duhai map.', 'warning');
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+function handlePhotoSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('preview-img').src = e.target.result;
+    document.getElementById('preview-filename').textContent = file.name;
+    document.getElementById('upload-preview').style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+  document.getElementById('form-photo').value = '';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('ai-prescan-box').style.display = 'none';
+}
+
+async function runAIPrescan() {
+  const btn = document.getElementById('btn-prescan');
+  const file = document.getElementById('form-photo').files[0];
+  const desc = document.getElementById('form-description').value;
+  const category = document.getElementById('form-category').value;
+
+  if (!file && !desc) {
+    showToast('Provide a photo or description for the AI to analyze.', 'warning');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing...';
+
+  try {
+    const fd = new FormData();
+    if (file) fd.append('image', file);
+    fd.append('category', category);
+    fd.append('description', desc);
+
+    const res = await fetch(API + '/api/ai/classify', { method: 'POST', body: fd });
+    const d = await res.json();
+
+    if (!res.ok) throw new Error(d.error || 'AI assessment failed.');
+
+    const box = document.getElementById('ai-prescan-box');
+    const badge = document.getElementById('prescan-score-badge');
+    const details = document.getElementById('prescan-details');
+
+    badge.className = `card-urgency urgency-${d.priority}`;
+    badge.textContent = `${d.priority} Urgency (${d.urgencyScore}/100)`;
+
+    details.innerHTML = `
+      <b>Predicted Category:</b> ${esc(d.category)}<br>
+      <b>Estimated Repair Cost:</b> ₹ ${Number(d.estimatedCost || 0).toLocaleString('en-IN')}<br>
+      <b>Reasoning:</b> ${esc((d.reasons || []).join('; ') || 'Standard civic parameters.')}
+    `;
+    box.style.display = 'block';
+    showToast(`⚡ AI Urgency Check: ${d.priority} Urgency (${d.urgencyScore}/100)`, 'success');
+  } catch (err) {
+    showToast(`AI check failed: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⚡ Pre-scan AI';
+  }
+}
+
+async function submitReportForm() {
+  if (!pickedLocation) {
+    showToast('Please choose the issue location inside Duhai on the map first.', 'warning');
+    return;
+  }
+
+  const desc = document.getElementById('form-description').value.trim();
+  if (!desc) {
+    showToast('Please provide a description of the defect.', 'warning');
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳ Processing AI Urgency & Ward Routing...</span>';
+
+  try {
+    const fd = new FormData();
+    fd.append('category', document.getElementById('form-category').value);
+    fd.append('description', desc);
+    fd.append('lat', pickedLocation.lat);
+    fd.append('lng', pickedLocation.lng);
+    fd.append('landmark', document.getElementById('form-landmark').value);
+    fd.append('reporter', document.getElementById('form-reporter').value || 'Citizen (Duhai Portal)');
+
+    const file = document.getElementById('form-photo').files[0];
+    if (file) fd.append('image', file);
+
+    const res = await fetch(API + '/api/reports', { method: 'POST', body: fd });
+    const saved = await res.json();
+
+    if (!res.ok) throw new Error(saved.error || 'Failed to submit report.');
+
+    showToast(`🎉 Report ${saved.id} lodged successfully! Urgency: ${saved.priority} (${saved.riskScore}). Automated email notification sent to awasthishailendra59@gmail.com.`, 'success');
+    playMinecraftSound('level-up');
+
+    // Reset Form
+    document.getElementById('form-description').value = '';
+    document.getElementById('form-landmark').value = '';
+    removePhoto();
+    pickedLocation = null;
+    if (pickMarker) { map.removeLayer(pickMarker); pickMarker = null; }
+    document.getElementById('location-status-pill').className = 'loc-display-pill';
+    document.getElementById('location-status-pill').innerHTML = '<span>No location selected yet. Tap above or pick on Duhai map.</span>';
+
+    // Refresh data and switch to map view
+    await reloadReports();
+    switchTab('map');
+    focusReportOnMap(saved.id);
+  } catch (err) {
+    showToast(`Submission Error: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>Submit Civic Report to Duhai Ward Officer</span>';
+  }
+}
+
+/* ---------------------------------------------------------------------
+   TAB 3: CIVIC ANALYTICS ENGINE (Chart.js Integration)
+   --------------------------------------------------------------------- */
+async function loadAnalyticsData() {
+  try {
+    const res = await fetch(API + '/api/analytics');
+    const d = await res.json();
+
+    document.getElementById('kpi-total').textContent = d.totalReports || 0;
+    document.getElementById('kpi-high').textContent = d.highPriority || 0;
+    document.getElementById('kpi-pending').textContent = d.pendingRepairs || 0;
+    document.getElementById('kpi-resolved').textContent = d.resolved || 0;
+    document.getElementById('kpi-avg-days').textContent = d.avgResolutionDays != null ? `${d.avgResolutionDays}d` : 'N/A';
+
+    // Render Categories Doughnut Chart
+    renderCategoryChart(d.byCategory || {});
+
+    // Render Monthly Trend Chart
+    renderTrendChart(d.monthlyTrend || []);
+
+    // Render Ward Leaderboard Table
+    renderWardTable(d.wards || []);
+  } catch (err) {
+    showToast('Failed to load civic analytics data.', 'error');
+  }
+}
+
+function renderCategoryChart(catData) {
+  const ctx = document.getElementById('chart-categories').getContext('2d');
+  const labels = Object.keys(catData);
+  const data = Object.values(catData);
+
+  if (categoryChartInstance) categoryChartInstance.destroy();
+
+  categoryChartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: [
+          '#dc2626', '#f59e0b', '#0ea5a4', '#2563eb',
+          '#16a34a', '#8b5cf6', '#64748b'
+        ],
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+function renderTrendChart(trendData) {
+  const ctx = document.getElementById('chart-trend').getContext('2d');
+  const labels = trendData.map(t => t.month);
+  const reported = trendData.map(t => t.reported);
+  const resolved = trendData.map(t => t.resolved);
+
+  if (trendChartInstance) trendChartInstance.destroy();
+
+  trendChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels.length ? labels : ['Current'],
+      datasets: [
+        { label: 'Reported', data: reported.length ? reported : [0], backgroundColor: '#3b82f6' },
+        { label: 'Resolved', data: resolved.length ? resolved : [0], backgroundColor: '#10b981' }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } }
+      },
+      plugins: {
+        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+function renderWardTable(wardList) {
+  const tbody = document.getElementById('ward-leaderboard-body');
+  if (!wardList.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--mut);">No ward data recorded yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = wardList.map(w => `
+    <tr>
+      <td><b>${esc(w.ward)}</b></td>
+      <td>${esc(w.total)}</td>
+      <td>${esc(w.resolved)}</td>
+      <td style="width:160px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" style="width:${w.resolutionRate || 0}%"></div>
+          </div>
+          <span style="font-size:11px;font-weight:600;">${w.resolutionRate || 0}%</span>
+        </div>
+      </td>
+      <td>
+        <span class="status-pill ${w.resolutionRate >= 70 ? 'status-Resolved' : 'status-Under-Review'}">
+          ${w.resolutionRate >= 70 ? 'High Efficiency' : 'Active Intake'}
+        </span>
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* ---------------------------------------------------------------------
+   TAB 4: KNAPSACK BUDGET OPTIMIZER
+   --------------------------------------------------------------------- */
+function setPresetBudget(amount) {
+  document.getElementById('budget-amount').value = amount;
+  runBudgetOptimization();
+}
+
+async function runBudgetOptimization() {
+  const budget = parseInt(document.getElementById('budget-amount').value, 10);
+  const strategy = document.getElementById('budget-strategy').value;
+
+  if (!budget || budget <= 0) {
+    showToast('Please enter a valid budget amount in ₹ rupees.', 'warning');
+    return;
+  }
+
+  try {
+    const res = await fetch(API + '/api/budget/optimize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ budget, strategy })
+    });
+    const d = await res.json();
+
+    if (!res.ok) throw new Error(d.error || 'Optimization error.');
+
+    document.getElementById('budget-stats-grid').style.display = 'grid';
+    document.getElementById('budget-results-tables').style.display = 'block';
+
+    document.getElementById('b-stat-allocated').textContent = `₹ ${Number(d.allocatedCost || 0).toLocaleString('en-IN')}`;
+    document.getElementById('b-stat-remaining').textContent = `₹ ${Number(d.remaining || 0).toLocaleString('en-IN')}`;
+    document.getElementById('b-stat-critical').textContent = `${d.criticalEliminated || 0} / ${d.criticalTotal || 0}`;
+    document.getElementById('b-stat-count').textContent = `${(d.selected || []).length} Defects`;
+
+    // Render Approved
+    const approvedBody = document.getElementById('budget-approved-body');
+    approvedBody.innerHTML = (d.selected || []).map(r => `
+      <tr>
+        <td><code>${esc(r.id)}</code></td>
+        <td><b>${esc(r.title)}</b></td>
+        <td>${esc(r.ward)}</td>
+        <td><span class="card-urgency urgency-${r.priority}">${esc(r.priority)} (${esc(r.riskScore)})</span></td>
+        <td><b>₹ ${Number(r.cost || 0).toLocaleString('en-IN')}</b></td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--mut);">No projects fit in this budget allocation.</td></tr>';
+
+    // Render Deferred
+    const deferredBody = document.getElementById('budget-deferred-body');
+    deferredBody.innerHTML = (d.deferred || []).map(r => `
+      <tr>
+        <td><code>${esc(r.id)}</code></td>
+        <td><b>${esc(r.title)}</b></td>
+        <td>${esc(r.ward)}</td>
+        <td><span class="card-urgency urgency-${r.priority}">${esc(r.priority)} (${esc(r.riskScore)})</span></td>
+        <td>₹ ${Number(r.cost || 0).toLocaleString('en-IN')}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--mut);">All open defects covered under current allocation!</td></tr>';
+
+    showToast(`⚡ Optimal schedule calculated: ${(d.selected || []).length} projects approved.`, 'success');
+  } catch (err) {
+    showToast(`Budget calculation error: ${err.message}`, 'error');
+  }
+}
+
+/* ---------------------------------------------------------------------
+   TAB 5: DUHAI WARDS & SLA DIRECTORY
+   --------------------------------------------------------------------- */
+function renderWardsDirectory() {
+  const wards = cfg.wardDetails || [
+    { name: "Zone 1 (Duhai Village)", lat: 28.7304, lng: 77.4759, officer: "Zone 1 Officer", email: "zone1.officer@example.org" },
+    { name: "Zone 2 (Duhai RRTS Station)", lat: 28.7273, lng: 77.4718, officer: "Zone 2 Officer", email: "zone2.officer@example.org" },
+    { name: "Zone 3 (North Duhai)", lat: 28.7420, lng: 77.4730, officer: "Zone 3 Officer", email: "zone3.officer@example.org" },
+    { name: "Zone 4 (South Duhai)", lat: 28.7130, lng: 77.4730, officer: "Zone 4 Officer", email: "zone4.officer@example.org" },
+    { name: "Zone 5 (East Duhai)", lat: 28.7290, lng: 77.4930, officer: "Zone 5 Officer", email: "zone5.officer@example.org" },
+    { name: "Zone 6 (West Duhai)", lat: 28.7290, lng: 77.4550, officer: "Zone 6 Officer", email: "zone6.officer@example.org" }
+  ];
+
+  const grid = document.getElementById('wards-cards-list');
+  grid.innerHTML = wards.map(w => `
+    <div class="ward-card">
+      <div>
+        <div class="ward-card-header">
+          <span class="ward-zone-badge">🏛️ Civic Zone</span>
+          <b style="font-size:15px;color:var(--ink);">${esc(w.name)}</b>
+        </div>
+        <div style="font-size:12px;color:var(--mut);line-height:1.7;">
+          <div><b>Jurisdiction Centre:</b> ${w.lat.toFixed(4)}°N, ${w.lng.toFixed(4)}°E</div>
+          <div><b>Assigned Engineer:</b> ${esc(w.officer)}</div>
+          <div><b>Email Alert:</b> <code>${esc(w.email)}</code></div>
+          <div style="margin-top:6px;padding:6px 8px;background:#f8fafc;border-radius:6px;font-size:11px;">
+            ⏱️ <b>Response SLA:</b> High Urgency &lt;48h &bull; Medium &lt;7d
+          </div>
+        </div>
+      </div>
+      <button class="loc-btn" style="margin-top:14px;width:100%;justify-content:center;" onclick="viewWardOnMap(${w.lat}, ${w.lng}, '${esc(w.name)}')">
+        🗺️ View Zone on Duhai Map
+      </button>
+    </div>
+  `).join('');
+}
+
+function viewWardOnMap(lat, lng, name) {
+  switchTab('map');
+  flyToDuhai(lat, lng, 16.5, name);
+  if (!showWards) toggleWardLayer();
+}
+
+/* ---------------------------------------------------------------------
+   ISSUE DETAIL MODAL & STATUS UPDATER
+   --------------------------------------------------------------------- */
+function openReportModal(id) {
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+  selectedReport = r;
+
+  document.getElementById('m-title').textContent = r.title || 'Civic Defect';
+  document.getElementById('m-id-date').textContent = `${r.id} • Reported on ${r.date || 'Recent'}`;
+
+  // Image
+  const imgWrapper = document.getElementById('m-img-wrapper');
+  if (r.imageUrl) {
+    document.getElementById('m-image').src = r.imageUrl;
+    imgWrapper.style.display = 'block';
+  } else {
+    imgWrapper.style.display = 'none';
+  }
+
+  // Score & Urgency
+  const level = r.status === 'Resolved' ? 'Resolved' : r.priority;
+  const scoreCircle = document.getElementById('m-score-circle');
+  scoreCircle.style.background = COLORS[level] || COLORS.Low;
+  document.getElementById('m-score-val').textContent = r.riskScore || 0;
+
+  const priLabel = document.getElementById('m-priority-label');
+  priLabel.textContent = `${level} Urgency`;
+  priLabel.style.color = COLORS[level] || COLORS.Low;
+
+  const statusTag = document.getElementById('m-status-tag');
+  statusTag.className = `status-pill status-${(r.status||'').replace(/\s+/g,'-')}`;
+  statusTag.textContent = r.status || 'Reported';
+
+  document.getElementById('m-category-location').textContent = `${r.category} • ${r.location || 'Duhai'}`;
+
+  // Breakdown Bars
+  const b = r.scoreBreakdown || {};
+  document.getElementById('m-breakdown-bars').innerHTML = `
+    <div class="popup-bar-item interactive-bar" title="Severity Factor">
+      <div class="popup-bar-label"><span>Severity Factor</span><span>${b.severity || 0}/40</span></div>
+      <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.severity||0)/40)*100)}%"></div></div>
+      <div class="bar-auto-popup"><span>Severity: ${b.severity || 0} / 40 pts</span></div>
+    </div>
+    <div class="popup-bar-item interactive-bar" title="Traffic Volume">
+      <div class="popup-bar-label"><span>Traffic Exposure</span><span>${b.trafficVolume || 0}/25</span></div>
+      <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.trafficVolume||0)/25)*100)}%"></div></div>
+      <div class="bar-auto-popup"><span>Traffic: ${b.trafficVolume || 0} / 25 pts</span></div>
+    </div>
+    <div class="popup-bar-item interactive-bar" title="Repeat Complaints">
+      <div class="popup-bar-label"><span>Repeat Complaints</span><span>${b.repeatReports || 0}/20</span></div>
+      <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.repeatReports||0)/20)*100)}%"></div></div>
+      <div class="bar-auto-popup"><span>Repeat Reports: ${b.repeatReports || 0} / 20 pts</span></div>
+    </div>
+    <div class="popup-bar-item interactive-bar" title="Aging Factor">
+      <div class="popup-bar-label"><span>Aging Factor</span><span>${b.agingFactor || 0}/15</span></div>
+      <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.agingFactor||0)/15)*100)}%"></div></div>
+      <div class="bar-auto-popup"><span>Aging Duration: ${b.agingFactor || 0} / 15 pts</span></div>
+    </div>
+  `;
+
+  // AI Classification
+  const ai = r.aiClassification || {};
+  document.getElementById('m-ai-analysis').innerHTML = `
+    <div><b>AI Model Assessment:</b> ${esc(ai.severityGrade || 'Standard Evaluation')} (${ai.confidence || 90}% confidence)</div>
+    <div><b>Detected Defect Type:</b> ${esc(ai.predictedType || r.category)}</div>
+    <div><b>Bounding Surface Area:</b> ${esc(ai.boundingArea || r.dimensions || 'Localized defect')}</div>
+    <div><b>Description:</b> ${esc(r.description)}</div>
+  `;
+
+  // Ward & Cost
+  document.getElementById('m-ward').textContent = r.ward || 'Zone 2 (Duhai RRTS Station)';
+  document.getElementById('m-cost').textContent = `₹ ${Number(r.estimatedCost || 0).toLocaleString('en-IN')}`;
+  document.getElementById('m-officer').innerHTML = `${r.inspectorName || 'Junior Engineer'} (${r.contractor || 'Contractor Pending'})<br><span style="color:#0ea5a4;font-size:11px;font-weight:700;">✉️ Automated Notification Recipient: awasthishailendra59@gmail.com</span>`;
+
+  // Active Status Buttons
+  document.querySelectorAll('.status-change-btn').forEach(btn => {
+    btn.classList.toggle('current', btn.dataset.st === r.status);
+  });
+
+  document.getElementById('issue-modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('issue-modal').style.display = 'none';
+  selectedReport = null;
+}
+
+async function updateCurrentReportStatus(newStatus) {
+  if (!selectedReport) return;
+  const id = selectedReport.id;
+
+  try {
+    const res = await fetch(`${API}/api/reports/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+    const updated = await res.json();
+
+    if (!res.ok) throw new Error(updated.error || 'Failed to update status.');
+
+    showToast(`Status updated to "${newStatus}" for report ${id}`, 'success');
+
+    // Update local state
+    const idx = reports.findIndex(x => x.id === id);
+    if (idx !== -1) reports[idx] = updated;
+
+    selectedReport = updated;
+    openReportModal(id);
+    renderMarkers();
+    renderFilteredReports();
+    updateHeaderCounters();
+  } catch (err) {
+    showToast(`Could not update status: ${err.message}`, 'error');
+  }
+}
+
+
+/* ---------------------------------------------------------------------
+   MINECRAFT UI CONTROLLER, SYNTH SOUND EFFECTS, HOTBAR & ZOOM ENGINE
+   --------------------------------------------------------------------- */
+let minecraftMode = false;
+let audioCtx = null;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    const AudioCtor = window.AudioContext || window.webkitAudioContext;
+    if (AudioCtor) audioCtx = new AudioCtor();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function playMinecraftSound(type) {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    if (type === 'click') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(340, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(70, ctx.currentTime + 0.04);
+      gain.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.04);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.04);
+    } else if (type === 'pop') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1050, ctx.currentTime + 0.07);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.07);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.07);
+    } else if (type === 'level-up') {
+      const freqs = [440, 554, 659, 880];
+      freqs.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.09);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime + idx * 0.09);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.09 + 0.22);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + idx * 0.09);
+        osc.stop(ctx.currentTime + idx * 0.09 + 0.22);
+      });
+    }
+  } catch (e) {
+    // Audio synthesis fallback
+  }
+}
+
+function toggleMinecraftMode() {
+  minecraftMode = !minecraftMode;
+  document.body.classList.toggle('minecraft-mode', minecraftMode);
+  const btn = document.getElementById('btn-mc-mode');
+  const lbl = document.getElementById('mc-mode-label');
+  if (btn) btn.classList.toggle('active', minecraftMode);
+  if (lbl) lbl.textContent = minecraftMode ? 'Craft Mode: ON' : 'Craft Mode: OFF';
+  
+  playMinecraftSound(minecraftMode ? 'level-up' : 'click');
+  showToast(minecraftMode ? '⛏️ Minecraft UI Activated! Retro block style, hotbar & synth audio enabled.' : 'Civic Modern UI Restored.', 'info');
+  
+  try {
+    localStorage.setItem('sudharsarthi_mc_mode', minecraftMode ? '1' : '0');
+  } catch(e) {}
+}
+
+function selectHotbarSlot(num) {
+  playMinecraftSound('click');
+  document.querySelectorAll('.mc-slot').forEach(s => {
+    s.classList.toggle('active', parseInt(s.dataset.slot) === num);
+  });
+  
+  if (num === 1) { switchTab('map'); resetDuhaiBounds(); }
+  else if (num === 2) { switchTab('report'); startReportFromMap(); }
+  else if (num === 3) { switchTab('analytics'); }
+  else if (num === 4) { switchTab('budget'); }
+  else if (num === 5) { switchTab('wards'); }
+  else if (num === 6) { zoomInMap(); }
+  else if (num === 7) { zoomOutMap(); }
+  else if (num === 8) {
+    const urgent = [...reports].sort((a,b) => (b.riskScore||0) - (a.riskScore||0))[0];
+    if (urgent) {
+      switchTab('map');
+      zoomInOnReport(urgent.id);
+      showToast(`💎 Focused highest urgency hazard: ${urgent.id} (${urgent.riskScore} pts)`, 'info');
+    }
+  }
+  else if (num === 9) {
+    showToast('✉️ Automated Alert: All reports dispatched to awasthishailendra59@gmail.com', 'success', 3500);
+  }
+}
+
+/* ZOOM ENGINE */
+function zoomInMap() {
+  if (map) {
+    map.zoomIn(1, { animate: true });
+    playMinecraftSound('pop');
+    showToast('🔍 Zoomed in onto Duhai map', 'info', 1000);
+  }
+}
+
+function zoomOutMap() {
+  if (map) {
+    map.zoomOut(1, { animate: true });
+    playMinecraftSound('pop');
+    showToast('🔎 Zoomed out from Duhai map', 'info', 1000);
+  }
+}
+
+function zoomInOnReport(id, ev) {
+  if (ev) ev.stopPropagation();
+  const r = reports.find(x => x.id === id);
+  if (!r || !map) return;
+  highlightSidebarCard(id);
+  map.flyTo([r.lat, r.lng], 18.5, { duration: 0.8 });
+  if (markers[id]) {
+    setTimeout(() => markers[id].openPopup(), 400);
+  }
+  playMinecraftSound('pop');
+}
+
+function previewReportMarker(id) {
+  if (markers[id] && map) {
+    markers[id].openPopup();
+  }
+}
+
+// Keyboard shortcuts (1-9, M for craft mode, +, -)
+window.addEventListener('keydown', (e) => {
+  if (['input', 'textarea', 'select'].includes(document.activeElement.tagName.toLowerCase())) return;
+  const k = parseInt(e.key);
+  if (k >= 1 && k <= 9) {
+    selectHotbarSlot(k);
+  } else if (e.key.toLowerCase() === 'm') {
+    toggleMinecraftMode();
+  } else if (e.key === '+' || e.key === '=') {
+    zoomInMap();
+  } else if (e.key === '-' || e.key === '_') {
+    zoomOutMap();
+  }
+});
+
+// Start Application on Load
+window.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>

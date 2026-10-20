@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 128" role="img" aria-label="SUDHARSARTHI">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e3a8a"/><stop offset="1" stop-color="#0ea5a4"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+    <path d="M10 108 Q64 84 118 108" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 12"/>
+    <path d="M64 18c-18 0-32 13.5-32 31 0 22 32 52 32 52s32-30 32-52c0-17.500-14-31-32-31z" fill="#ffffff"/>
+    <circle cx="64" cy="49" r="21" fill="#16a34a"/>
+    <path d="M53 50l8 8 15-17" fill="none" stroke="#ffffff" stroke-width="6.500" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="150" y="70" font-family="Poppins, 'Segoe UI', Arial, sans-serif" font-size="46" font-weight="800" fill="#1e3a8a" letter-spacing="1">SUDHAR<tspan fill="#0ea5a4">SARTHI</tspan></text>
+  <text x="152" y="102" font-family="Poppins, 'Segoe UI', Arial, sans-serif" font-size="17" fill="#64748b" letter-spacing="2">BETTER CITY, TOGETHER</text>
+</svg>

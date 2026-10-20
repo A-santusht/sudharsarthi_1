@@ -1,0 +1,47 @@
+{
+  "_note": "PLACEHOLDER zones and emails. Rename zones to the real Duhai wards/mohallas and replace the example.org emails before live use. lat/lng are approximate zone centres used to auto-assign a zone from a report's GPS point.",
+  "wards": [
+    {
+      "name": "Zone 1 (Duhai Village)",
+      "lat": 28.7304,
+      "lng": 77.4759,
+      "officer": "Zone 1 Officer",
+      "email": "zone1.officer@example.org"
+    },
+    {
+      "name": "Zone 2 (Duhai RRTS Station)",
+      "lat": 28.7273,
+      "lng": 77.4718,
+      "officer": "Zone 2 Officer",
+      "email": "zone2.officer@example.org"
+    },
+    {
+      "name": "Zone 3 (North Duhai)",
+      "lat": 28.742,
+      "lng": 77.473,
+      "officer": "Zone 3 Officer",
+      "email": "zone3.officer@example.org"
+    },
+    {
+      "name": "Zone 4 (South Duhai)",
+      "lat": 28.713,
+      "lng": 77.473,
+      "officer": "Zone 4 Officer",
+      "email": "zone4.officer@example.org"
+    },
+    {
+      "name": "Zone 5 (East Duhai)",
+      "lat": 28.729,
+      "lng": 77.493,
+      "officer": "Zone 5 Officer",
+      "email": "zone5.officer@example.org"
+    },
+    {
+      "name": "Zone 6 (West Duhai)",
+      "lat": 28.729,
+      "lng": 77.455,
+      "officer": "Zone 6 Officer",
+      "email": "zone6.officer@example.org"
+    }
+  ]
+}
