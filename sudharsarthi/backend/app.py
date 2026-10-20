@@ -68,11 +68,21 @@ if os.environ.get("SEED_DEMO", "1") == "1":
 
 # ------------------------------------------------------------------ helpers
 
+@app.before_request
+def handle_options_preflight():
+    if request.method == "OPTIONS":
+        resp = app.make_default_options_response()
+        resp.headers["Access-Control-Allow-Origin"] = os.environ.get("CORS_ORIGIN", "*")
+        resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept"
+        resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PATCH, PUT, DELETE, OPTIONS"
+        return resp
+
+
 @app.after_request
 def add_cors(resp):
     resp.headers["Access-Control-Allow-Origin"] = os.environ.get("CORS_ORIGIN", "*")
-    resp.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    resp.headers["Access-Control-Allow-Methods"] = "GET,POST,PATCH,OPTIONS"
+    resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept"
+    resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PATCH, PUT, DELETE, OPTIONS"
     return resp
 
 
