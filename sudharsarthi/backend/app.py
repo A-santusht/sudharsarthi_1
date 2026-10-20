@@ -158,7 +158,8 @@ def health():
 def config():
     return jsonify({"area": duhai.AREA_NAME, "center": duhai.CENTER, "bounds": duhai.BOUNDS,
                     "categories": urgency_ai.CATEGORIES,
-                    "wards": [w["name"] for w in notifier._load_wards()]})
+                    "wards": [w["name"] for w in notifier._load_wards()],
+                    "wardDetails": notifier._load_wards()})
 
 
 @app.get("/api/reports")
