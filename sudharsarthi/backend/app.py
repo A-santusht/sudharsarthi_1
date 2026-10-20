@@ -255,7 +255,8 @@ def create_report():
 
     return jsonify({**saved, "success": True, "slaHours": assessment["slaHours"],
                     "urgencyReasons": assessment["reasons"],
-                    "notification": notification}), 201
+                    "notification": notification,
+                    "notifiedEmail": notifier.DEFAULT_ALERT_EMAIL}), 201
 
 
 @app.patch("/api/reports/<report_id>/status")

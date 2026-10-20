@@ -7,7 +7,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -1443,6 +1443,504 @@ textarea.form-control {
   header { flex-wrap: wrap; }
   .nav-tabs { order: 3; width: 100%; justify-content: space-around; margin-top: 8px; }
 }
+
+/* =====================================================================
+   MINECRAFT UI, INTERACTIVE HOVER BARS & AUTO POPUPS, ZOOM CONTROLS
+   ===================================================================== */
+
+/* ZOOM CONTROLS IN FLOATING CONTROLS */
+.zoom-btn {
+  font-size: 16px;
+  font-weight: 900;
+  color: #1e3a8a;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.zoom-btn:hover {
+  background: #0ea5a4;
+  color: #ffffff;
+  border-color: #0f766e;
+  transform: scale(1.12);
+  box-shadow: 0 4px 14px rgba(14, 165, 164, 0.45);
+}
+
+/* MINECRAFT HEADER TOGGLE */
+.mc-toggle-btn {
+  background: #262626;
+  color: #55ff55;
+  border: 2px solid #000;
+  box-shadow: inset -2px -2px 0px 0px #111, inset 2px 2px 0px 0px #666;
+  padding: 6px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 0;
+  transition: all 0.15s ease;
+  text-shadow: 1px 1px 0 #000;
+  user-select: none;
+}
+.mc-toggle-btn:hover {
+  background: #3b3b3b;
+  color: #ffff55;
+  box-shadow: inset -2px -2px 0px 0px #181818, inset 2px 2px 0px 0px #aaa;
+  transform: translateY(-1px);
+}
+.mc-toggle-btn.active {
+  background: #1b4d1b;
+  color: #55ff55;
+  border-color: #55ff55;
+  box-shadow: inset -2px -2px 0px 0px #0a240a, inset 2px 2px 0px 0px #70db4f, 0 0 12px rgba(85,255,85,0.4);
+}
+
+/* INTERACTIVE BARS: CHANGE COLOR ON HOVER & AUTO POPUP */
+.interactive-bar {
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+/* Duhai Map Bar Color Change & Auto Popup */
+.duhai-map-bar.interactive-bar {
+  pointer-events: auto;
+  border-radius: 12px;
+  padding: 2px 6px;
+  transition: all 0.3s ease;
+}
+.duhai-map-bar.interactive-bar:hover {
+  background: linear-gradient(135deg, rgba(14, 165, 164, 0.95), rgba(30, 58, 138, 0.95));
+  box-shadow: 0 8px 24px rgba(14, 165, 164, 0.35), 0 0 16px rgba(56, 189, 248, 0.4);
+}
+.duhai-map-bar.interactive-bar .bar-auto-popup {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 20px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  border: 1px solid #38bdf8;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1000;
+  white-space: nowrap;
+}
+.duhai-map-bar.interactive-bar:hover .bar-auto-popup {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Card Urgency Interactive Bar */
+.card-bar-interactive {
+  position: relative;
+  margin-top: 8px;
+  cursor: pointer;
+  padding: 2px 0;
+}
+.card-bar-track {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+.card-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+}
+.card-bar-fill.fill-high { background: #dc2626; }
+.card-bar-fill.fill-medium { background: #f59e0b; }
+.card-bar-fill.fill-low { background: #16a34a; }
+.card-bar-fill.fill-resolved { background: #64748b; }
+
+/* When cursor hovers above the card bar: COLOR CHANGE! */
+.card-bar-interactive:hover .card-bar-track {
+  height: 10px;
+  background: #cbd5e1;
+}
+.card-bar-interactive:hover .card-bar-fill {
+  filter: brightness(1.25);
+  background: linear-gradient(90deg, #06b6d4, #a855f7, #ec4899, #10b981);
+  background-size: 250% 100%;
+  animation: mc-rainbow-shift 2s infinite linear;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+}
+
+/* Card Bar Auto Popup */
+.card-bar-popup {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 200;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  border: 1px solid #38bdf8;
+}
+.card-bar-interactive:hover .card-bar-popup {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Popup Meter Interactive Bar (in modals and popup) */
+.popup-bar-item.interactive-bar {
+  cursor: pointer;
+}
+.popup-bar-item.interactive-bar:hover .popup-meter-fill {
+  background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+  transform: scaleY(1.3);
+}
+.popup-bar-item.interactive-bar .bar-auto-popup {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #0f172a;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 100;
+  border: 1px solid #38bdf8;
+}
+.popup-bar-item.interactive-bar:hover .bar-auto-popup {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Card action buttons */
+.btn-card-zoom, .btn-card-detail {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+.btn-card-zoom:hover {
+  background: #0ea5a4;
+  color: #fff;
+  border-color: #0f766e;
+  transform: translateY(-1px);
+}
+.btn-card-detail:hover {
+  background: #1e3a8a;
+  color: #fff;
+  border-color: #1e3a8a;
+  transform: translateY(-1px);
+}
+
+/* Popup zoom button */
+.popup-zoom-btn {
+  background: #0ea5a4;
+  color: #fff;
+  border: 0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.popup-zoom-btn:hover {
+  background: #0f766e;
+  transform: scale(1.02);
+}
+
+/* MINECRAFT HUD & EXP BAR */
+.mc-hud-container {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  pointer-events: auto;
+}
+.mc-exp-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+.mc-exp-level {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: #80ff00;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+.mc-exp-bar-track {
+  width: 360px;
+  max-width: 88vw;
+  height: 8px;
+  background: #181818;
+  border: 2px solid #000;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+  border-radius: 1px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.mc-exp-bar-fill {
+  height: 100%;
+  background: #55ff55;
+  box-shadow: 0 0 8px #55ff55;
+  transition: width 0.4s ease, background 0.3s ease;
+}
+/* When cursor is above the MC EXP bar: COLOR CHANGE & AUTO POPUP */
+.mc-exp-wrapper:hover .mc-exp-bar-track {
+  border-color: #00e5ff;
+  transform: scaleY(1.5);
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.6);
+}
+.mc-exp-wrapper:hover .mc-exp-bar-fill {
+  background: linear-gradient(90deg, #00e5ff, #a855f7, #ec4899, #55ff55, #ffd700);
+  background-size: 300% 100%;
+  animation: mc-rainbow-shift 1.5s infinite linear;
+  box-shadow: 0 0 14px #00e5ff, 0 0 20px #55ff55;
+}
+.mc-exp-wrapper .bar-auto-popup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: #100010;
+  border: 2px solid #5500aa;
+  box-shadow: 0 0 14px rgba(85, 0, 170, 0.5), inset 0 0 8px rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 4px;
+  min-width: 300px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1200;
+  text-align: center;
+}
+.mc-exp-wrapper:hover .bar-auto-popup {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+.mc-popup-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: #ffff55;
+  margin-bottom: 4px;
+}
+.mc-popup-desc {
+  font-size: 11px;
+  color: #e2e8f0;
+  line-height: 1.4;
+}
+
+@keyframes mc-rainbow-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* MINECRAFT HOTBAR */
+.mc-hotbar {
+  display: flex;
+  background: rgba(26, 26, 26, 0.94);
+  border: 3px solid #000;
+  box-shadow: inset -3px -3px 0 #111, inset 3px 3px 0 #555, 0 8px 24px rgba(0,0,0,0.5);
+  padding: 3px;
+  gap: 3px;
+}
+.mc-slot {
+  width: 38px;
+  height: 38px;
+  background: #8b8b8b;
+  border: 2px solid #373737;
+  box-shadow: inset 2px 2px 0 #373737, inset -2px -2px 0 #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s;
+}
+.mc-slot:hover {
+  transform: scale(1.08);
+  background: #a0a0a0;
+}
+.mc-slot.active {
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 0 10px #ffffff, inset 2px 2px 0 #ffffff;
+  transform: scale(1.12);
+  z-index: 2;
+}
+.mc-item-icon {
+  font-size: 18px;
+  filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.6));
+}
+.mc-slot-num {
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.mc-stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 360px;
+  max-width: 88vw;
+  font-size: 11px;
+  text-shadow: 1px 1px #000;
+  color: #fff;
+}
+.mc-hud-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: #aaa;
+  letter-spacing: 0.5px;
+}
+
+/* MINECRAFT MODE COMPLETE RETRO STYLING */
+body.minecraft-mode {
+  font-family: 'Silkscreen', 'Press Start 2P', monospace !important;
+  background: #252525 !important;
+  color: #f1f5f9;
+}
+body.minecraft-mode header {
+  background: #373737 !important;
+  border-bottom: 3px solid #1a1a1a !important;
+}
+body.minecraft-mode .brand-text b {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: #55ff55 !important;
+  text-shadow: 2px 2px #000;
+}
+body.minecraft-mode .brand-text b span { color: #00e5ff !important; }
+body.minecraft-mode .brand-text small {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: #aaaaaa;
+}
+body.minecraft-mode .nav-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  border-radius: 0;
+  background: #4a4a4a;
+  color: #fff;
+  border: 2px solid #000;
+  box-shadow: inset -2px -2px 0 #222, inset 2px 2px 0 #777;
+}
+body.minecraft-mode .nav-btn.active {
+  background: #1b4d1b;
+  color: #55ff55;
+  border-color: #55ff55;
+  box-shadow: inset -2px -2px 0 #0d260d, inset 2px 2px 0 #4ade80;
+}
+body.minecraft-mode .btn-report-quick {
+  border-radius: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  background: #15803d;
+  border: 2px solid #000;
+  box-shadow: inset -2px -2px 0 #0f4d25, inset 2px 2px 0 #4ade80;
+}
+body.minecraft-mode .sidebar-panel {
+  background: #292929 !important;
+  border-right: 3px solid #141414 !important;
+}
+body.minecraft-mode .sidebar-header {
+  background: #333333 !important;
+  border-bottom: 2px solid #141414;
+}
+body.minecraft-mode .sidebar-title span {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: #55ff55;
+}
+body.minecraft-mode .issue-card {
+  background: #383838 !important;
+  border: 2px solid #1a1a1a !important;
+  border-radius: 0 !important;
+  box-shadow: inset -2px -2px 0 #1c1c1c, inset 2px 2px 0 #555 !important;
+}
+body.minecraft-mode .issue-card:hover {
+  background: #454545 !important;
+  border-color: #55ff55 !important;
+  box-shadow: inset -2px -2px 0 #1c1c1c, inset 2px 2px 0 #777, 0 0 12px rgba(85,255,85,0.3) !important;
+}
+body.minecraft-mode .card-title {
+  color: #ffffff !important;
+}
+body.minecraft-mode .card-meta {
+  color: #cbd5e1 !important;
+}
+body.minecraft-mode .map-ctrl-btn {
+  border-radius: 0 !important;
+  background: #3f3f3f !important;
+  color: #55ff55 !important;
+  border: 2px solid #000 !important;
+  box-shadow: inset -2px -2px 0 #1f1f1f, inset 2px 2px 0 #666 !important;
+}
+body.minecraft-mode .leaflet-popup-content-wrapper {
+  background: #140014 !important;
+  border: 3px solid #5500aa !important;
+  box-shadow: 0 0 16px rgba(85, 0, 170, 0.6) !important;
+  border-radius: 0 !important;
+  color: #ffffff !important;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+}
+body.minecraft-mode .leaflet-popup-tip {
+  background: #5500aa !important;
+}
+
 </style>
 </head>
 <body>
@@ -1479,6 +1977,9 @@ textarea.form-control {
       <span class="live-dot"></span>
       <span id="header-stats-text">Duhai Jurisdiction</span>
     </div>
+    <button class="mc-toggle-btn" id="btn-mc-mode" onclick="toggleMinecraftMode()" title="Toggle Minecraft UI Mode (Hotkey: M)">
+      ⛏️ <span id="mc-mode-label">Craft Mode: OFF</span>
+    </button>
     <button class="btn-report-quick" onclick="startReportFromMap()">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
       Report Pothole / Hazard
@@ -1531,7 +2032,11 @@ textarea.form-control {
       <div id="map"></div>
 
       <!-- DUHAI QUICK NAVIGATION BAR -->
-      <div class="duhai-map-bar">
+      <div class="duhai-map-bar interactive-bar" id="duhai-map-header-bar">
+        <!-- AUTO POPUP ON HOVER -->
+        <div class="bar-auto-popup">
+          ⚡ <b>Duhai Civic Radar:</b> Live jurisdiction active. All citizen reports auto-dispatch to <u>awasthishailendra59@gmail.com</u>.
+        </div>
         <div class="duhai-landmark-pills">
           <span style="font-size:11px;font-weight:700;color:#0369a1;padding:4px 2px;">📍 DUHAI:</span>
           <button class="landmark-btn" onclick="flyToDuhai(28.7273, 77.4718, 17, 'Duhai RRTS Station')">🚉 RRTS Station</button>
@@ -1555,6 +2060,8 @@ textarea.form-control {
 
       <!-- MAP FLOATING ACTION CONTROLS -->
       <div class="map-floating-controls">
+        <button class="map-ctrl-btn zoom-btn" id="btn-map-zoom-in" title="Zoom In onto Map (+)" onclick="zoomInMap()">➕</button>
+        <button class="map-ctrl-btn zoom-btn" id="btn-map-zoom-out" title="Zoom Out from Map (-)" onclick="zoomOutMap()">➖</button>
         <button class="map-ctrl-btn" id="btn-toggle-satellite" title="Toggle Satellite Aerial View" onclick="toggleSatelliteView()">🛰️</button>
         <button class="map-ctrl-btn" id="btn-toggle-wards" title="Toggle Duhai Ward Zones" onclick="toggleWardLayer()">🏛️</button>
         <button class="map-ctrl-btn" title="Center Map on Duhai" onclick="resetDuhaiBounds()">🎯</button>
@@ -1572,6 +2079,14 @@ textarea.form-control {
             Report a Civic Issue in Duhai
           </h2>
           <p>Citizen reports are analyzed by our AI urgency engine. Urgent hazards alert the local Duhai ward junior engineer automatically.</p>
+        </div>
+
+        <!-- AUTOMATED EMAIL DISPATCH NOTICE -->
+        <div style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:12px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;">
+          <span style="font-size:24px;">📧</span>
+          <div style="font-size:12.5px;color:#1e3a8a;line-height:1.45;">
+            <b>Automated Dispatch Active:</b> Any report lodged is automatically delivered with GPS coordinates, photos & AI urgency metrics to <b>awasthishailendra59@gmail.com</b>.
+          </div>
         </div>
 
         <div class="form-grid">
@@ -1843,6 +2358,43 @@ textarea.form-control {
       </div>
     </div>
   </section>
+
+<!-- MINECRAFT HUD & HOTBAR -->
+<div class="mc-hud-container" id="mc-hud-container">
+  <!-- MINECRAFT EXPERIENCE / CIVIC LEVEL BAR -->
+  <div class="mc-exp-wrapper interactive-bar" id="mc-exp-bar" title="Duhai Civic Experience (Hover to inspect)">
+    <div class="mc-exp-level" id="mc-exp-level-text">42</div>
+    <div class="mc-exp-bar-track">
+      <div class="mc-exp-bar-fill" id="mc-exp-fill" style="width: 82%;"></div>
+    </div>
+    <!-- AUTO POPUP ON HOVER -->
+    <div class="bar-auto-popup">
+      <div class="mc-popup-title">⛏️ CIVIC CRAFT EXP LEVEL 42</div>
+      <div class="mc-popup-desc">Infrastructure Health: 82% • Reports auto-forward to <b>awasthishailendra59@gmail.com</b></div>
+    </div>
+  </div>
+
+  <!-- MINECRAFT 9-SLOT HOTBAR -->
+  <div class="mc-hotbar" id="mc-hotbar">
+    <div class="mc-slot active" data-slot="1" onclick="selectHotbarSlot(1)" title="[1] Duhai Map (Press 1)"><span class="mc-item-icon">🗺️</span><span class="mc-slot-num">1</span></div>
+    <div class="mc-slot" data-slot="2" onclick="selectHotbarSlot(2)" title="[2] Report Hazard (Press 2)"><span class="mc-item-icon">⛏️</span><span class="mc-slot-num">2</span></div>
+    <div class="mc-slot" data-slot="3" onclick="selectHotbarSlot(3)" title="[3] Civic Analytics (Press 3)"><span class="mc-item-icon">📊</span><span class="mc-slot-num">3</span></div>
+    <div class="mc-slot" data-slot="4" onclick="selectHotbarSlot(4)" title="[4] Budget AI (Press 4)"><span class="mc-item-icon">💰</span><span class="mc-slot-num">4</span></div>
+    <div class="mc-slot" data-slot="5" onclick="selectHotbarSlot(5)" title="[5] Duhai Wards (Press 5)"><span class="mc-item-icon">🛡️</span><span class="mc-slot-num">5</span></div>
+    <div class="mc-slot" data-slot="6" onclick="selectHotbarSlot(6)" title="[6] Zoom In Map (Press 6)"><span class="mc-item-icon">➕</span><span class="mc-slot-num">6</span></div>
+    <div class="mc-slot" data-slot="7" onclick="selectHotbarSlot(7)" title="[7] Zoom Out Map (Press 7)"><span class="mc-item-icon">➖</span><span class="mc-slot-num">7</span></div>
+    <div class="mc-slot" data-slot="8" onclick="selectHotbarSlot(8)" title="[8] Urgency Radar (Press 8)"><span class="mc-item-icon">💎</span><span class="mc-slot-num">8</span></div>
+    <div class="mc-slot" data-slot="9" onclick="selectHotbarSlot(9)" title="[9] Auto-Email: awasthishailendra59@gmail.com (Press 9)"><span class="mc-item-icon">✉️</span><span class="mc-slot-num">9</span></div>
+  </div>
+
+  <!-- MINECRAFT HEARTS & HUNGER ROW -->
+  <div class="mc-stats-row">
+    <div class="mc-hearts" title="Road Safety Rating: 10/10 HP">❤️❤️❤️❤️❤️</div>
+    <div class="mc-hud-label">DUHAI CIVIC CRAFT</div>
+    <div class="mc-hunger" title="Municipal Response Readiness: Full">🍗🍗🍗🍗🍗</div>
+  </div>
+</div>
+
 </main>
 
 <!-- ISSUE DETAIL MODAL -->
@@ -2246,17 +2798,21 @@ function createPopupContent(r) {
       <div class="popup-meta">
         <b>📍 ${esc(r.location)}</b><br>
         🏛️ ${esc(r.ward)}
+        <div style="font-size:10.5px;color:#0ea5a4;font-weight:600;margin-top:3px;">✉️ Alert sent to: awasthishailendra59@gmail.com</div>
       </div>
       <div class="popup-bars">
-        <div class="popup-bar-item">
+        <div class="popup-bar-item interactive-bar" title="Severity Factor">
           <div class="popup-bar-label"><span>Severity</span><span>${b.severity || 0}/40</span></div>
           <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100, ((b.severity||0)/40)*100)}%"></div></div>
+          <div class="bar-auto-popup"><span>Severity: ${b.severity || 0}/40 pts</span></div>
         </div>
-        <div class="popup-bar-item">
+        <div class="popup-bar-item interactive-bar" title="Traffic Exposure">
           <div class="popup-bar-label"><span>Traffic Exposure</span><span>${b.trafficVolume || 0}/25</span></div>
           <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100, ((b.trafficVolume||0)/25)*100)}%"></div></div>
+          <div class="bar-auto-popup"><span>Traffic: ${b.trafficVolume || 0}/25 pts</span></div>
         </div>
       </div>
+      <button class="popup-zoom-btn" onclick="zoomInOnReport('${r.id}', event)">🔍 Zoom In Closer (18.5x)</button>
       <button class="popup-action-btn" onclick="openReportModal('${r.id}')">Inspect Full Analysis & Actions</button>
     </div>
   `;
@@ -2273,6 +2829,12 @@ function renderMarkers() {
     }).bindPopup(createPopupContent(r), { maxWidth: 300 });
 
     marker.on('click', () => {
+      highlightSidebarCard(r.id);
+    });
+
+    // Auto pop up when cursor is above marker
+    marker.on('mouseover', () => {
+      marker.openPopup();
       highlightSidebarCard(r.id);
     });
 
@@ -2359,7 +2921,7 @@ function renderFilteredReports() {
     const hasThumb = Boolean(r.imageUrl);
 
     return `
-      <div class="issue-card" id="card-${esc(r.id)}" onclick="focusReportOnMap('${esc(r.id)}')">
+      <div class="issue-card" id="card-${esc(r.id)}" onclick="focusReportOnMap('${esc(r.id)}')" onmouseenter="previewReportMarker('${esc(r.id)}')">
         <div class="card-top">
           <span class="card-category">${catIcon} ${esc(r.category)}</span>
           <span class="card-urgency urgency-${level}">${esc(level)} (${esc(r.riskScore)})</span>
@@ -2378,6 +2940,16 @@ function renderFilteredReports() {
           </div>
         </div>
 
+        <!-- THE INTERACTIVE URGENCY BAR: COLOR CHANGE ON HOVER & AUTO POPUP -->
+        <div class="card-bar-interactive" title="Urgency Meter">
+          <div class="card-bar-track">
+            <div class="card-bar-fill fill-${level.toLowerCase()}" style="width: ${Math.min(100, Math.max(15, r.riskScore || 20))}%;"></div>
+          </div>
+          <div class="card-bar-popup">
+            <span>⚡ Urgency: <b>${esc(r.riskScore)}/100</b> (${esc(level)}) • Email: <u>awasthishailendra59@gmail.com</u></span>
+          </div>
+        </div>
+
         ${hasThumb ? `
           <div class="card-thumb-row">
             <img src="${esc(r.imageUrl)}" class="card-thumb" alt="Photo" loading="lazy">
@@ -2386,6 +2958,11 @@ function renderFilteredReports() {
         ` : `
           <div style="font-size:12px;color:#64748b;margin-top:6px;line-height:1.4;">${esc(r.description || '')}</div>
         `}
+
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button class="btn-card-zoom" onclick="zoomInOnReport('${esc(r.id)}', event)" title="Zoom in onto this defect on map">🔍 Zoom In</button>
+          <button class="btn-card-detail" onclick="openReportModal('${esc(r.id)}'); event.stopPropagation();" title="Inspect Full Report Details">📋 Details</button>
+        </div>
       </div>
     `;
   }).join('');
@@ -2642,7 +3219,8 @@ async function submitReportForm() {
 
     if (!res.ok) throw new Error(saved.error || 'Failed to submit report.');
 
-    showToast(`🎉 Report ${saved.id} lodged successfully! Urgency: ${saved.priority} (${saved.riskScore}). Ward officer notified.`, 'success');
+    showToast(`🎉 Report ${saved.id} lodged successfully! Urgency: ${saved.priority} (${saved.riskScore}). Automated email notification sent to awasthishailendra59@gmail.com.`, 'success');
+    playMinecraftSound('level-up');
 
     // Reset Form
     document.getElementById('form-description').value = '';
@@ -2929,21 +3507,25 @@ function openReportModal(id) {
   // Breakdown Bars
   const b = r.scoreBreakdown || {};
   document.getElementById('m-breakdown-bars').innerHTML = `
-    <div class="popup-bar-item">
+    <div class="popup-bar-item interactive-bar" title="Severity Factor">
       <div class="popup-bar-label"><span>Severity Factor</span><span>${b.severity || 0}/40</span></div>
       <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.severity||0)/40)*100)}%"></div></div>
+      <div class="bar-auto-popup"><span>Severity: ${b.severity || 0} / 40 pts</span></div>
     </div>
-    <div class="popup-bar-item">
+    <div class="popup-bar-item interactive-bar" title="Traffic Volume">
       <div class="popup-bar-label"><span>Traffic Exposure</span><span>${b.trafficVolume || 0}/25</span></div>
       <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.trafficVolume||0)/25)*100)}%"></div></div>
+      <div class="bar-auto-popup"><span>Traffic: ${b.trafficVolume || 0} / 25 pts</span></div>
     </div>
-    <div class="popup-bar-item">
+    <div class="popup-bar-item interactive-bar" title="Repeat Complaints">
       <div class="popup-bar-label"><span>Repeat Complaints</span><span>${b.repeatReports || 0}/20</span></div>
       <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.repeatReports||0)/20)*100)}%"></div></div>
+      <div class="bar-auto-popup"><span>Repeat Reports: ${b.repeatReports || 0} / 20 pts</span></div>
     </div>
-    <div class="popup-bar-item">
+    <div class="popup-bar-item interactive-bar" title="Aging Factor">
       <div class="popup-bar-label"><span>Aging Factor</span><span>${b.agingFactor || 0}/15</span></div>
       <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.agingFactor||0)/15)*100)}%"></div></div>
+      <div class="bar-auto-popup"><span>Aging Duration: ${b.agingFactor || 0} / 15 pts</span></div>
     </div>
   `;
 
@@ -2959,7 +3541,7 @@ function openReportModal(id) {
   // Ward & Cost
   document.getElementById('m-ward').textContent = r.ward || 'Zone 2 (Duhai RRTS Station)';
   document.getElementById('m-cost').textContent = `₹ ${Number(r.estimatedCost || 0).toLocaleString('en-IN')}`;
-  document.getElementById('m-officer').textContent = `${r.inspectorName || 'Junior Engineer'} (${r.contractor || 'Contractor Pending'})`;
+  document.getElementById('m-officer').innerHTML = `${r.inspectorName || 'Junior Engineer'} (${r.contractor || 'Contractor Pending'})<br><span style="color:#0ea5a4;font-size:11px;font-weight:700;">✉️ Automated Notification Recipient: awasthishailendra59@gmail.com</span>`;
 
   // Active Status Buttons
   document.querySelectorAll('.status-change-btn').forEach(btn => {
@@ -3003,6 +3585,164 @@ async function updateCurrentReportStatus(newStatus) {
     showToast(`Could not update status: ${err.message}`, 'error');
   }
 }
+
+
+/* ---------------------------------------------------------------------
+   MINECRAFT UI CONTROLLER, SYNTH SOUND EFFECTS, HOTBAR & ZOOM ENGINE
+   --------------------------------------------------------------------- */
+let minecraftMode = false;
+let audioCtx = null;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    const AudioCtor = window.AudioContext || window.webkitAudioContext;
+    if (AudioCtor) audioCtx = new AudioCtor();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function playMinecraftSound(type) {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    if (type === 'click') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(340, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(70, ctx.currentTime + 0.04);
+      gain.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.04);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.04);
+    } else if (type === 'pop') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1050, ctx.currentTime + 0.07);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.07);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.07);
+    } else if (type === 'level-up') {
+      const freqs = [440, 554, 659, 880];
+      freqs.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.09);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime + idx * 0.09);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.09 + 0.22);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + idx * 0.09);
+        osc.stop(ctx.currentTime + idx * 0.09 + 0.22);
+      });
+    }
+  } catch (e) {
+    // Audio synthesis fallback
+  }
+}
+
+function toggleMinecraftMode() {
+  minecraftMode = !minecraftMode;
+  document.body.classList.toggle('minecraft-mode', minecraftMode);
+  const btn = document.getElementById('btn-mc-mode');
+  const lbl = document.getElementById('mc-mode-label');
+  if (btn) btn.classList.toggle('active', minecraftMode);
+  if (lbl) lbl.textContent = minecraftMode ? 'Craft Mode: ON' : 'Craft Mode: OFF';
+  
+  playMinecraftSound(minecraftMode ? 'level-up' : 'click');
+  showToast(minecraftMode ? '⛏️ Minecraft UI Activated! Retro block style, hotbar & synth audio enabled.' : 'Civic Modern UI Restored.', 'info');
+  
+  try {
+    localStorage.setItem('sudharsarthi_mc_mode', minecraftMode ? '1' : '0');
+  } catch(e) {}
+}
+
+function selectHotbarSlot(num) {
+  playMinecraftSound('click');
+  document.querySelectorAll('.mc-slot').forEach(s => {
+    s.classList.toggle('active', parseInt(s.dataset.slot) === num);
+  });
+  
+  if (num === 1) { switchTab('map'); resetDuhaiBounds(); }
+  else if (num === 2) { switchTab('report'); startReportFromMap(); }
+  else if (num === 3) { switchTab('analytics'); }
+  else if (num === 4) { switchTab('budget'); }
+  else if (num === 5) { switchTab('wards'); }
+  else if (num === 6) { zoomInMap(); }
+  else if (num === 7) { zoomOutMap(); }
+  else if (num === 8) {
+    const urgent = [...reports].sort((a,b) => (b.riskScore||0) - (a.riskScore||0))[0];
+    if (urgent) {
+      switchTab('map');
+      zoomInOnReport(urgent.id);
+      showToast(`💎 Focused highest urgency hazard: ${urgent.id} (${urgent.riskScore} pts)`, 'info');
+    }
+  }
+  else if (num === 9) {
+    showToast('✉️ Automated Alert: All reports dispatched to awasthishailendra59@gmail.com', 'success', 3500);
+  }
+}
+
+/* ZOOM ENGINE */
+function zoomInMap() {
+  if (map) {
+    map.zoomIn(1, { animate: true });
+    playMinecraftSound('pop');
+    showToast('🔍 Zoomed in onto Duhai map', 'info', 1000);
+  }
+}
+
+function zoomOutMap() {
+  if (map) {
+    map.zoomOut(1, { animate: true });
+    playMinecraftSound('pop');
+    showToast('🔎 Zoomed out from Duhai map', 'info', 1000);
+  }
+}
+
+function zoomInOnReport(id, ev) {
+  if (ev) ev.stopPropagation();
+  const r = reports.find(x => x.id === id);
+  if (!r || !map) return;
+  highlightSidebarCard(id);
+  map.flyTo([r.lat, r.lng], 18.5, { duration: 0.8 });
+  if (markers[id]) {
+    setTimeout(() => markers[id].openPopup(), 400);
+  }
+  playMinecraftSound('pop');
+}
+
+function previewReportMarker(id) {
+  if (markers[id] && map) {
+    markers[id].openPopup();
+  }
+}
+
+// Keyboard shortcuts (1-9, M for craft mode, +, -)
+window.addEventListener('keydown', (e) => {
+  if (['input', 'textarea', 'select'].includes(document.activeElement.tagName.toLowerCase())) return;
+  const k = parseInt(e.key);
+  if (k >= 1 && k <= 9) {
+    selectHotbarSlot(k);
+  } else if (e.key.toLowerCase() === 'm') {
+    toggleMinecraftMode();
+  } else if (e.key === '+' || e.key === '=') {
+    zoomInMap();
+  } else if (e.key === '-' || e.key === '_') {
+    zoomOutMap();
+  }
+});
 
 // Start Application on Load
 window.addEventListener('DOMContentLoaded', initApp);

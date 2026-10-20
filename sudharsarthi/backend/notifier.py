@@ -23,6 +23,7 @@ from database import haversine_m
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTBOX = os.path.join(BASE_DIR, "outbox")
 WARDS_PATH = os.path.join(BASE_DIR, "wards.json")
+DEFAULT_ALERT_EMAIL = "awasthishailendra59@gmail.com"
 log = logging.getLogger("sudharsarthi.notifier")
 
 
@@ -46,7 +47,7 @@ def officer_for(ward_name):
     for w in _load_wards():
         if w["name"] == ward_name:
             return w["officer"], w["email"]
-    return "Municipal Officer", os.environ.get("DEFAULT_OFFICER_EMAIL", "officer@example.org")
+    return "Municipal Officer", os.environ.get("DEFAULT_OFFICER_EMAIL", "awasthishailendra59@gmail.com")
 
 
 def build_message(report, reasons=None, image_path=None):
@@ -54,7 +55,11 @@ def build_message(report, reasons=None, image_path=None):
     urgency = report.get("priority", "Medium")
     sender = os.environ.get("MAIL_FROM", "sudharsarthi@localhost")
     msg = EmailMessage()
-    msg["From"], msg["To"] = sender, to_addr
+    target_email = os.environ.get("ALERT_RECIPIENT_EMAIL", DEFAULT_ALERT_EMAIL)
+    msg["From"] = sender
+    msg["To"] = target_email
+    if to_addr and to_addr.lower() != target_email.lower():
+        msg["Cc"] = to_addr
     msg["Subject"] = (f"[{urgency.upper()} urgency] {report['id']} - {report['category']} "
                       f"at {report.get('location', '')[:60]}")
     map_link = (f"https://www.openstreetmap.org/?mlat={report['lat']}&mlon={report['lng']}"
@@ -94,7 +99,8 @@ def _deliver(msg, report_id):
         path = os.path.join(OUTBOX, f"{report_id}.txt")
         body = msg.get_body(preferencelist=("plain",)).get_content()
         with open(path, "w", encoding="utf-8") as f:
-            f.write(f"To: {msg['To']}\nSubject: {msg['Subject']}\n\n{body}")
+            cc_hdr = f"\nCc: {msg['Cc']}" if msg.get("Cc") else ""
+            f.write(f"To: {msg['To']}{cc_hdr}\nSubject: {msg['Subject']}\n\n{body}")
         log.info("SMTP not configured - saved email to %s", path)
         return "saved-to-outbox"
     port = int(os.environ.get("SMTP_PORT", "587"))
