@@ -2623,19 +2623,65 @@ async function checkBackendConnectivity() {
 }
 
 function openBackendConfigModal() {
-  const current = API || DEFAULT_RENDER_BACKEND;
-  const url = prompt(
-    "🔗 VERCEL <-> RENDER CLOUD CONNECTION\n\n" +
-    "Connected Render Backend URL (or leave blank to use Vercel auto-proxy):\n\n" +
-    "Current: " + (API || 'Auto-Proxy via Vercel') + "\nDefault Render: " + DEFAULT_RENDER_BACKEND,
-    current
-  );
-  if (url !== null) {
-    API = url.trim().replace(/\/+$/, '');
+  const modal = document.getElementById('backend-config-modal');
+  const input = document.getElementById('input-backend-url');
+  if (input) input.value = API || localStorage.getItem('sudharsarthi_backend_url') || DEFAULT_RENDER_BACKEND;
+  const result = document.getElementById('backend-test-result');
+  if (result) result.style.display = 'none';
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeBackendConfigModal() {
+  const modal = document.getElementById('backend-config-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function testAndSaveBackendUrl() {
+  const input = document.getElementById('input-backend-url');
+  const result = document.getElementById('backend-test-result');
+  const pill = document.getElementById('backend-status-pill');
+  const txt = document.getElementById('backend-status-text');
+  
+  const rawUrl = (input ? input.value : '').trim().replace(/\/+$/, '');
+  result.style.display = 'block';
+  result.style.background = '#eff6ff';
+  result.style.color = '#1e3a8a';
+  result.style.border = '1px solid #bfdbfe';
+  result.textContent = '⏳ Testing connection to Render backend...';
+
+  try {
+    const res = await fetch((rawUrl ? rawUrl : '') + '/api/health', { method: 'GET', signal: AbortSignal.timeout(8000) });
+    if (res.ok) {
+      const data = await res.json();
+      API = rawUrl;
+      localStorage.setItem('sudharsarthi_backend_url', API);
+      result.style.background = '#ecfdf5';
+      result.style.color = '#065f46';
+      result.style.border = '1px solid #6ee7b7';
+      result.innerHTML = `✅ <b>Connected successfully!</b> Found ${data.reports || 0} reports in Duhai database. (Urgency AI: ${data.aiMode})`;
+      
+      if (pill && txt) {
+        pill.className = 'backend-cloud-pill connected';
+        txt.textContent = 'Render Connected 🟢';
+      }
+      showToast('🎉 Connected to Render backend successfully!', 'success');
+      setTimeout(() => {
+        closeBackendConfigModal();
+        reloadReports();
+      }, 1500);
+      return;
+    }
+  } catch(e) {
+    result.style.background = '#fffbeb';
+    result.style.color = '#92400e';
+    result.style.border = '1px solid #fde68a';
+    result.innerHTML = `⏳ <b>Render service is waking up:</b> Render free tier takes ~30s to boot up from sleep. Saved URL! We will keep retrying automatically.`;
+    API = rawUrl;
     localStorage.setItem('sudharsarthi_backend_url', API);
-    showToast(`🔗 Backend updated to: ${API || 'Vercel Auto-Proxy'}`, 'info');
-    checkBackendConnectivity();
-    reloadReports();
+    if (pill && txt) {
+      pill.className = 'backend-cloud-pill connected';
+      txt.textContent = 'Render Waking ⏳';
+    }
   }
 }
 const DUHAI_CENTER = [28.7285, 77.4740];
