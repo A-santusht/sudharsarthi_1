@@ -2,8 +2,25 @@
   "version": 2,
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/sudharsarthi/frontend/index.html" },
-    { "source": "/assets/(.*)", "destination": "/sudharsarthi/frontend/assets/$1" },
-    { "source": "/(.*)", "destination": "/sudharsarthi/frontend/$1" }
+    {
+      "source": "/api/:path*",
+      "destination": "https://sudharsarthi.onrender.com/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://sudharsarthi.onrender.com/uploads/:path*"
+    },
+    {
+      "source": "/assets/:path*",
+      "destination": "/sudharsarthi/frontend/assets/:path*"
+    },
+    {
+      "source": "/",
+      "destination": "/sudharsarthi/frontend/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/sudharsarthi/frontend/$1"
+    }
   ]
 }

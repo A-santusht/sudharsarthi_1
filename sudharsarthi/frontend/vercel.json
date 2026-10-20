@@ -1,3 +1,14 @@
 {
-  "cleanUrls": true
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://sudharsarthi.onrender.com/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://sudharsarthi.onrender.com/uploads/:path*"
+    }
+  ]
 }

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="SUDHARSARTHI Gen-Z Favicon">
+  <defs>
+    <linearGradient id="gz-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0f1d"/>
+      <stop offset="100%" stop-color="#050811"/>
+    </linearGradient>
+    <linearGradient id="gz-neon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f5ff"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="gz-bolt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="148" height="148" rx="36" fill="url(#gz-bg)" stroke="url(#gz-neon)" stroke-width="6" />
+  <path d="M 40 134 L 72 68 L 88 68 L 120 134 Z" fill="url(#gz-neon)" opacity="0.85" />
+  <line x1="80" y1="130" x2="80" y2="72" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-dasharray="8 8" />
+  <polygon points="84,18 58,74 76,74 70,122 104,64 86,64" fill="url(#gz-bolt)" stroke="#ffffff" stroke-width="2" />
+</svg>

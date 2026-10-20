@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: sudharsarthi
+    runtime: python
+    plan: free
+    buildCommand: pip install -r sudharsarthi/backend/requirements.txt
+    startCommand: gunicorn --chdir sudharsarthi/backend app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: ALERT_RECIPIENT_EMAIL
+        value: awasthishailendra59@gmail.com
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: ALLOW_DEMO_RESET
+        value: "0"
