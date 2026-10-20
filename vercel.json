@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/", "destination": "/sudharsarthi/frontend/index.html" },
+    { "source": "/assets/(.*)", "destination": "/sudharsarthi/frontend/assets/$1" },
+    { "source": "/(.*)", "destination": "/sudharsarthi/frontend/$1" }
+  ]
+}
