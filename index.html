@@ -3,1735 +3,2291 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SudharSarthi | Duhai Civic Intelligence & Road Safety</title>
+<title>SUDHARSARTHI | Duhai Civic Issue & Road Safety Monitor</title>
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-
 <style>
 :root {
-  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  
-  --bg-app: #f4f5f7;
-  --bg-card: #ffffff;
-  --bg-sidebar: #ffffff;
-  --border: #e5e7eb;
-  --border-light: #f1f2f4;
-  
-  --text-main: #111827;
-  --text-muted: #6b7280;
-  --text-subtle: #9ca3af;
-  
-  --primary: #111827;
-  --accent-red: #e11d48;
-  --accent-red-bg: #fff1f2;
-  --accent-amber: #f59e0b;
-  --accent-amber-bg: #fffbeb;
-  --accent-emerald: #10b981;
-  --accent-emerald-bg: #ecfdf5;
-  --accent-blue: #2563eb;
-  --accent-blue-bg: #eff6ff;
-  
+  --primary: #1e3a8a;
+  --primary-light: #2563eb;
+  --primary-subtle: #eff6ff;
+  --teal: #0ea5a4;
+  --teal-dark: #0f766e;
+  --teal-subtle: #f0fdfa;
+  --high: #dc2626;
+  --high-bg: #fef2f2;
+  --high-border: #fecaca;
+  --med: #f59e0b;
+  --med-bg: #fffbeb;
+  --med-border: #fde68a;
+  --low: #16a34a;
+  --low-bg: #f0fdf4;
+  --low-border: #bbf7d0;
+  --done: #64748b;
+  --done-bg: #f8fafc;
+  --done-border: #cbd5e1;
+  --bg-page: #f8fafc;
+  --card-bg: #ffffff;
+  --ink: #0f172a;
+  --ink-secondary: #334155;
+  --mut: #64748b;
+  --border-color: #e2e8f0;
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
-  --shadow-subtle: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
-  --shadow-card: 0 4px 14px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02);
-  --shadow-floating: 0 10px 28px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04);
+  --shadow-lg: 0 12px 28px rgba(15,23,42,0.12), 0 4px 10px rgba(15,23,42,0.06);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
-  font-family: var(--font-main);
-  background: var(--bg-app);
-  color: var(--text-main);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-page);
+  color: var(--ink);
   height: 100vh;
-  width: 100vw;
-  overflow: hidden;
   display: flex;
-  -webkit-font-smoothing: antialiased;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* 3-COLUMN HYBRID LAYOUT */
-.app-container {
-  display: grid;
-  grid-template-columns: 240px 450px 1fr;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+/* HEADER */
+header {
   background: #ffffff;
-}
-
-/* =====================================================================
-   COLUMN 1: SIDEBAR (FlowPilot Navigation)
-   ===================================================================== */
-.sidebar {
-  background: var(--bg-sidebar);
-  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 20px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: space-between;
-  padding: 18px 14px;
-  height: 100vh;
-  overflow-y: auto;
-}
-.sidebar-top {
-  display: flex;
-  flex-direction: column;
   gap: 16px;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
-.sidebar-brand {
+.brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 4px 6px;
+  gap: 12px;
+  text-decoration: none;
   cursor: pointer;
 }
-.sidebar-logo-icon {
-  width: 28px;
-  height: 28px;
-  background: #111827;
-  color: #ffffff;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.brand img { height: 42px; width: auto; }
+.brand-text b {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
   font-weight: 800;
-  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+  display: block;
+  line-height: 1.1;
 }
-.sidebar-brand-name {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-  color: #111827;
-}
-
-/* Search input */
-.sidebar-search {
-  position: relative;
-}
-.sidebar-search svg {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 14px;
-  height: 14px;
-  color: var(--text-subtle);
-}
-.sidebar-search input {
-  width: 100%;
-  padding: 7px 10px 7px 30px;
-  font-size: 12.5px;
-  background: #f9fafb;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-main);
-  outline: none;
-}
-.sidebar-search input:focus {
-  background: #ffffff;
-  border-color: #9ca3af;
-  box-shadow: 0 0 0 2px rgba(17,24,39,0.05);
-}
-
-/* Navigation */
-.nav-group {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.nav-group-title {
-  font-size: 10.5px;
+.brand-text b span { color: var(--teal); }
+.brand-text small {
+  display: block;
+  color: var(--mut);
+  font-size: 10px;
   font-weight: 600;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-subtle);
-  padding: 10px 8px 4px 8px;
 }
-.nav-item {
-  display: flex;
+.header-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  border-radius: var(--radius-md);
-  color: #4b5563;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.12s ease;
-  user-select: none;
-}
-.nav-item:hover {
-  background: #f3f4f6;
-  color: #111827;
-}
-.nav-item.active {
-  background: #111827;
-  color: #ffffff;
-  font-weight: 600;
-}
-.nav-item-left {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-.nav-item svg {
-  width: 16px;
-  height: 16px;
-  stroke-width: 2;
-}
-.nav-badge {
-  background: #f3f4f6;
-  color: #4b5563;
+  gap: 6px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
-  padding: 1px 6px;
-  border-radius: 999px;
+  color: #334155;
 }
-.nav-item.active .nav-badge {
-  background: #374151;
-  color: #f9fafb;
-}
-
-/* Render Cloud Connection Card */
-.sidebar-bottom {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border-light);
-}
-.cloud-card {
-  background: #f9fafb;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.cloud-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.cloud-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #1f2937;
-}
-.cloud-dot {
+.header-badge .live-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #10b981;
+  background: #16a34a;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25);
+  animation: pulse-dot 2s infinite;
 }
-.cloud-dot.connecting { background: #f59e0b; animation: pulse 1.5s infinite; }
-.cloud-dot.offline { background: #9ca3af; }
-.cloud-input-row {
-  display: flex;
-  gap: 4px;
-}
-.cloud-input {
-  flex: 1;
-  padding: 5px 8px;
-  font-size: 11px;
-  font-family: var(--font-mono);
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  color: #374151;
-  outline: none;
-}
-.cloud-btn {
-  background: #111827;
-  color: #ffffff;
-  border: none;
-  border-radius: 5px;
-  padding: 5px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-.cloud-btn:hover { opacity: 0.85; }
-.cloud-info {
-  font-size: 10px;
-  color: var(--text-subtle);
-  line-height: 1.35;
+@keyframes pulse-dot {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* =====================================================================
-   COLUMN 2: MIDDLE ACTIVITY DASHBOARD (FlowPilot Style)
-   ===================================================================== */
-.dashboard-col {
-  background: #fcfcfd;
-  border-right: 1px solid var(--border);
-  height: 100vh;
-  overflow-y: auto;
-  padding: 22px 20px;
+/* NAV TABS */
+.nav-tabs {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.dash-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.dash-title {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.6px;
-  color: #111827;
-}
-.dash-sub {
-  font-size: 12px;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
   gap: 6px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-
-/* KPI cards */
-.kpi-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-.kpi-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 14px 12px;
-  box-shadow: var(--shadow-subtle);
-}
-.kpi-val {
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.1;
-  margin-bottom: 4px;
-  letter-spacing: -0.5px;
-}
-.kpi-val.red { color: var(--accent-red); }
-.kpi-val.dark { color: #111827; }
-.kpi-lbl {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-/* Average Defect Load Heatmap */
-.heatmap-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  box-shadow: var(--shadow-subtle);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.heatmap-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.heatmap-title {
+.nav-tabs::-webkit-scrollbar { display: none; }
+.nav-btn {
+  border: 0;
+  background: transparent;
+  color: var(--mut);
   font-size: 13px;
   font-weight: 600;
-  color: #111827;
-}
-.heatmap-filters {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-.heatmap-pill {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-muted);
-  background: #f3f4f6;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 8px 14px;
+  border-radius: 8px;
   cursor: pointer;
-}
-.heatmap-pill.active {
-  background: #111827;
-  color: #ffffff;
-}
-.heatmap-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.heatmap-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+  transition: all 0.2s ease;
 }
-.heatmap-day {
-  font-size: 9.5px;
-  font-weight: 600;
-  color: var(--text-subtle);
-  width: 26px;
-  text-transform: uppercase;
+.nav-btn:hover { color: var(--ink); background: rgba(255,255,255,0.6); }
+.nav-btn.active {
+  background: #ffffff;
+  color: var(--primary);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
-.heatmap-cells {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 5px;
-  flex: 1;
-}
-.heatmap-cell {
-  height: 16px;
-  border-radius: 3px;
-  background: #f1f2f4;
-}
-.heatmap-cell.active-amber { background: #facc15; }
-.heatmap-cell.hatched {
-  background: repeating-linear-gradient(45deg, #e5e7eb, #e5e7eb 2px, #f3f4f6 2px, #f3f4f6 6px);
-}
-.heatmap-months {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  margin-left: 32px;
-  font-size: 9px;
-  font-weight: 600;
-  color: var(--text-subtle);
-  text-transform: uppercase;
-  padding-top: 4px;
-}
-
-/* Active Reports section */
-.reports-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.reports-sec-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.reports-sec-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.reports-sec-count {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-/* Filter tabs */
-.filter-tabs {
-  display: flex;
-  gap: 12px;
-  border-bottom: 1px solid var(--border-light);
-  padding-bottom: 8px;
-}
-.filter-tab {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-muted);
-  cursor: pointer;
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  user-select: none;
-}
-.filter-tab.active {
-  color: #111827;
-  font-weight: 600;
-}
-.filter-tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: -9px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #111827;
-  border-radius: 2px;
-}
-.filter-tab-count {
+.nav-btn .badge {
+  background: var(--primary-subtle);
+  color: var(--primary);
   font-size: 11px;
-  color: var(--text-subtle);
+  padding: 2px 6px;
+  border-radius: 999px;
 }
 
-/* Cards List */
-.cards-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.incident-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 14px;
-  box-shadow: var(--shadow-subtle);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  transition: border-color 0.15s;
-}
-.incident-card:hover {
-  border-color: #cbd5e1;
-}
-.incident-card.selected {
-  border-color: #111827;
-  box-shadow: 0 0 0 1.5px #111827;
-}
-.card-header-row {
+/* HEADER ACTIONS */
+.header-right {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
 }
-.card-id-group {
+.btn-report-quick {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0ea5a4 100%);
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(14,165,164,0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.card-id {
-  font-size: 12px;
-  font-weight: 700;
-  color: #111827;
+.btn-report-quick:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(14,165,164,0.45);
 }
-.card-status-pill {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-.pill-in-progress { background: #dcfce7; color: #15803d; }
-.pill-action-needed { background: #ffe4e6; color: #be123c; }
-.pill-resolved { background: #f3f4f6; color: #4b5563; }
-.card-score-circle {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 1px solid #fecdd3;
-  color: #be123c;
-  font-size: 10.5px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.card-score-circle.low { border-color: #bbf7d0; color: #15803d; }
-.card-score-circle.med { border-color: #fde68a; color: #b45309; }
 
-.card-route-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #1f2937;
-}
-.card-date {
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--text-muted);
-}
-.timeline-track {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 0;
-}
-.timeline-icon {
-  font-size: 12px;
-  color: #6b7280;
-}
-.timeline-line {
+/* MAIN VIEWPORT */
+main {
   flex: 1;
-  height: 2px;
-  background: #e5e7eb;
   position: relative;
+  overflow: hidden;
 }
-.timeline-line-fill {
+.tab-content {
   position: absolute;
-  left: 0;
-  top: 0;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+}
+.tab-content.active {
+  display: flex;
+}
+
+/* TAB 1: MAP & ISSUES */
+#tab-map.active {
+  display: grid;
+  grid-template-columns: 410px 1fr;
   height: 100%;
-  background: #111827;
 }
-.timeline-point {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #111827;
+.sidebar-panel {
+  background: #ffffff;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  z-index: 20;
 }
-.card-warning-callout {
-  background: #fff1f2;
-  border-radius: var(--radius-sm);
-  padding: 8px 10px;
+.sidebar-header {
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border-color);
+  background: #ffffff;
+}
+.sidebar-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.sidebar-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
 }
-.warning-text {
-  font-size: 11px;
+.sidebar-stats-pill {
+  font-size: 12px;
+  padding: 3px 9px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  color: #475569;
   font-weight: 600;
-  color: #be123c;
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
-.btn-manage-black {
-  background: #111827;
-  color: #ffffff;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 5px 12px;
-  font-size: 11.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-.btn-manage-black:hover { opacity: 0.85; }
-
-/* =====================================================================
-   COLUMN 3: MAP VIEW (OPENSTREETMAP + ESRI SATELLITE - NO API KEY!)
-   ===================================================================== */
-.map-col {
+.search-box {
   position: relative;
-  height: 100vh;
+  margin-bottom: 10px;
+}
+.search-box input {
   width: 100%;
+  padding: 9px 12px 9px 34px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 13px;
   background: #f8fafc;
+  transition: all 0.2s;
 }
-#map {
-  width: 100%;
-  height: 100%;
+.search-box input:focus {
+  background: #fff;
+  border-color: var(--primary-light);
   outline: none;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+}
+.search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 13px;
 }
 
-/* Map Top Overlay Pills */
-.map-top-bar {
-  position: absolute;
-  top: 18px;
-  left: 20px;
-  right: 20px;
-  z-index: 500;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  pointer-events: none;
-}
-.map-pills-row {
+/* FILTER CHIPS */
+.filter-row {
   display: flex;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  padding: 5px 10px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-card);
-  pointer-events: auto;
   overflow-x: auto;
-  max-width: calc(100% - 180px);
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.landmark-btn {
-  background: #f9fafb;
-  border: 1px solid var(--border);
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  font-size: 11px;
-  font-weight: 600;
-  color: #1f2937;
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-chip {
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  gap: 5px;
+  transition: all 0.15s;
+  color: #475569;
+}
+.filter-chip:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+.filter-chip.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.filter-chip.active.chip-high { background: var(--high); border-color: var(--high); }
+.filter-chip.active.chip-med { background: var(--med); border-color: var(--med); }
+.filter-chip.active.chip-low { background: var(--low); border-color: var(--low); }
+.filter-chip.active.chip-done { background: var(--done); border-color: var(--done); }
+.chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ADVANCED FILTER EXPAND */
+.filter-secondary {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.filter-secondary select {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 11px;
+  background: #fff;
+  color: #475569;
+}
+
+/* ISSUE LIST */
+.issues-scroll-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  background: #f8fafc;
+}
+.issue-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  position: relative;
+  overflow: hidden;
+}
+.issue-card:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd;
+  box-shadow: var(--shadow-md);
+}
+.issue-card.selected {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.25), var(--shadow-md);
+  background: #fbfdff;
+}
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.card-category {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--teal-dark);
+  background: #ccfbf1;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
   gap: 4px;
+}
+.card-urgency {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.urgency-High { background: #fee2e2; color: #b91c1c; }
+.urgency-Medium { background: #fef3c7; color: #b45309; }
+.urgency-Low { background: #dcfce7; color: #15803d; }
+.urgency-Resolved { background: #f1f5f9; color: #475569; }
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+.card-meta {
+  font-size: 12px;
+  color: var(--mut);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-meta-row svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.card-thumb-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.card-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+}
+.card-preview-text {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.status-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  color: #334155;
+}
+.status-pill.status-Reported { background: #e0f2fe; color: #0369a1; }
+.status-pill.status-Under-Review { background: #fef3c7; color: #b45309; }
+.status-pill.status-Repair-in-Progress { background: #ffedd5; color: #c2410c; }
+.status-pill.status-Resolved { background: #dcfce7; color: #15803d; }
+
+/* MAP CONTAINER & CONTROLS */
+.map-wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+#map {
+  height: 100%;
+  width: 100%;
+  background: #0f172a;
+}
+
+/* DUHAI MAP OVERLAY HEADER */
+.duhai-map-bar {
+  position: absolute;
+  top: 14px;
+  left: 60px;
+  right: 14px;
+  z-index: 800;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+.duhai-landmark-pills {
+  pointer-events: auto;
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 6px 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  overflow-x: auto;
+  max-width: calc(100% - 240px);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.duhai-landmark-pills::-webkit-scrollbar { display: none; }
+.landmark-btn {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   transition: all 0.15s;
 }
 .landmark-btn:hover {
-  background: #111827;
-  color: #ffffff;
-  border-color: #111827;
+  background: var(--primary-subtle);
+  border-color: var(--primary-light);
+  color: var(--primary);
 }
-
-/* Floating Bottom Dock (FlowPilot Pill) */
-.map-bottom-dock {
-  position: absolute;
-  bottom: 24px;
-  right: 24px;
-  z-index: 500;
-  background: rgba(255, 255, 255, 0.95);
+.duhai-tag-badge {
+  pointer-events: auto;
+  background: rgba(15, 23, 42, 0.88);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
   backdrop-filter: blur(8px);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 4px 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   display: flex;
   align-items: center;
-  gap: 4px;
-  box-shadow: var(--shadow-floating);
+  gap: 6px;
 }
-.dock-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: #4b5563;
+.duhai-tag-badge span { color: #38bdf8; }
+
+/* MAP CONTROLS FLOATING */
+.map-floating-controls {
+  position: absolute;
+  bottom: 24px;
+  right: 16px;
+  z-index: 800;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.map-ctrl-btn {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 14px;
-  transition: background 0.12s;
+  box-shadow: var(--shadow-md);
+  color: #334155;
+  transition: all 0.2s;
 }
-.dock-btn:hover {
-  background: #f3f4f6;
-  color: #111827;
+.map-ctrl-btn:hover {
+  background: #f8fafc;
+  color: var(--primary);
+  border-color: var(--primary-light);
 }
-.dock-btn.active {
-  background: #111827;
-  color: #ffffff;
+.map-ctrl-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
 }
 
-/* Bottom Progress Ticker */
-.map-bottom-ticker {
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
-  z-index: 500;
+/* MAP LEGEND */
+.duhai-legend {
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 8px 14px;
-  font-size: 11.5px;
-  font-weight: 500;
-  color: #374151;
-  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(6px);
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  font-size: 11px;
+  line-height: 1.8;
+  color: #1e293b;
+}
+.duhai-legend b {
+  font-size: 12px;
+  display: block;
+  margin-bottom: 3px;
+  color: var(--ink);
+}
+.duhai-legend-item {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.ticker-dot {
-  width: 6px;
-  height: 6px;
+.legend-dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: #10b981;
+  flex-shrink: 0;
 }
 
-/* FlowPilot Popup Card on Marker Click */
+/* LEAFLET CUSTOM MARKERS */
+.pin-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+.pin-wrapper svg {
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+  transition: transform 0.2s ease;
+}
+.pin-wrapper:hover svg {
+  transform: scale(1.15) translateY(-3px);
+}
+.pin-wrapper.pin-high::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 34px;
+  width: 18px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.6);
+  animation: radar-pulse 1.5s infinite;
+}
+@keyframes radar-pulse {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+/* PICK LOCATION CROSSHAIR */
+.picking-mode-banner {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e3a8a;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(30, 58, 138, 0.4);
+  z-index: 850;
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+/* POPUP STYLES */
 .leaflet-popup-content-wrapper {
-  background: #ffffff !important;
-  border-radius: var(--radius-lg) !important;
-  box-shadow: var(--shadow-floating) !important;
-  border: 1px solid var(--border) !important;
-  padding: 0 !important;
+  border-radius: 14px;
+  padding: 0;
   overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.18);
 }
 .leaflet-popup-content {
-  margin: 0 !important;
-  line-height: 1.4 !important;
+  margin: 0;
+  width: 290px !important;
 }
-.leaflet-popup-tip {
-  background: #ffffff !important;
+.popup-box {
+  padding: 14px 16px;
 }
-.flow-popup {
-  padding: 16px;
+.popup-img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.popup-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 4px;
+}
+.popup-tag-row {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 270px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
-.flow-popup-top {
+.popup-meta {
+  font-size: 11px;
+  color: var(--mut);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.popup-bars {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+.popup-bar-item {
+  margin-bottom: 4px;
+}
+.popup-bar-item:last-child { margin-bottom: 0; }
+.popup-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 2px;
+}
+.popup-meter {
+  height: 5px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.popup-meter-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--teal);
+}
+.popup-action-btn {
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.popup-action-btn:hover { background: var(--primary-light); }
+
+/* TAB 2: REPORT FORM */
+#tab-report {
+  overflow-y: auto;
+  padding: 24px;
+  background: #f1f5f9;
+  justify-content: center;
+}
+.report-container {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+.report-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.report-title-area {
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 14px;
+}
+.report-title-area h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.report-title-area p {
+  color: var(--mut);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.form-full { grid-column: span 2; }
+.form-group {
+  margin-bottom: 16px;
+}
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-label span {
+  color: var(--high);
+}
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  background: #ffffff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-control:focus {
+  border-color: var(--primary-light);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+}
+textarea.form-control {
+  resize: vertical;
+  min-height: 85px;
+}
+
+/* CATEGORY SELECTOR CARDS */
+.cat-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+}
+.cat-card-opt {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: all 0.15s;
+}
+.cat-card-opt:hover {
+  border-color: var(--teal);
+  background: #f0fdfa;
+}
+.cat-card-opt.selected {
+  border-color: var(--primary);
+  background: var(--primary-subtle);
+  color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.2);
+}
+.cat-icon {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 4px;
+}
+.cat-name {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* LOCATION PICKER IN REPORT FORM */
+.loc-picker-box {
+  background: #f8fafc;
+  border: 1px dashed #94a3b8;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 6px;
+}
+.loc-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.loc-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.loc-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+.loc-btn.primary {
+  background: var(--teal);
+  color: #fff;
+  border-color: var(--teal);
+}
+.loc-btn.primary:hover {
+  background: var(--teal-dark);
+}
+.loc-display-pill {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #334155;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.flow-popup-id {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #111827;
+.loc-display-pill.valid {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #166534;
 }
-.flow-popup-route {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #374151;
+.quick-loc-shortcuts {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.quick-loc-shortcuts span {
+  font-size: 11px;
+  color: var(--mut);
+}
+.quick-loc-btn {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  color: #475569;
+}
+.quick-loc-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+
+/* PHOTO UPLOAD BOX */
+.upload-dropzone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  background: #f8fafc;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+.upload-dropzone:hover {
+  border-color: var(--primary-light);
+  background: #f1f5f9;
+}
+.upload-dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.upload-preview-area {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
 }
-.flow-popup-alert {
-  background: #fff1f2;
-  border: 1px solid #fecdd3;
-  border-radius: var(--radius-sm);
-  padding: 8px;
-  font-size: 11px;
-  color: #be123c;
-  line-height: 1.35;
+.upload-preview-img {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  object-fit: cover;
 }
-.flow-popup-btn {
-  background: #111827;
-  color: #ffffff;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 7px;
+
+/* AI LIVE SCANNER */
+.ai-prescan-box {
+  background: #f0fdfa;
+  border: 1px solid #99f6e4;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  display: none;
+}
+.ai-prescan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.ai-prescan-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--teal-dark);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* SUBMIT BUTTON */
+.btn-submit-report {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  color: #fff;
+  border: 0;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  width: 100%;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(30, 58, 138, 0.3);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.btn-submit-report:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+}
+.btn-submit-report:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* TAB 3: CIVIC ANALYTICS */
+#tab-analytics {
+  overflow-y: auto;
+  padding: 24px;
+  background: #f8fafc;
+  flex-direction: column;
+  gap: 20px;
+}
+.analytics-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+.kpi-title {
   font-size: 12px;
   font-weight: 600;
-  text-align: center;
-  cursor: pointer;
-  transition: opacity 0.15s;
+  color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
 }
-.flow-popup-btn:hover { opacity: 0.85; }
+.kpi-value {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+}
+.kpi-sub {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 6px;
+}
 
-/* MODALS & FULL VIEW PANELS (Old complete features) */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.chart-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+}
+.chart-card h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ward-leaderboard-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+}
+.ward-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 10px;
+}
+.ward-table th {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 2px solid #e2e8f0;
+  color: var(--mut);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.ward-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--ink);
+}
+.progress-bar-container {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  width: 100%;
+  min-width: 90px;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #0ea5a4);
+  border-radius: 999px;
+}
+
+/* TAB 4: BUDGET OPTIMIZER */
+#tab-budget {
+  overflow-y: auto;
+  padding: 24px;
+  background: #f8fafc;
+  flex-direction: column;
+}
+.budget-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+.budget-header-card {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f766e 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 20px;
+}
+.budget-header-card h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.budget-ctrl-panel {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+.budget-input-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.budget-preset-chips {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.preset-chip {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #334155;
+}
+.preset-chip:hover {
+  background: #e2e8f0;
+}
+.btn-optimize {
+  background: var(--teal);
+  color: #fff;
+  border: 0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-optimize:hover {
+  background: var(--teal-dark);
+}
+
+.budget-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.budget-stat-box {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+}
+.budget-stat-box b {
+  display: block;
+  font-size: 22px;
+  font-family: 'Poppins', sans-serif;
+  color: var(--ink);
+  margin-top: 4px;
+}
+
+/* TAB 5: DUHAI WARDS & SLA */
+#tab-wards {
+  overflow-y: auto;
+  padding: 24px;
+  background: #f8fafc;
+  flex-direction: column;
+}
+.wards-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+.wards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.ward-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.ward-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ward-zone-badge {
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+/* ISSUE DETAIL MODAL */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(17, 24, 39, 0.45);
+  background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(4px);
-  z-index: 1000;
-  display: flex;
+  z-index: 2000;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 20px;
 }
-.modal-card {
+.modal-dialog {
   background: #ffffff;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-floating);
+  border-radius: 18px;
   width: 100%;
-  max-width: 650px;
+  max-width: 680px;
   max-height: 90vh;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  animation: modal-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modal-pop {
+  0% { transform: scale(0.94); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 .modal-header {
-  padding: 18px 22px;
-  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-header h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.modal-close-btn {
+  background: #f1f5f9;
+  border: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  color: #475569;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
-.modal-title { font-size: 17px; font-weight: 700; color: #111827; }
-.modal-close {
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-.modal-body {
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+.modal-close-btn:hover { background: #e2e8f0; }
 
-/* Full View Overlay (For Analytics, Budget AI, Wards) */
-.view-overlay {
-  position: fixed;
-  inset: 0;
-  background: #ffffff;
-  z-index: 800;
-  display: flex;
-  flex-direction: column;
+.modal-body {
+  padding: 20px;
   overflow-y: auto;
 }
-.view-overlay-header {
-  padding: 18px 24px;
-  border-bottom: 1px solid var(--border);
+.modal-img-wrapper {
+  width: 100%;
+  height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background: #0f172a;
+}
+.modal-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.modal-score-banner {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.score-circle-big {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.score-circle-big small { font-size: 9px; font-weight: 600; text-transform: uppercase; }
+
+.modal-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 14px 0 8px;
+}
+.modal-status-changer {
+  display: flex;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 6px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+.status-change-btn {
+  flex: 1;
+  padding: 8px 10px;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #475569;
+  transition: all 0.15s;
+}
+.status-change-btn.current {
   background: #ffffff;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-.view-overlay-body {
-  padding: 24px;
-  max-width: 1100px;
-  width: 100%;
-  margin: 0 auto;
+  color: var(--primary);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
 }
 
-/* Toast */
-.toast-msg {
+/* TOAST ALERTS */
+.toast-container {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #111827;
-  color: #ffffff;
-  padding: 10px 16px;
-  border-radius: var(--radius-md);
-  font-size: 12.5px;
-  font-weight: 500;
-  box-shadow: var(--shadow-floating);
-  z-index: 2000;
-  transition: opacity 0.2s;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
 }
-
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.toast {
+  pointer-events: auto;
+  background: #1e293b;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: toast-in 0.25s ease-out;
+}
+.toast.success { background: #166534; }
+.toast.warning { background: #b45309; }
+.toast.error { background: #991b1b; }
+@keyframes toast-in {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
 
 /* RESPONSIVE */
-@media (max-width: 1024px) {
-  .app-container {
-    grid-template-columns: 200px 380px 1fr;
-  }
-}
-@media (max-width: 768px) {
-  .app-container {
+@media (max-width: 900px) {
+  #tab-map {
     grid-template-columns: 1fr;
-    height: auto;
-    overflow-y: auto;
+    grid-template-rows: 45vh 1fr;
   }
-  .sidebar, .dashboard-col, .map-col {
-    height: auto;
-  }
-  .map-col { height: 50vh; }
+  .map-wrapper { order: -1; }
+  .duhai-landmark-pills { max-width: 100%; }
+  .charts-grid { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-full { grid-column: span 1; }
+  header { flex-wrap: wrap; }
+  .nav-tabs { order: 3; width: 100%; justify-content: space-around; margin-top: 8px; }
 }
 </style>
 </head>
 <body>
 
-<div class="app-container">
-
-  <!-- ===================================================================
-       COLUMN 1: SIDEBAR (FlowPilot Navigation)
-       =================================================================== -->
-  <aside class="sidebar">
-    <div class="sidebar-top">
-      
-      <!-- Brand -->
-      <div class="sidebar-brand" onclick="switchView('dashboard')">
-        <div class="sidebar-logo-icon">S</div>
-        <div>
-          <div class="sidebar-brand-name">SudharSarthi</div>
-          <div style="font-size:10px;color:var(--text-subtle);font-weight:600;letter-spacing:0.5px;">DUHAI CIVIC AI</div>
-        </div>
-      </div>
-
-      <!-- Search -->
-      <div class="sidebar-search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="global-search" placeholder="Find reports, roads..." oninput="handleSearch()">
-      </div>
-
-      <!-- Quick Section -->
-      <div class="nav-group">
-        <div class="nav-item" onclick="switchView('dashboard')">
-          <div class="nav-item-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            <span>Folders</span>
-          </div>
-        </div>
-        <div class="nav-item" onclick="openEmailNotificationInfo()">
-          <div class="nav-item-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            <span>Communication</span>
-          </div>
-          <span class="nav-badge" style="background:#ecfdf5;color:#065f46;">Auto</span>
-        </div>
-      </div>
-
-      <!-- Work Section -->
-      <div class="nav-group">
-        <div class="nav-group-title">Work</div>
-        <div class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')">
-          <div class="nav-item-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            <span>Dashboard</span>
-          </div>
-        </div>
-        <div class="nav-item" id="nav-report" onclick="openReportModalForm()">
-          <div class="nav-item-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-            <span>Report Issue</span>
-          </div>
-          <span class="nav-badge">+</span>
-        </div>
-        <div class="nav-item" id="nav-wards" onclick="openWardsView()">
-          <div class="nav-item-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Duhai Wards</span>
-          </div>
-        </div>
-        <div class="nav-item" id="nav-budget" onclick="openBudgetView()">
-          <div class="nav-item-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
-            <span>Budget AI</span>
-          </div>
-        </div>
-        <div class="nav-item" id="nav-analytics" onclick="openAnalyticsView()">
-          <div class="nav-item-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            <span>Analytics</span>
-          </div>
-        </div>
-      </div>
-
+<header>
+  <div class="brand" onclick="switchTab('map')">
+    <img src="assets/logo-icon.svg" alt="SUDHARSARTHI Logo">
+    <div class="brand-text">
+      <b>SUDHAR<span>SARTHI</span></b>
+      <small>DUHAI CIVIC MONITOR &bull; GHAZIABAD</small>
     </div>
+  </div>
 
-    <!-- Sidebar Bottom: Render Cloud Connection Card -->
-    <div class="sidebar-bottom">
-      <div class="cloud-card">
-        <div class="cloud-header">
-          <div class="cloud-title">
-            <span class="cloud-dot" id="cloud-dot"></span>
-            <span>Cloud Backend (Render)</span>
+  <nav class="nav-tabs">
+    <button class="nav-btn active" data-tab="map" onclick="switchTab('map')">
+      🗺️ Duhai Map
+    </button>
+    <button class="nav-btn" data-tab="report" onclick="switchTab('report')">
+      ➕ Report Issue
+    </button>
+    <button class="nav-btn" data-tab="analytics" onclick="switchTab('analytics')">
+      📊 Analytics
+    </button>
+    <button class="nav-btn" data-tab="budget" onclick="switchTab('budget')">
+      💰 Budget AI
+    </button>
+    <button class="nav-btn" data-tab="wards" onclick="switchTab('wards')">
+      👮 Duhai Wards
+    </button>
+  </nav>
+
+  <div class="header-right">
+    <div class="header-badge">
+      <span class="live-dot"></span>
+      <span id="header-stats-text">Duhai Jurisdiction</span>
+    </div>
+    <button class="btn-report-quick" onclick="startReportFromMap()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Report Pothole / Hazard
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- TAB 1: DUHAI MAP & INCIDENT EXPLORER -->
+  <section id="tab-map" class="tab-content active">
+    <aside class="sidebar-panel">
+      <div class="sidebar-header">
+        <div class="sidebar-title-row">
+          <div class="sidebar-title">
+            <span>Duhai Issues</span>
+            <span class="sidebar-stats-pill" id="issues-count-pill">Loading...</span>
           </div>
+          <button class="quick-loc-btn" title="Refresh reports" onclick="reloadReports()">🔄 Refresh</button>
         </div>
-        <div class="cloud-input-row">
-          <input type="text" id="render-url-input" class="cloud-input" placeholder="https://sudharsarthi.onrender.com">
-          <button class="cloud-btn" onclick="saveRenderUrl()">Connect</button>
+
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Search pothole, road, RRTS gate, ward..." oninput="handleSearch()">
         </div>
-        <div class="cloud-info" id="cloud-status-text">
-          Paste your live Render backend URL above to link.
+
+        <div class="filter-row" id="priority-chips">
+          <span class="filter-chip active" data-filter="All" onclick="setPriorityFilter('All')">All</span>
+          <span class="filter-chip chip-high" data-filter="High" onclick="setPriorityFilter('High')"><span class="chip-dot" style="background:#dc2626"></span>High Urgency</span>
+          <span class="filter-chip chip-med" data-filter="Medium" onclick="setPriorityFilter('Medium')"><span class="chip-dot" style="background:#f59e0b"></span>Medium</span>
+          <span class="filter-chip chip-low" data-filter="Low" onclick="setPriorityFilter('Low')"><span class="chip-dot" style="background:#16a34a"></span>Low</span>
+          <span class="filter-chip chip-done" data-filter="Resolved" onclick="setPriorityFilter('Resolved')"><span class="chip-dot" style="background:#64748b"></span>Resolved</span>
         </div>
-      </div>
 
-      <div style="font-size:10.5px;color:var(--text-subtle);display:flex;align-items:center;justify-content:space-between;">
-        <span>Duhai, Ghaziabad</span>
-        <span>v2.5 Flow</span>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ===================================================================
-       COLUMN 2: MIDDLE ACTIVITY / DASHBOARD COLUMN (FlowPilot Style)
-       =================================================================== -->
-  <main class="dashboard-col">
-    
-    <!-- Title & Status -->
-    <div class="dash-header">
-      <div>
-        <h1 class="dash-title">Dashboard</h1>
-        <div class="dash-sub">
-          <span>Duhai Jurisdiction</span> &bull; <span id="dash-date">October 2026</span>
-        </div>
-      </div>
-      <button class="btn-manage-black" onclick="openReportModalForm()">+ Lodge Defect</button>
-    </div>
-
-    <!-- Top KPI Cards Row -->
-    <div class="kpi-row">
-      <div class="kpi-card">
-        <div class="kpi-val red" id="kpi-actions">5</div>
-        <div class="kpi-lbl">Actions needed</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-val dark" id="kpi-total">12</div>
-        <div class="kpi-lbl">Total reports</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-val dark" id="kpi-risk">5,5</div>
-        <div class="kpi-lbl">Risk level</div>
-      </div>
-    </div>
-
-    <!-- Average defect load heatmap widget (FlowPilot style) -->
-    <div class="heatmap-card">
-      <div class="heatmap-top">
-        <span class="heatmap-title">Average defect load</span>
-        <div class="heatmap-filters">
-          <span class="heatmap-pill">Today</span>
-          <span class="heatmap-pill">1w</span>
-          <span class="heatmap-pill active">1m</span>
-          <span class="heatmap-pill">6m</span>
-          <span class="heatmap-pill">1y</span>
-          <span style="font-size:11px;color:var(--text-subtle);cursor:pointer;" onclick="openAnalyticsView()">↗</span>
+        <div class="filter-secondary">
+          <select id="cat-filter" onchange="renderFilteredReports()">
+            <option value="All">All Categories</option>
+          </select>
+          <select id="ward-filter" onchange="renderFilteredReports()">
+            <option value="All">All Duhai Wards</option>
+          </select>
         </div>
       </div>
 
-      <div class="heatmap-grid">
-        <div class="heatmap-row">
-          <span class="heatmap-day">Mon</span>
-          <div class="heatmap-cells">
-            <div class="heatmap-cell active-amber"></div>
-            <div class="heatmap-cell active-amber"></div>
-            <div class="heatmap-cell hatched"></div>
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell active-amber"></div>
-            <div class="heatmap-cell"></div>
-          </div>
+      <div class="issues-scroll-list" id="reports-list">
+        <!-- Rendered items -->
+      </div>
+    </aside>
+
+    <div class="map-wrapper">
+      <div id="map"></div>
+
+      <!-- DUHAI QUICK NAVIGATION BAR -->
+      <div class="duhai-map-bar">
+        <div class="duhai-landmark-pills">
+          <span style="font-size:11px;font-weight:700;color:#0369a1;padding:4px 2px;">📍 DUHAI:</span>
+          <button class="landmark-btn" onclick="flyToDuhai(28.7273, 77.4718, 17, 'Duhai RRTS Station')">🚉 RRTS Station</button>
+          <button class="landmark-btn" onclick="flyToDuhai(28.7360, 77.4815, 16.5, 'Duhai RRTS Depot')">🚆 Duhai Depot</button>
+          <button class="landmark-btn" onclick="flyToDuhai(28.7304, 77.4759, 17, 'Duhai Village Chowk')">🏘️ Village Chowk</button>
+          <button class="landmark-btn" onclick="flyToDuhai(28.7285, 77.4740, 16, 'Delhi-Meerut Road (NH-34)')">🛣️ NH-34 Meerut Rd</button>
+          <button class="landmark-btn" onclick="flyToDuhai(28.7130, 77.4730, 16, 'Morti / South Duhai')">🌳 Morti Link</button>
+          <button class="landmark-btn" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;" onclick="resetDuhaiBounds()">🎯 Full Duhai</button>
         </div>
-        <div class="heatmap-row">
-          <span class="heatmap-day">Tue</span>
-          <div class="heatmap-cells">
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell active-amber"></div>
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell active-amber"></div>
-            <div class="heatmap-cell active-amber"></div>
-          </div>
-        </div>
-        <div class="heatmap-row">
-          <span class="heatmap-day">Wed</span>
-          <div class="heatmap-cells">
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell active-amber"></div>
-            <div class="heatmap-cell hatched"></div>
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell active-amber"></div>
-          </div>
-        </div>
-        <div class="heatmap-row">
-          <span class="heatmap-day">Thu</span>
-          <div class="heatmap-cells">
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell active-amber"></div>
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell active-amber"></div>
-            <div class="heatmap-cell"></div>
-          </div>
-        </div>
-        <div class="heatmap-row">
-          <span class="heatmap-day">Fri</span>
-          <div class="heatmap-cells">
-            <div class="heatmap-cell active-amber"></div>
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell active-amber"></div>
-            <div class="heatmap-cell active-amber"></div>
-            <div class="heatmap-cell"></div>
-            <div class="heatmap-cell"></div>
-          </div>
+
+        <div class="duhai-tag-badge">
+          <span>Boundary Locked:</span> Duhai Civic Area
         </div>
       </div>
 
-      <div class="heatmap-months">
-        <span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span>
-      </div>
-    </div>
-
-    <!-- Active reports list -->
-    <div class="reports-section">
-      <div class="reports-sec-header">
-        <div class="reports-sec-title">
-          <span>Active reports</span>
-          <span class="reports-sec-count" id="count-active">9</span>
-        </div>
-        <span style="font-size:12px;color:var(--text-subtle);cursor:pointer;" onclick="reloadReports()">🔄 Refresh</span>
+      <!-- PICKING MODE BANNER -->
+      <div class="picking-mode-banner" id="pick-mode-banner">
+        <span>📍 Click anywhere inside Duhai on the map to set report location</span>
+        <button onclick="cancelPickingMode()" style="background:#fff;color:#1e3a8a;border:0;padding:2px 8px;border-radius:6px;cursor:pointer;font-weight:600;font-size:11px;">Cancel</button>
       </div>
 
-      <!-- Filter tabs -->
-      <div class="filter-tabs">
-        <span class="filter-tab active" data-filter="All" onclick="setFilter('All')">All</span>
-        <span class="filter-tab" data-filter="High" onclick="setFilter('High')">Actions needed <span class="filter-tab-count" id="tab-cnt-high">5</span></span>
-        <span class="filter-tab" data-filter="Medium" onclick="setFilter('Medium')">Delayed <span class="filter-tab-count" id="tab-cnt-med">12</span></span>
-        <span class="filter-tab" data-filter="Resolved" onclick="setFilter('Resolved')">Resolved</span>
+      <!-- MAP FLOATING ACTION CONTROLS -->
+      <div class="map-floating-controls">
+        <button class="map-ctrl-btn" id="btn-toggle-satellite" title="Toggle Satellite Aerial View" onclick="toggleSatelliteView()">🛰️</button>
+        <button class="map-ctrl-btn" id="btn-toggle-wards" title="Toggle Duhai Ward Zones" onclick="toggleWardLayer()">🏛️</button>
+        <button class="map-ctrl-btn" title="Center Map on Duhai" onclick="resetDuhaiBounds()">🎯</button>
       </div>
-
-      <!-- Cards Container -->
-      <div class="cards-list" id="incident-cards-container">
-        <!-- Rendered by JS -->
-      </div>
-    </div>
-
-  </main>
-
-  <!-- ===================================================================
-       COLUMN 3: MAP VIEW (OPENSTREETMAP + ESRI SATELLITE - NO API KEY!)
-       =================================================================== -->
-  <section class="map-col">
-    <div id="map"></div>
-
-    <!-- Map Top Bar: Duhai Quick Landmark Navigation -->
-    <div class="map-top-bar">
-      <div class="map-pills-row">
-        <span style="font-size:11px;font-weight:700;color:#0369a1;padding:4px 2px;">📍 DUHAI:</span>
-        <button class="landmark-btn" onclick="flyToDuhai(28.7273, 77.4718, 17, 'Duhai RRTS Station')">🚉 RRTS Station</button>
-        <button class="landmark-btn" onclick="flyToDuhai(28.7360, 77.4815, 16.5, 'Duhai RRTS Depot')">🚆 Depot</button>
-        <button class="landmark-btn" onclick="flyToDuhai(28.7304, 77.4759, 17, 'Duhai Village')">🏘️ Village</button>
-        <button class="landmark-btn" onclick="flyToDuhai(28.7285, 77.4740, 16, 'NH-34 Meerut Rd')">🛣️ NH-34</button>
-        <button class="landmark-btn" onclick="resetDuhaiBounds()">🎯 Full Bounds</button>
-      </div>
-
-      <div style="background:rgba(17,24,39,0.88);color:#fff;padding:6px 12px;border-radius:10px;font-size:11px;font-weight:600;box-shadow:var(--shadow-card);pointer-events:auto;">
-        <span style="color:#38bdf8;">Locked:</span> Duhai 42 sq km
-      </div>
-    </div>
-
-    <!-- Floating Bottom-Right Dock (FlowPilot Pill) -->
-    <div class="map-bottom-dock">
-      <button class="dock-btn" id="btn-toggle-sat" title="Toggle Satellite" onclick="toggleSatelliteView()">🛰️</button>
-      <button class="dock-btn" id="btn-toggle-wards" title="Toggle Wards" onclick="toggleWardLayer()">🏛️</button>
-      <button class="dock-btn" title="Zoom In (+)" onclick="mapZoomIn()">➕</button>
-      <button class="dock-btn" title="Zoom Out (-)" onclick="mapZoomOut()">➖</button>
-      <button class="dock-btn" title="Center Duhai" onclick="resetDuhaiBounds()">🎯</button>
-    </div>
-
-    <!-- Bottom Progress Ticker -->
-    <div class="map-bottom-ticker">
-      <span class="ticker-dot"></span>
-      <span>Duhai Infrastructure &bull; Automated Reports to <b>awasthishailendra59@gmail.com</b></span>
     </div>
   </section>
 
-</div>
+  <!-- TAB 2: CITIZEN REPORT FORM -->
+  <section id="tab-report" class="tab-content">
+    <div class="report-container">
+      <div class="report-card">
+        <div class="report-title-area">
+          <h2>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Report a Civic Issue in Duhai
+          </h2>
+          <p>Citizen reports are analyzed by our AI urgency engine. Urgent hazards alert the local Duhai ward junior engineer automatically.</p>
+        </div>
 
-<!-- ===================================================================
-     MODALS: INCIDENT INSPECTOR & CITIZEN REPORT FORM
-     =================================================================== -->
+        <div class="form-grid">
+          <!-- CATEGORY PICKER -->
+          <div class="form-group form-full">
+            <label class="form-label">Select Issue Category <span>*</span></label>
+            <div class="cat-picker-grid" id="category-cards">
+              <!-- Rendered via JS -->
+            </div>
+            <input type="hidden" id="form-category" value="Pothole">
+          </div>
 
-<!-- INCIDENT DETAIL MODAL (Full 4-Bar Diagnostic & Status Changer) -->
-<div class="modal-backdrop" id="incident-detail-modal" style="display:none;" onclick="if(event.target===this)closeIncidentModal()">
-  <div class="modal-card">
+          <!-- DESCRIPTION -->
+          <div class="form-group form-full">
+            <label class="form-label">Describe the Issue <span>*</span></label>
+            <textarea id="form-description" class="form-control" placeholder="Explain the hazard in detail (e.g. Deep 15cm pothole on the fast lane outside Duhai RRTS station gate; two-wheelers slipping in darkness)."></textarea>
+          </div>
+
+          <!-- PHOTO UPLOAD & PREVIEW -->
+          <div class="form-group">
+            <label class="form-label">Photo of the Problem (AI Urgency Analysis)</label>
+            <div class="upload-dropzone" id="upload-zone">
+              <input type="file" id="form-photo" accept="image/*" onchange="handlePhotoSelect(event)">
+              <div style="font-size:26px;margin-bottom:6px;">📸</div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b;">Click or drag photo here</div>
+              <div style="font-size:11px;color:#64748b;margin-top:2px;">Supports JPG, PNG, WebP (up to 5MB)</div>
+            </div>
+
+            <div class="upload-preview-area" id="upload-preview" style="display:none;">
+              <img id="preview-img" class="upload-preview-img" src="" alt="Issue Preview">
+              <div style="flex:1;">
+                <div id="preview-filename" style="font-size:12px;font-weight:600;color:#1e293b;">photo.jpg</div>
+                <div style="font-size:11px;color:#64748b;">Image attached for AI vision check</div>
+                <button type="button" onclick="removePhoto()" style="background:none;border:0;color:#dc2626;font-size:11px;font-weight:600;cursor:pointer;padding:0;margin-top:4px;">Remove</button>
+              </div>
+              <button type="button" class="loc-btn primary" onclick="runAIPrescan()" id="btn-prescan">⚡ Pre-scan AI</button>
+            </div>
+
+            <!-- AI PRE-SCAN RESULT -->
+            <div class="ai-prescan-box" id="ai-prescan-box">
+              <div class="ai-prescan-header">
+                <span class="ai-prescan-title">⚡ AI Vision Pre-Assessment</span>
+                <span id="prescan-score-badge" class="card-urgency urgency-High">High Urgency</span>
+              </div>
+              <div id="prescan-details" style="font-size:12px;color:#0f766e;line-height:1.4;"></div>
+            </div>
+          </div>
+
+          <!-- LOCATION SELECTION -->
+          <div class="form-group">
+            <label class="form-label">Location in Duhai <span>*</span></label>
+            <div class="loc-picker-box">
+              <div class="loc-actions">
+                <button type="button" class="loc-btn primary" onclick="pickLocationOnMap()">📍 Pick on Duhai Map</button>
+                <button type="button" class="loc-btn" onclick="useCurrentGPS()">📡 Use GPS</button>
+              </div>
+
+              <div class="loc-display-pill" id="location-status-pill">
+                <span id="loc-status-text">No location selected yet. Tap the button above or pick on Duhai map.</span>
+              </div>
+
+              <div class="quick-loc-shortcuts">
+                <span>Quick Duhai Spots:</span>
+                <button type="button" class="quick-loc-btn" onclick="setQuickLocation(28.7276, 77.4724, 'Duhai RRTS Station Gate', 'Zone 2 (Duhai RRTS Station)')">RRTS Station</button>
+                <button type="button" class="quick-loc-btn" onclick="setQuickLocation(28.7310, 77.4768, 'Duhai Village Main Road', 'Zone 1 (Duhai Village)')">Village Road</button>
+                <button type="button" class="quick-loc-btn" onclick="setQuickLocation(28.7360, 77.4815, 'Duhai Depot Entrance', 'Zone 5 (East Duhai)')">RRTS Depot</button>
+                <button type="button" class="quick-loc-btn" onclick="setQuickLocation(28.7285, 77.4740, 'Meerut Road NH-34 Junction', 'Zone 2 (Duhai RRTS Station)')">NH-34</button>
+              </div>
+            </div>
+
+            <div style="margin-top:10px;">
+              <label class="form-label">Landmark / Place Name</label>
+              <input type="text" id="form-landmark" class="form-control" placeholder="E.g. Near RRTS Gate 2, opposite temple">
+            </div>
+          </div>
+
+          <!-- REPORTER NAME -->
+          <div class="form-group form-full">
+            <label class="form-label">Your Name / Contact (Optional)</label>
+            <input type="text" id="form-reporter" class="form-control" placeholder="Citizen (or leave blank for anonymous report)">
+          </div>
+
+          <!-- SUBMIT BUTTON -->
+          <div class="form-group form-full">
+            <button type="button" class="btn-submit-report" id="btn-submit" onclick="submitReportForm()">
+              <span>Submit Civic Report to Duhai Ward Officer</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: CIVIC ANALYTICS -->
+  <section id="tab-analytics" class="tab-content">
+    <div class="analytics-container">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+          <h2 style="font-family:'Poppins',sans-serif;font-size:22px;color:var(--primary);">Duhai Civic Analytics & Performance</h2>
+          <p style="font-size:13px;color:var(--mut);">Real-time municipal performance metrics and resolution rates for Duhai, Ghaziabad.</p>
+        </div>
+        <button class="quick-loc-btn" style="padding:8px 14px;font-weight:600;" onclick="loadAnalyticsData()">🔄 Refresh Analytics</button>
+      </div>
+
+      <!-- KPI METRICS -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-title">Total Reports</span>
+          <b class="kpi-value" id="kpi-total">0</b>
+          <span class="kpi-sub">Lifetime logged in Duhai</span>
+        </div>
+        <div class="kpi-card" style="border-left:4px solid var(--high);">
+          <span class="kpi-title" style="color:var(--high);">Critical / High</span>
+          <b class="kpi-value" style="color:var(--high);" id="kpi-high">0</b>
+          <span class="kpi-sub">Priority hazards open</span>
+        </div>
+        <div class="kpi-card" style="border-left:4px solid var(--med);">
+          <span class="kpi-title" style="color:var(--med);">Pending Repairs</span>
+          <b class="kpi-value" style="color:var(--med);" id="kpi-pending">0</b>
+          <span class="kpi-sub">Under active works</span>
+        </div>
+        <div class="kpi-card" style="border-left:4px solid var(--low);">
+          <span class="kpi-title" style="color:var(--low);">Resolved Issues</span>
+          <b class="kpi-value" style="color:var(--low);" id="kpi-resolved">0</b>
+          <span class="kpi-sub">Citizen verified repairs</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Avg Resolution</span>
+          <b class="kpi-value" id="kpi-avg-days">--</b>
+          <span class="kpi-sub">Days from report to fix</span>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Issues by Category</h3>
+          <div style="height:240px;position:relative;">
+            <canvas id="chart-categories"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>Monthly Trend (Reported vs Fixed)</h3>
+          <div style="height:240px;position:relative;">
+            <canvas id="chart-trend"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- DUHAI WARD RESOLUTION TABLE -->
+      <div class="ward-leaderboard-card">
+        <h3 style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:6px;">Duhai Ward Performance Leaderboard</h3>
+        <p style="font-size:12px;color:var(--mut);margin-bottom:12px;">Resolution rate and speed across all 6 Duhai municipal zones.</p>
+        <table class="ward-table">
+          <thead>
+            <tr>
+              <th>Zone / Ward Name</th>
+              <th>Total Issues</th>
+              <th>Resolved</th>
+              <th>Resolution Rate</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="ward-leaderboard-body">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: MUNICIPAL BUDGET OPTIMIZER -->
+  <section id="tab-budget" class="tab-content">
+    <div class="budget-container">
+      <div class="budget-header-card">
+        <h2>💰 Municipal Road Budget Optimizer</h2>
+        <p style="font-size:13px;opacity:0.9;">Solves the true 0/1 knapsack problem to maximize hazard elimination for Duhai's civic repair funds.</p>
+      </div>
+
+      <div class="budget-ctrl-panel">
+        <div class="budget-input-row">
+          <div style="flex:1;min-width:240px;">
+            <label class="form-label">Available Repair Budget (₹ Rupees)</label>
+            <input type="number" id="budget-amount" class="form-control" value="250000" step="10000" min="10000">
+            <div class="budget-preset-chips">
+              <span class="preset-chip" onclick="setPresetBudget(100000)">₹ 1.0 Lakh</span>
+              <span class="preset-chip" onclick="setPresetBudget(250000)">₹ 2.5 Lakhs</span>
+              <span class="preset-chip" onclick="setPresetBudget(500000)">₹ 5.0 Lakhs</span>
+              <span class="preset-chip" onclick="setPresetBudget(1000000)">₹ 10.0 Lakhs</span>
+            </div>
+          </div>
+
+          <div style="min-width:200px;">
+            <label class="form-label">Optimization Strategy</label>
+            <select id="budget-strategy" class="form-control">
+              <option value="balanced">Balanced (Risk + Value)</option>
+              <option value="priority">Critical Safety First</option>
+              <option value="coverage">Maximum Road Coverage</option>
+            </select>
+          </div>
+
+          <button class="btn-optimize" onclick="runBudgetOptimization()">⚡ Run AI Optimization</button>
+        </div>
+      </div>
+
+      <div class="budget-stats-grid" id="budget-stats-grid" style="display:none;">
+        <div class="budget-stat-box">
+          <span style="font-size:12px;color:var(--mut);">Allocated Spend</span>
+          <b id="b-stat-allocated" style="color:var(--primary);">₹ 0</b>
+        </div>
+        <div class="budget-stat-box">
+          <span style="font-size:12px;color:var(--mut);">Surplus / Reserve</span>
+          <b id="b-stat-remaining" style="color:var(--teal-dark);">₹ 0</b>
+        </div>
+        <div class="budget-stat-box">
+          <span style="font-size:12px;color:var(--mut);">Critical Hazards Fixed</span>
+          <b id="b-stat-critical" style="color:var(--high);">0 / 0</b>
+        </div>
+        <div class="budget-stat-box">
+          <span style="font-size:12px;color:var(--mut);">Total Works Scheduled</span>
+          <b id="b-stat-count" style="color:#16a34a;">0</b>
+        </div>
+      </div>
+
+      <div id="budget-results-tables" style="display:none;">
+        <div class="ward-leaderboard-card" style="margin-bottom:20px;">
+          <h3 style="font-family:'Poppins',sans-serif;font-size:15px;color:#16a34a;margin-bottom:10px;">✅ Approved Immediate Works (Under Budget)</h3>
+          <table class="ward-table">
+            <thead>
+              <tr>
+                <th>Issue ID</th>
+                <th>Project Title</th>
+                <th>Ward</th>
+                <th>Urgency Score</th>
+                <th>Estimated Cost</th>
+              </tr>
+            </thead>
+            <tbody id="budget-approved-body"></tbody>
+          </table>
+        </div>
+
+        <div class="ward-leaderboard-card">
+          <h3 style="font-family:'Poppins',sans-serif;font-size:15px;color:#dc2626;margin-bottom:10px;">⏳ Deferred To Next Funding Tranche</h3>
+          <table class="ward-table">
+            <thead>
+              <tr>
+                <th>Issue ID</th>
+                <th>Project Title</th>
+                <th>Ward</th>
+                <th>Urgency Score</th>
+                <th>Estimated Cost</th>
+              </tr>
+            </thead>
+            <tbody id="budget-deferred-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 5: DUHAI WARDS & SLA -->
+  <section id="tab-wards" class="tab-content">
+    <div class="wards-container">
+      <h2 style="font-family:'Poppins',sans-serif;font-size:22px;color:var(--primary);">Duhai Municipal Wards & Officer Directory</h2>
+      <p style="font-size:13px;color:var(--mut);">SUDHARSARTHI monitors the 6 municipal zones of Duhai, Ghaziabad. High urgency alerts notify the assigned engineer directly.</p>
+
+      <div class="wards-grid" id="wards-cards-list">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ISSUE DETAIL MODAL -->
+<div class="modal-backdrop" id="issue-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-dialog">
     <div class="modal-header">
       <div>
-        <div class="modal-title" id="m-title">NS-2026-1042</div>
-        <div style="font-size:12px;color:var(--text-muted);" id="m-subtitle">Master Plan Road &bull; Pothole</div>
+        <h3 id="m-title">Issue Title</h3>
+        <span style="font-size:11px;color:var(--mut);" id="m-id-date">NS-2026-1042 &bull; 2026-10-14</span>
       </div>
-      <button class="modal-close" onclick="closeIncidentModal()">&times;</button>
+      <button class="modal-close-btn" onclick="closeModal()">&times;</button>
     </div>
+
     <div class="modal-body">
-      <div id="m-image-container" style="display:none;">
-        <img id="m-photo" src="" alt="Defect Photo" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);">
+      <div class="modal-img-wrapper" id="m-img-wrapper">
+        <img id="m-image" src="" alt="Issue Photo">
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div style="background:#f9fafb;padding:12px;border-radius:var(--radius-md);border:1px solid var(--border);">
-          <div style="font-size:11px;color:var(--text-muted);font-weight:600;">URGENCY SCORE</div>
-          <div style="font-size:22px;font-weight:800;color:#111827;margin-top:2px;" id="m-score">88/100</div>
-          <div style="font-size:11px;color:#be123c;font-weight:600;margin-top:2px;" id="m-priority">High Priority Hazard</div>
+      <div class="modal-score-banner">
+        <div class="score-circle-big" id="m-score-circle" style="background:#dc2626;">
+          <span id="m-score-val">92</span>
+          <small>Score</small>
         </div>
-        <div style="background:#f9fafb;padding:12px;border-radius:var(--radius-md);border:1px solid var(--border);">
-          <div style="font-size:11px;color:var(--text-muted);font-weight:600;">ESTIMATED REPAIR</div>
-          <div style="font-size:22px;font-weight:800;color:#111827;margin-top:2px;" id="m-cost">₹ 35,000</div>
-          <div style="font-size:11px;color:#15803d;font-weight:600;margin-top:2px;" id="m-ward">Zone 2 (RRTS)</div>
-        </div>
-      </div>
-
-      <!-- 4 Factor Breakdown Bars -->
-      <div style="background:#f9fafb;padding:14px;border-radius:var(--radius-md);border:1px solid var(--border);display:flex;flex-direction:column;gap:10px;">
-        <div style="font-size:12px;font-weight:700;color:#111827;">AI Risk Breakdown Factor Meters:</div>
-        <div>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:#374151;margin-bottom:3px;"><span>Severity Factor</span><span id="m-bar-sev">36/40</span></div>
-          <div style="height:6px;background:#e5e7eb;border-radius:999px;overflow:hidden;"><div id="m-bar-sev-fill" style="height:100%;background:#e11d48;width:90%;"></div></div>
-        </div>
-        <div>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:#374151;margin-bottom:3px;"><span>Traffic Exposure</span><span id="m-bar-traf">22/25</span></div>
-          <div style="height:6px;background:#e5e7eb;border-radius:999px;overflow:hidden;"><div id="m-bar-traf-fill" style="height:100%;background:#f59e0b;width:88%;"></div></div>
-        </div>
-        <div>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:#374151;margin-bottom:3px;"><span>Repeat Complaints</span><span id="m-bar-rep">18/20</span></div>
-          <div style="height:6px;background:#e5e7eb;border-radius:999px;overflow:hidden;"><div id="m-bar-rep-fill" style="height:100%;background:#2563eb;width:90%;"></div></div>
-        </div>
-        <div>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:#374151;margin-bottom:3px;"><span>Aging Factor</span><span id="m-bar-age">12/15</span></div>
-          <div style="height:6px;background:#e5e7eb;border-radius:999px;overflow:hidden;"><div id="m-bar-age-fill" style="height:100%;background:#10b981;width:80%;"></div></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <b id="m-priority-label" style="font-size:15px;color:#dc2626;">High Urgency</b>
+            <span id="m-status-tag" class="status-pill status-Reported">Reported</span>
+          </div>
+          <div style="font-size:12px;color:#475569;" id="m-category-location">Pothole &bull; Near Duhai RRTS Gate</div>
         </div>
       </div>
 
-      <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:var(--radius-md);padding:12px;font-size:12px;color:#be123c;">
-        <b>⚠️ AI Urgency Diagnosis & Officer Route:</b>
-        <div id="m-reasons" style="margin-top:4px;line-height:1.4;">Defect depth > 10cm on high-traffic artery. Automated alert dispatched to awasthishailendra59@gmail.com.</div>
+      <div class="modal-section-title">Urgency Score Breakdown (AI Weighted Formula)</div>
+      <div class="popup-bars" id="m-breakdown-bars">
+        <!-- Bars rendered by JS -->
       </div>
 
-      <div>
-        <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Update Incident Status:</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn-manage-black" onclick="updateStatus('Reported')">Reported</button>
-          <button class="btn-manage-black" onclick="updateStatus('Under Review')">Under Review</button>
-          <button class="btn-manage-black" onclick="updateStatus('Repair in Progress')">In Progress</button>
-          <button class="btn-manage-black" style="background:#15803d;" onclick="updateStatus('Resolved')">Resolved ✅</button>
+      <div class="modal-section-title">AI Vision Inspection Analysis</div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;font-size:12px;line-height:1.6;" id="m-ai-analysis">
+        <!-- AI details -->
+      </div>
+
+      <div class="modal-section-title">Ward Officer & Repair Status Action</div>
+      <div style="background:#f1f5f9;border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+          <span><b>Assigned Ward:</b> <span id="m-ward">Zone 2</span></span>
+          <span><b>Cost Estimate:</b> <span id="m-cost">₹ 35,000</span></span>
         </div>
+        <div style="font-size:12px;color:#475569;">
+          <span><b>Officer:</b> <span id="m-officer">Junior Engineer</span></span>
+        </div>
+      </div>
+
+      <div class="modal-section-title">Update Repair Status (Officer Action)</div>
+      <div class="modal-status-changer">
+        <button class="status-change-btn" data-st="Reported" onclick="updateCurrentReportStatus('Reported')">Reported</button>
+        <button class="status-change-btn" data-st="Under Review" onclick="updateCurrentReportStatus('Under Review')">Under Review</button>
+        <button class="status-change-btn" data-st="Repair in Progress" onclick="updateCurrentReportStatus('Repair in Progress')">In Progress</button>
+        <button class="status-change-btn" data-st="Resolved" onclick="updateCurrentReportStatus('Resolved')">Resolved</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- CITIZEN REPORT FORM MODAL -->
-<div class="modal-backdrop" id="report-form-modal" style="display:none;" onclick="if(event.target===this)closeReportModalForm()">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-title">Report Civic Defect (Duhai)</div>
-      <button class="modal-close" onclick="closeReportModalForm()">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--radius-md);padding:12px;font-size:12px;color:#1e40af;">
-        <b>✉️ Automatic Email Dispatch:</b> Every submitted report is instantly emailed with live GPS coordinates, photo attachment & AI risk score to <b>awasthishailendra59@gmail.com</b>.
-      </div>
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
 
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Issue Category</label>
-        <select id="form-category" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:13px;">
-          <option value="Pothole">Pothole / Road Surface Defect</option>
-          <option value="Streetlight Out">Streetlight Out / Darkness Hazard</option>
-          <option value="Waterlogging">Waterlogging / Drainage Failure</option>
-          <option value="Garbage Dump">Illegal Garbage Dump</option>
-          <option value="Broken Pipe">Water Pipeline Leakage</option>
-          <option value="Open Manhole">Open Manhole / Missing Cover</option>
-        </select>
-      </div>
-
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Defect Location (inside Duhai)</label>
-        <div style="display:flex;gap:6px;">
-          <input type="text" id="form-location" placeholder="e.g. Master Plan Road near Duhai RRTS Gate 2" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:13px;">
-          <button type="button" class="btn-manage-black" onclick="setQuickLocation('Master Plan Road near City Hospital, Duhai', 28.7285, 77.4740)">📍 Duhai GPS</button>
-        </div>
-      </div>
-
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Landmark (Optional)</label>
-        <input type="text" id="form-landmark" placeholder="e.g. Opposite Metro Pillar 42" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:13px;">
-      </div>
-
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Description</label>
-        <textarea id="form-description" rows="3" placeholder="Describe defect size, depth, or traffic danger..." style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:13px;"></textarea>
-      </div>
-
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Upload Defect Photo (AI Vision Scan)</label>
-        <input type="file" id="form-photo" accept="image/*" style="font-size:12px;">
-      </div>
-
-      <button class="btn-manage-black" id="btn-submit-report" onclick="submitReport()" style="padding:11px;font-size:13px;margin-top:6px;">
-        Submit Civic Report & Dispatch Alert ✉️
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ===================================================================
-     FULL OVERLAY VIEWS: ANALYTICS, BUDGET AI, WARDS DIRECTORY
-     =================================================================== -->
-
-<!-- ANALYTICS VIEW OVERLAY -->
-<div class="view-overlay" id="view-analytics" style="display:none;">
-  <div class="view-overlay-header">
-    <div style="font-size:18px;font-weight:700;color:#111827;">📊 Duhai Civic Analytics Engine</div>
-    <button class="btn-manage-black" onclick="closeOverlays()">← Back to Dashboard</button>
-  </div>
-  <div class="view-overlay-body">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
-      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;">
-        <h4 style="font-size:14px;font-weight:600;margin-bottom:14px;">Reports by Category</h4>
-        <div style="height:260px;"><canvas id="chart-cat"></canvas></div>
-      </div>
-      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;">
-        <h4 style="font-size:14px;font-weight:600;margin-bottom:14px;">Monthly Incident Trends</h4>
-        <div style="height:260px;"><canvas id="chart-trend"></canvas></div>
-      </div>
-    </div>
-    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;">
-      <h4 style="font-size:14px;font-weight:600;margin-bottom:12px;">Ward Resolution Performance</h4>
-      <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
-        <thead>
-          <tr style="text-align:left;border-bottom:1px solid var(--border);color:var(--text-muted);">
-            <th style="padding:8px 6px;">Ward Zone</th>
-            <th style="padding:8px 6px;">Officer</th>
-            <th style="padding:8px 6px;">Open Hazards</th>
-            <th style="padding:8px 6px;">Resolution Rate</th>
-          </tr>
-        </thead>
-        <tbody id="analytics-ward-table"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- BUDGET AI OVERLAY -->
-<div class="view-overlay" id="view-budget" style="display:none;">
-  <div class="view-overlay-header">
-    <div style="font-size:18px;font-weight:700;color:#111827;">💰 Municipal Road Budget Optimizer (0/1 Knapsack)</div>
-    <button class="btn-manage-black" onclick="closeOverlays()">← Back to Dashboard</button>
-  </div>
-  <div class="view-overlay-body">
-    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;">
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
-        Optimizes road repair funds to mathematically maximize hazard mitigation using dynamic programming.
-      </div>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-        <div style="flex:1;min-width:240px;">
-          <label style="font-size:11.5px;font-weight:600;color:#374151;">Available Budget (₹ Rupees)</label>
-          <input type="number" id="budget-amount" value="250000" step="25000" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:14px;font-weight:600;margin-top:4px;">
-        </div>
-        <div style="min-width:180px;">
-          <label style="font-size:11.5px;font-weight:600;color:#374151;">Strategy</label>
-          <select id="budget-strategy" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:13px;margin-top:4px;">
-            <option value="balanced">Balanced (Risk + Cost)</option>
-            <option value="priority">Critical Safety First</option>
-            <option value="coverage">Maximum Road Coverage</option>
-          </select>
-        </div>
-        <button class="btn-manage-black" onclick="runKnapsackOptimization()" style="margin-top:20px;padding:9px 16px;">⚡ Run AI Optimization</button>
-      </div>
-
-      <div style="display:flex;gap:6px;margin-top:12px;">
-        <button class="landmark-btn" onclick="setPresetBudget(100000)">₹ 1.0 Lakh</button>
-        <button class="landmark-btn" onclick="setPresetBudget(250000)">₹ 2.5 Lakhs</button>
-        <button class="landmark-btn" onclick="setPresetBudget(500000)">₹ 5.0 Lakhs</button>
-        <button class="landmark-btn" onclick="setPresetBudget(1000000)">₹ 10.0 Lakhs</button>
-      </div>
-    </div>
-
-    <div id="budget-results-box" style="display:none;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;">
-      <h4 style="font-size:15px;font-weight:700;color:#15803d;margin-bottom:12px;">Approved Immediate Works (Under Budget)</h4>
-      <table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:18px;">
-        <thead>
-          <tr style="border-bottom:1px solid var(--border);color:var(--text-muted);text-align:left;">
-            <th style="padding:6px;">ID</th><th>Category</th><th>Location</th><th>Urgency</th><th>Est. Cost</th>
-          </tr>
-        </thead>
-        <tbody id="budget-approved-rows"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- WARDS DIRECTORY OVERLAY -->
-<div class="view-overlay" id="view-wards" style="display:none;">
-  <div class="view-overlay-header">
-    <div style="font-size:18px;font-weight:700;color:#111827;">🏛️ Duhai Municipal Wards & Jurisdictions</div>
-    <button class="btn-manage-black" onclick="closeOverlays()">← Back to Dashboard</button>
-  </div>
-  <div class="view-overlay-body">
-    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:16px;" id="wards-grid-container">
-      <!-- Rendered by JS -->
-    </div>
-  </div>
-</div>
-
-<!-- ===================================================================
-     JAVASCRIPT LOGIC
-     =================================================================== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-/* ---------------------------------------------------------------------
-   STATE & CLOUD BACKEND ENGINE
-   --------------------------------------------------------------------- */
-const DEFAULT_RENDER_URL = "https://sudharsarthi.onrender.com";
-let API = localStorage.getItem('sudharsarthi_backend_url') || '';
-let reports = [];
-let currentFilter = 'All';
+/* =====================================================================
+   SUDHARSARTHI - DUHAI CIVIC MONITOR FRONTEND LOGIC
+   ===================================================================== */
+// Smart Backend Resolver: Supports Vercel -> Render connection via localStorage or query param
+let API = (function() {
+  const urlParam = new URLSearchParams(window.location.search).get('backend');
+  if (urlParam) {
+    localStorage.setItem('SUDHARSARTHI_BACKEND_URL', urlParam.replace(/\/+$/, ''));
+    return urlParam.replace(/\/+$/, '');
+  }
+  const stored = localStorage.getItem('SUDHARSARTHI_BACKEND_URL');
+  if (stored) return stored.replace(/\/+$/, '');
+  if (window.API_BASE) return window.API_BASE.replace(/\/+$/, '');
+  if (window.location.hostname.includes('onrender.com')) return '';
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return 'http://127.0.0.1:5000';
+  return '';
+})();
+const DUHAI_CENTER = [28.7285, 77.4740];
+// South, West, North, East (roughly 6.5 km square strictly bounding Duhai)
+const DUHAI_BOUNDS = [[28.700, 77.440], [28.760, 77.510]];
+
+const COLORS = {
+  High: '#dc2626',
+  Medium: '#f59e0b',
+  Low: '#16a34a',
+  Resolved: '#64748b'
+};
+
+const CATEGORY_ICONS = {
+  'Pothole': '🕳️',
+  'Road Crack': '⚡',
+  'Surface Damage': '⚠️',
+  'Waterlogging': '🌊',
+  'Fallen Tree': '🌳',
+  'Garbage': '🗑️',
+  'Other': '❓'
+};
+
 let map = null;
-let markers = {};
-let selectedReport = null;
 let tileLayerOsm = null;
 let tileLayerSat = null;
 let isSatellite = false;
+let boundaryPolygon = null;
 let wardLayerGroup = null;
 let showWards = false;
 
-// Duhai Constants
-const DUHAI_CENTER = [28.7285, 77.4740];
-const DUHAI_BOUNDS = [[28.700, 77.440], [28.760, 77.510]];
+let cfg = null;
+let reports = [];
+let markers = {};
+let currentFilter = 'All';
+let currentSearch = '';
+let selectedReport = null;
 
-const DUHAI_WARDS = [
-  { name: "Zone 1 (Duhai Village)", officer: "P. K. Sharma", email: "zone1.officer@ghaziabad.gov.in", contractor: "Shree Ram Infratech", lat: 28.7304, lng: 77.4759 },
-  { name: "Zone 2 (Duhai RRTS Station)", officer: "Virender Tyagi", email: "zone2.officer@ghaziabad.gov.in", contractor: "NCRTC Road Maintenance Wing", lat: 28.7273, lng: 77.4718 },
-  { name: "Zone 3 (North Duhai)", officer: "Anil Chauhan", email: "zone3.officer@ghaziabad.gov.in", contractor: "UP PWD Division 2", lat: 28.7420, lng: 77.4730 },
-  { name: "Zone 4 (South Duhai)", officer: "Sunil Tomar", email: "zone4.officer@ghaziabad.gov.in", contractor: "Ghaziabad Nagar Nigam Ward 4", lat: 28.7130, lng: 77.4730 },
-  { name: "Zone 5 (East Duhai)", officer: "Mahesh Rawat", email: "zone5.officer@ghaziabad.gov.in", contractor: "Eastern Express Roads Ltd", lat: 28.7290, lng: 77.4930 },
-  { name: "Zone 6 (West Duhai)", officer: "Rajeev Singhal", email: "zone6.officer@ghaziabad.gov.in", contractor: "Hind Builders & Infra", lat: 28.7290, lng: 77.4550 }
-];
+let isPickingLocation = false;
+let pickedLocation = null;
+let pickMarker = null;
 
-/* Initialize Application */
-window.addEventListener('DOMContentLoaded', async () => {
-  initMap();
-  initCloudConnection();
-  await loadReports();
-});
+let categoryChartInstance = null;
+let trendChartInstance = null;
 
-/* Cloud Connection Handlers */
-function initCloudConnection() {
-  const input = document.getElementById('render-url-input');
-  if (API && input) input.value = API;
-  testBackendConnection();
+/* Toast helper */
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    setTimeout(() => toast.remove(), 250);
+  }, 3500);
 }
 
-async function saveRenderUrl() {
-  const input = document.getElementById('render-url-input');
-  const url = (input ? input.value : '').trim().replace(/\/+$/, '');
-  API = url;
-  localStorage.setItem('sudharsarthi_backend_url', API);
-  showToast('Connecting to ' + (API || 'Render Backend') + '...');
-  await testBackendConnection();
-  await loadReports();
-}
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-async function testBackendConnection() {
-  const dot = document.getElementById('cloud-dot');
-  const txt = document.getElementById('cloud-status-text');
-  dot.className = 'cloud-dot connecting';
-  txt.textContent = 'Testing connection...';
-
-  const testUrls = [API, '', DEFAULT_RENDER_URL];
-  for (const u of testUrls) {
-    try {
-      const res = await fetch((u ? u : '') + '/api/health', { method: 'GET', signal: AbortSignal.timeout(4000) });
-      if (res.ok) {
-        API = u;
-        localStorage.setItem('sudharsarthi_backend_url', u);
-        dot.className = 'cloud-dot';
-        txt.textContent = u ? 'Connected to Render 🟢' : 'Vercel Proxy 🟢';
-        return;
-      }
-    } catch(e) {}
+/* ---------------------------------------------------------------------
+   INITIALIZATION
+   --------------------------------------------------------------------- */
+async function initApp() {
+  try {
+    cfg = await (await fetch(API + '/api/config')).json();
+  } catch (err) {
+    showToast('Failed to reach backend API. Make sure Flask is running.', 'error');
+    cfg = {
+      area: 'Duhai, Ghaziabad',
+      center: DUHAI_CENTER,
+      bounds: [28.700, 77.440, 28.760, 77.510],
+      categories: ['Pothole', 'Road Crack', 'Surface Damage', 'Waterlogging', 'Fallen Tree', 'Garbage', 'Other'],
+      wards: [
+        'Zone 1 (Duhai Village)',
+        'Zone 2 (Duhai RRTS Station)',
+        'Zone 3 (North Duhai)',
+        'Zone 4 (South Duhai)',
+        'Zone 5 (East Duhai)',
+        'Zone 6 (West Duhai)'
+      ]
+    };
   }
 
-  dot.className = 'cloud-dot offline';
-  txt.textContent = 'Render waking up / Offline mode';
+  initDuhaiMap();
+  initFormCategories();
+  initFilters();
+  await reloadReports();
+  renderWardsDirectory();
+  checkUrlRouting();
+  window.addEventListener('hashchange', checkUrlRouting);
+}
+
+function checkUrlRouting() {
+  const hash = window.location.hash.replace('#', '');
+  if (['map', 'report', 'analytics', 'budget', 'wards'].includes(hash)) {
+    switchTab(hash, false);
+  }
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('sat') === '1') {
+    setTimeout(() => toggleSatelliteView(), 300);
+  }
+  if (params.get('wards') === '1') {
+    setTimeout(() => toggleWardLayer(), 400);
+  }
+  const reportId = params.get('report') || params.get('modal');
+  if (reportId) {
+    setTimeout(() => openReportModal(reportId), 400);
+  }
 }
 
 /* ---------------------------------------------------------------------
-   LEAFLET MAP - PROVEN OPENSTREETMAP & ESRI (ZERO API KEYS!)
+   DUHAI MAP ENGINE - STRICTLY CONSTRAINED TO DUHAI, GHAZIABAD
    --------------------------------------------------------------------- */
-function initMap() {
-  map = L.map('map', {
-    center: DUHAI_CENTER,
-    zoom: 14.5,
-    minZoom: 13,
-    maxZoom: 18,
-    scrollWheelZoom: false, // STABLE: No erratic jumping on wheel scroll!
-    zoomControl: false
-  });
+function initDuhaiMap() {
+  const [s, w, n, e] = cfg.bounds || [28.700, 77.440, 28.760, 77.510];
+  const southWest = L.latLng(s, w);
+  const northEast = L.latLng(n, e);
+  const bounds = L.latLngBounds(southWest, northEast);
 
-  // Standard OpenStreetMap (100% Free, NO API KEY REQUIRED!)
+  // Initialize Map with smooth bounding constraints (no scroll trapping, no jerkiness)
+  map = L.map('map', {
+    minZoom: 12.8,
+    maxZoom: 19,
+    maxBounds: bounds.pad(0.08),
+    maxBoundsViscosity: 0.5,
+    scrollWheelZoom: false,
+    zoomControl: true
+  }).fitBounds(bounds, { padding: [15, 15] });
+
+  // Standard Street Layer
   tileLayerOsm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap'
   }).addTo(map);
 
-  // Esri Satellite (100% Free, NO API KEY REQUIRED!)
+  // High-Resolution Satellite Layer (Esri)
   tileLayerSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 19,
     attribution: '&copy; Esri World Imagery'
   });
 
-  // Boundary Stroke
-  L.rectangle(DUHAI_BOUNDS, {
-    color: '#2563eb',
-    weight: 2,
-    dashArray: '6, 6',
+  /* MASK OUTSIDE DUHAI (Inverted Polygon Spotlight):
+     Darkens the entire world EXCEPT Duhai, spotlighting Duhai! */
+  const outerWorld = [
+    [-90, -180],
+    [-90, 180],
+    [90, 180],
+    [90, -180]
+  ];
+  // Clockwise winding for inner hole cutout:
+  const duhaiCutout = [
+    [s, w],
+    [n, w],
+    [n, e],
+    [s, e]
+  ];
+  
+  L.polygon([outerWorld, duhaiCutout], {
+    fillColor: '#070d1e',
+    fillOpacity: 0.65,
+    weight: 1,
+    color: '#0284c7',
+    interactive: true
+  }).on('click', () => {
+    showToast('⚠️ Clicked outside Duhai jurisdiction. Please choose a location inside the active Duhai boundary.', 'warning');
+  }).addTo(map);
+
+  /* Glowing Duhai Boundary Stroke */
+  boundaryPolygon = L.rectangle([[s, w], [n, e]], {
+    color: '#0284c7',
+    weight: 3,
+    dashArray: '8, 8',
     fill: false,
     interactive: false
   }).addTo(map);
 
+  // Map Click Handler
+  map.on('click', ev => {
+    if (isPickingLocation) {
+      handlePickedLocation(ev.latlng.lat, ev.latlng.lng);
+    }
+  });
+
+  // Duhai Legend
+  const legend = L.control({ position: 'bottomleft' });
+  legend.onAdd = () => {
+    const div = L.DomUtil.create('div', 'duhai-legend');
+    div.innerHTML = `
+      <b>Duhai Hazard Legend</b>
+      <div class="duhai-legend-item"><span class="legend-dot" style="background:#dc2626"></span> High Urgency (60+)</div>
+      <div class="duhai-legend-item"><span class="legend-dot" style="background:#f59e0b"></span> Medium Urgency (40-59)</div>
+      <div class="duhai-legend-item"><span class="legend-dot" style="background:#16a34a"></span> Low Urgency (&lt;40)</div>
+      <div class="duhai-legend-item"><span class="legend-dot" style="background:#64748b"></span> Resolved Issue</div>
+    `;
+    return div;
+  };
+  legend.addTo(map);
+
   initWardLayers();
 }
 
-function mapZoomIn() { if (map) map.zoomIn(); }
-function mapZoomOut() { if (map) map.zoomOut(); }
-function resetDuhaiBounds() {
-  if (map) map.setView(DUHAI_CENTER, 14.5);
-}
-function flyToDuhai(lat, lng, zoom, name) {
-  if (map) {
-    map.flyTo([lat, lng], zoom, { duration: 0.8 });
-    showToast('Viewing ' + name);
-  }
-}
-function toggleSatelliteView() {
-  isSatellite = !isSatellite;
-  const btn = document.getElementById('btn-toggle-sat');
-  if (isSatellite) {
-    map.removeLayer(tileLayerOsm);
-    map.addLayer(tileLayerSat);
-    btn.classList.add('active');
-    showToast('Satellite Imagery Active');
-  } else {
-    map.removeLayer(tileLayerSat);
-    map.addLayer(tileLayerOsm);
-    btn.classList.remove('active');
-    showToast('Street Map Active');
-  }
-}
+/* DUHAI WARD OVERLAYS */
 function initWardLayers() {
   wardLayerGroup = L.layerGroup();
-  DUHAI_WARDS.forEach(w => {
-    L.circle([w.lat, w.lng], {
-      radius: 650,
+  const wardDetails = cfg.wardDetails || [
+    { name: "Zone 1 (Duhai Village)", lat: 28.7304, lng: 77.4759, officer: "Zone 1 Officer" },
+    { name: "Zone 2 (Duhai RRTS Station)", lat: 28.7273, lng: 77.4718, officer: "Zone 2 Officer" },
+    { name: "Zone 3 (North Duhai)", lat: 28.7420, lng: 77.4730, officer: "Zone 3 Officer" },
+    { name: "Zone 4 (South Duhai)", lat: 28.7130, lng: 77.4730, officer: "Zone 4 Officer" },
+    { name: "Zone 5 (East Duhai)", lat: 28.7290, lng: 77.4930, officer: "Zone 5 Officer" },
+    { name: "Zone 6 (West Duhai)", lat: 28.7290, lng: 77.4550, officer: "Zone 6 Officer" }
+  ];
+
+  wardDetails.forEach((w, idx) => {
+    // Circle representing ward influence
+    const circle = L.circle([w.lat, w.lng], {
+      radius: 700,
       color: '#3b82f6',
       fillColor: '#60a5fa',
       fillOpacity: 0.12,
       weight: 1.5,
       dashArray: '4, 4'
-    }).addTo(wardLayerGroup);
+    });
+
+    const marker = L.circleMarker([w.lat, w.lng], {
+      radius: 6,
+      fillColor: '#1e3a8a',
+      color: '#ffffff',
+      weight: 2,
+      fillOpacity: 0.9
+    }).bindTooltip(`<b>${esc(w.name)}</b><br><small>Officer: ${esc(w.officer)}</small>`, {
+      permanent: false,
+      direction: 'top'
+    });
+
+    circle.addTo(wardLayerGroup);
+    marker.addTo(wardLayerGroup);
   });
 }
+
 function toggleWardLayer() {
   showWards = !showWards;
   const btn = document.getElementById('btn-toggle-wards');
   if (showWards) {
     wardLayerGroup.addTo(map);
     btn.classList.add('active');
-    showToast('🏛️ Duhai Ward Boundaries Shown');
+    showToast('🏛️ Showing Duhai Ward Jurisdictions', 'info');
   } else {
     map.removeLayer(wardLayerGroup);
     btn.classList.remove('active');
-    showToast('Ward Boundaries Hidden');
   }
 }
 
+function toggleSatelliteView() {
+  isSatellite = !isSatellite;
+  const btn = document.getElementById('btn-toggle-satellite');
+  if (isSatellite) {
+    map.removeLayer(tileLayerOsm);
+    tileLayerSat.addTo(map);
+    btn.classList.add('active');
+    showToast('🛰️ Switched to High-Res Duhai Satellite View', 'info');
+  } else {
+    map.removeLayer(tileLayerSat);
+    tileLayerOsm.addTo(map);
+    btn.classList.remove('active');
+    showToast('🗺️ Switched to Duhai Street View', 'info');
+  }
+}
+
+function flyToDuhai(lat, lng, zoom = 16.5, name = '') {
+  map.flyTo([lat, lng], zoom, { duration: 1.2 });
+  if (name) showToast(`📍 Focused on ${name}`, 'info');
+}
+
+function resetDuhaiBounds() {
+  const [s, w, n, e] = cfg.bounds || [28.700, 77.440, 28.760, 77.510];
+  map.fitBounds([[s, w], [n, e]], { padding: [20, 20], maxZoom: 15.5 });
+  showToast('🎯 Centered on Duhai, Ghaziabad', 'info');
+}
+
 /* ---------------------------------------------------------------------
-   REPORTS DATA & INCIDENT CARDS
+   REPORTS LOADING & MARKER MANAGEMENT
    --------------------------------------------------------------------- */
-async function loadReports() {
+async function reloadReports() {
   try {
-    const res = await fetch((API ? API : '') + '/api/reports', { signal: AbortSignal.timeout(6000) });
-    if (res.ok) {
-      reports = await res.json();
-    } else {
-      throw new Error();
-    }
-  } catch(e) {
-    reports = getFallbackReports();
+    const res = await fetch(API + '/api/reports');
+    reports = await res.json();
+    renderMarkers();
+    renderFilteredReports();
+    updateHeaderCounters();
+  } catch (err) {
+    showToast('Could not load reports from server.', 'error');
   }
-
-  updateMetrics();
-  renderIncidentCards();
-  renderMarkers();
 }
 
-function updateMetrics() {
-  const high = reports.filter(r => r.priority === 'High' && r.status !== 'Resolved').length;
-  const total = reports.length;
-  const avgScore = (reports.reduce((acc, r) => acc + (r.riskScore || 50), 0) / (total || 1) / 10).toFixed(1);
+function createMarkerIcon(r) {
+  const level = r.status === 'Resolved' ? 'Resolved' : r.priority;
+  const color = COLORS[level] || COLORS.Low;
+  const isHigh = level === 'High';
 
-  document.getElementById('kpi-actions').textContent = high || 5;
-  document.getElementById('kpi-total').textContent = total || 12;
-  document.getElementById('kpi-risk').textContent = avgScore.replace('.', ',');
-  document.getElementById('count-active').textContent = reports.filter(r => r.status !== 'Resolved').length;
-  document.getElementById('tab-cnt-high').textContent = high;
-}
-
-function setFilter(filt) {
-  currentFilter = filt;
-  document.querySelectorAll('.filter-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.filter === filt);
+  return L.divIcon({
+    className: '',
+    iconSize: [32, 42],
+    iconAnchor: [16, 42],
+    popupAnchor: [0, -36],
+    html: `
+      <div class="pin-wrapper ${isHigh ? 'pin-high' : ''}">
+        <svg width="32" height="42" viewBox="0 0 30 40">
+          <path d="M15 1C7.3 1 1 7.2 1 14.8 1 25 15 39 15 39s14-14 14-24.2C29 7.2 22.7 1 15 1z" fill="${color}" stroke="#ffffff" stroke-width="2"/>
+          <circle cx="15" cy="15" r="5.5" fill="#ffffff"/>
+        </svg>
+      </div>`
   });
-  renderIncidentCards();
 }
 
-function handleSearch() {
-  renderIncidentCards();
-}
+function createPopupContent(r) {
+  const level = r.status === 'Resolved' ? 'Resolved' : r.priority;
+  const b = r.scoreBreakdown || {};
+  const img = r.imageUrl ? `<img src="${esc(r.imageUrl)}" class="popup-img" alt="Defect Photo" loading="lazy">` : '';
 
-function renderIncidentCards() {
-  const container = document.getElementById('incident-cards-container');
-  const query = (document.getElementById('global-search').value || '').toLowerCase();
-
-  const filtered = reports.filter(r => {
-    const matchFilter = (currentFilter === 'All') ||
-      (currentFilter === 'High' && r.priority === 'High' && r.status !== 'Resolved') ||
-      (currentFilter === 'Medium' && r.priority === 'Medium' && r.status !== 'Resolved') ||
-      (currentFilter === 'Resolved' && r.status === 'Resolved');
-    const matchQuery = !query || (r.title + ' ' + r.location + ' ' + r.id + ' ' + r.category).toLowerCase().includes(query);
-    return matchFilter && matchQuery;
-  });
-
-  if (filtered.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px;">No matching incidents found.</div>';
-    return;
-  }
-
-  container.innerHTML = filtered.map(r => {
-    const isActionNeeded = r.priority === 'High' && r.status !== 'Resolved';
-    const pillClass = r.status === 'Resolved' ? 'pill-resolved' : (isActionNeeded ? 'pill-action-needed' : 'pill-in-progress');
-    const pillText = r.status === 'Resolved' ? 'RESOLVED' : (isActionNeeded ? 'ACTIONS NEEDED' : 'IN PROGRESS');
-    const scoreVal = ((r.riskScore || 50) / 10).toFixed(1);
-    const scoreClass = r.priority === 'High' ? '' : (r.priority === 'Low' ? 'low' : 'med');
-
-    return `
-      <div class="incident-card ${selectedReport && selectedReport.id === r.id ? 'selected' : ''}" 
-           id="card-${r.id}" 
-           onclick="selectReport('${r.id}')">
-        
-        <div class="card-header-row">
-          <div class="card-id-group">
-            <span class="card-id">${r.id}</span>
-            <span class="card-status-pill ${pillClass}">${pillText}</span>
-          </div>
-          <div class="card-score-circle ${scoreClass}">${scoreVal}</div>
-        </div>
-
-        <div class="card-route-row">
-          <span>${esc(r.location)}</span>
-          <span class="card-date">${r.date || 'Recent'}</span>
-        </div>
-
-        <div class="timeline-track">
-          <span class="timeline-icon">🛣️</span>
-          <div class="timeline-line">
-            <div class="timeline-line-fill" style="width:${r.status === 'Resolved' ? '100%' : (r.status === 'Repair in Progress' ? '60%' : '25%')}"></div>
-          </div>
-          <span class="timeline-point"></span>
-        </div>
-
-        ${isActionNeeded ? `
-          <div class="card-warning-callout">
-            <div class="warning-text">
-              <span>⚠️</span>
-              <span>Urgent road hazard (${esc(r.category)})</span>
-            </div>
-            <button class="btn-manage-black" onclick="openIncidentModal('${r.id}'); event.stopPropagation();">Manage</button>
-          </div>
-        ` : `
-          <div style="display:flex;justify-content:flex-end;">
-            <button class="btn-manage-black" style="background:#f3f4f6;color:#374151;" onclick="openIncidentModal('${r.id}'); event.stopPropagation();">Inspect</button>
-          </div>
-        `}
+  return `
+    <div class="popup-box">
+      ${img}
+      <div class="popup-title">${esc(r.title)}</div>
+      <div class="popup-tag-row">
+        <span class="card-urgency urgency-${level}">${esc(level)} Urgency (${esc(r.riskScore)})</span>
+        <span class="status-pill status-${(r.status||'').replace(/\s+/g,'-')}">${esc(r.status)}</span>
       </div>
-    `;
-  }).join('');
+      <div class="popup-meta">
+        <b>📍 ${esc(r.location)}</b><br>
+        🏛️ ${esc(r.ward)}
+      </div>
+      <div class="popup-bars">
+        <div class="popup-bar-item">
+          <div class="popup-bar-label"><span>Severity</span><span>${b.severity || 0}/40</span></div>
+          <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100, ((b.severity||0)/40)*100)}%"></div></div>
+        </div>
+        <div class="popup-bar-item">
+          <div class="popup-bar-label"><span>Traffic Exposure</span><span>${b.trafficVolume || 0}/25</span></div>
+          <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100, ((b.trafficVolume||0)/25)*100)}%"></div></div>
+        </div>
+      </div>
+      <button class="popup-action-btn" onclick="openReportModal('${r.id}')">Inspect Full Analysis & Actions</button>
+    </div>
+  `;
 }
 
-/* ---------------------------------------------------------------------
-   MARKERS (CLICK ONLY - NO JITTERY HOVER!)
-   --------------------------------------------------------------------- */
 function renderMarkers() {
-  if (!map) return;
+  // Clear old markers
   Object.values(markers).forEach(m => map.removeLayer(m));
   markers = {};
 
   reports.forEach(r => {
-    const isUrgent = r.priority === 'High' && r.status !== 'Resolved';
-    const color = isUrgent ? '#e11d48' : (r.status === 'Resolved' ? '#6b7280' : '#f59e0b');
+    const marker = L.marker([r.lat, r.lng], {
+      icon: createMarkerIcon(r)
+    }).bindPopup(createPopupContent(r), { maxWidth: 300 });
 
-    const icon = L.divIcon({
-      className: 'flow-marker',
-      html: `
-        <div style="width:24px;height:24px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">
-          ${isUrgent ? '!' : '•'}
-        </div>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12]
-    });
-
-    const marker = L.marker([r.lat, r.lng], { icon: icon });
-
-    // ONLY CLICK! NO HOVER POPUP!
     marker.on('click', () => {
-      selectReport(r.id);
-      openFlowPopup(r, marker);
+      highlightSidebarCard(r.id);
     });
 
     markers[r.id] = marker;
@@ -1739,315 +2295,779 @@ function renderMarkers() {
   });
 }
 
-function openFlowPopup(r, marker) {
-  const content = `
-    <div class="flow-popup">
-      <div class="flow-popup-top">
-        <span class="flow-popup-id">${r.id}</span>
-        <span style="font-size:10.5px;font-weight:600;color:${r.priority === 'High' ? '#e11d48' : '#10b981'};">${r.priority} Urgency</span>
-      </div>
-      <div class="flow-popup-route">
-        <span>📍</span>
-        <span>${esc(r.location)}</span>
-      </div>
-      <div class="flow-popup-alert">
-        <b>Defect: ${esc(r.category)}</b><br>
-        ${esc(r.description || 'Reported by citizen')}
-      </div>
-      <button class="flow-popup-btn" onclick="openIncidentModal('${r.id}')">Manage & Inspect</button>
-    </div>
-  `;
-  marker.bindPopup(content, { maxWidth: 290 }).openPopup();
+/* ---------------------------------------------------------------------
+   SIDEBAR & FILTERING
+   --------------------------------------------------------------------- */
+function initFilters() {
+  const catFilter = document.getElementById('cat-filter');
+  catFilter.innerHTML = '<option value="All">All Categories</option>' +
+    (cfg.categories || []).map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+
+  const wardFilter = document.getElementById('ward-filter');
+  wardFilter.innerHTML = '<option value="All">All Duhai Wards</option>' +
+    (cfg.wards || []).map(w => `<option value="${esc(w)}">${esc(w)}</option>`).join('');
 }
 
-function selectReport(id) {
-  selectedReport = reports.find(x => x.id === id);
-  if (!selectedReport) return;
+function setPriorityFilter(filterName) {
+  currentFilter = filterName;
+  document.querySelectorAll('#priority-chips .filter-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.filter === filterName);
+  });
+  renderFilteredReports();
+}
 
-  document.querySelectorAll('.incident-card').forEach(c => c.classList.remove('selected'));
+function handleSearch() {
+  currentSearch = document.getElementById('search-input').value.toLowerCase().trim();
+  renderFilteredReports();
+}
+
+function renderFilteredReports() {
+  const selectedCat = document.getElementById('cat-filter').value;
+  const selectedWard = document.getElementById('ward-filter').value;
+
+  const filtered = reports.filter(r => {
+    const level = r.status === 'Resolved' ? 'Resolved' : r.priority;
+    if (currentFilter !== 'All' && level !== currentFilter) return false;
+    if (selectedCat !== 'All' && r.category !== selectedCat) return false;
+    if (selectedWard !== 'All' && r.ward !== selectedWard) return false;
+
+    if (currentSearch) {
+      const q = currentSearch;
+      const match = (r.title || '').toLowerCase().includes(q) ||
+                    (r.location || '').toLowerCase().includes(q) ||
+                    (r.landmark || '').toLowerCase().includes(q) ||
+                    (r.description || '').toLowerCase().includes(q) ||
+                    (r.id || '').toLowerCase().includes(q);
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  // Sync visible markers on map
+  Object.entries(markers).forEach(([id, marker]) => {
+    const isVisible = filtered.some(r => r.id === id);
+    if (isVisible && !map.hasLayer(marker)) marker.addTo(map);
+    if (!isVisible && map.hasLayer(marker)) map.removeLayer(marker);
+  });
+
+  // Render Sidebar List
+  const listEl = document.getElementById('reports-list');
+  document.getElementById('issues-count-pill').textContent = `${filtered.length} issues`;
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--mut);">
+        <div style="font-size:32px;margin-bottom:8px;">🔍</div>
+        <b>No matching reports found</b>
+        <p style="font-size:12px;margin-top:4px;">Try clearing search or changing the urgency filters.</p>
+      </div>`;
+    return;
+  }
+
+  // Sort: High urgency first, then newest
+  const sorted = [...filtered].sort((a, b) => (b.riskScore || 0) - (a.riskScore || 0));
+
+  listEl.innerHTML = sorted.map(r => {
+    const level = r.status === 'Resolved' ? 'Resolved' : r.priority;
+    const catIcon = CATEGORY_ICONS[r.category] || '📍';
+    const hasThumb = Boolean(r.imageUrl);
+
+    return `
+      <div class="issue-card" id="card-${esc(r.id)}" onclick="focusReportOnMap('${esc(r.id)}')">
+        <div class="card-top">
+          <span class="card-category">${catIcon} ${esc(r.category)}</span>
+          <span class="card-urgency urgency-${level}">${esc(level)} (${esc(r.riskScore)})</span>
+        </div>
+
+        <div class="card-title">${esc(r.title)}</div>
+
+        <div class="card-meta">
+          <div class="card-meta-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>${esc(r.location)}</span>
+          </div>
+          <div class="card-meta-row" style="justify-content:space-between;margin-top:4px;">
+            <span style="font-size:11px;">🏛️ ${esc(r.ward)}</span>
+            <span class="status-pill status-${(r.status||'').replace(/\s+/g,'-')}">${esc(r.status)}</span>
+          </div>
+        </div>
+
+        ${hasThumb ? `
+          <div class="card-thumb-row">
+            <img src="${esc(r.imageUrl)}" class="card-thumb" alt="Photo" loading="lazy">
+            <div class="card-preview-text">${esc(r.description || 'No description provided.')}</div>
+          </div>
+        ` : `
+          <div style="font-size:12px;color:#64748b;margin-top:6px;line-height:1.4;">${esc(r.description || '')}</div>
+        `}
+      </div>
+    `;
+  }).join('');
+}
+
+function focusReportOnMap(id) {
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+
+  highlightSidebarCard(id);
+  map.flyTo([r.lat, r.lng], 17.5, { duration: 1.0 });
+
+  if (markers[id]) {
+    setTimeout(() => markers[id].openPopup(), 400);
+  }
+}
+
+function highlightSidebarCard(id) {
+  document.querySelectorAll('.issue-card').forEach(c => c.classList.remove('selected'));
   const card = document.getElementById(`card-${id}`);
   if (card) {
     card.classList.add('selected');
     card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+}
 
-  if (map && markers[id]) {
-    map.flyTo([selectedReport.lat, selectedReport.lng], 16, { duration: 0.8 });
-    setTimeout(() => openFlowPopup(selectedReport, markers[id]), 400);
-  }
+function updateHeaderCounters() {
+  const openReports = reports.filter(r => r.status !== 'Resolved');
+  const highPriority = openReports.filter(r => r.priority === 'High').length;
+  document.getElementById('header-stats-text').textContent = `${openReports.length} Active in Duhai • ${highPriority} Critical`;
 }
 
 /* ---------------------------------------------------------------------
-   INCIDENT MODAL (Full 4-Bar Diagnostic)
+   TAB NAVIGATION SYSTEM
    --------------------------------------------------------------------- */
-function openIncidentModal(id) {
-  const r = reports.find(x => x.id === id);
-  if (!r) return;
-  selectedReport = r;
-
-  document.getElementById('m-title').textContent = r.id;
-  document.getElementById('m-subtitle').textContent = `${r.location} • ${r.category}`;
-  document.getElementById('m-score').textContent = `${r.riskScore || 50}/100`;
-  document.getElementById('m-priority').textContent = `${r.priority} Urgency (${r.status})`;
-  document.getElementById('m-cost').textContent = `₹ ${Number(r.estimatedCost || 25000).toLocaleString('en-IN')}`;
-  document.getElementById('m-ward').textContent = r.ward || 'Duhai';
-  document.getElementById('m-reasons').textContent = r.description || 'Civic issue filed in Duhai.';
-
-  const b = r.scoreBreakdown || { severity: 32, trafficVolume: 20, repeatReports: 16, agingFactor: 12 };
-  document.getElementById('m-bar-sev').textContent = `${b.severity || 32}/40`;
-  document.getElementById('m-bar-sev-fill').style.width = `${Math.min(100, ((b.severity || 32) / 40) * 100)}%`;
-  document.getElementById('m-bar-traf').textContent = `${b.trafficVolume || 20}/25`;
-  document.getElementById('m-bar-traf-fill').style.width = `${Math.min(100, ((b.trafficVolume || 20) / 25) * 100)}%`;
-  document.getElementById('m-bar-rep').textContent = `${b.repeatReports || 16}/20`;
-  document.getElementById('m-bar-rep-fill').style.width = `${Math.min(100, ((b.repeatReports || 16) / 20) * 100)}%`;
-  document.getElementById('m-bar-age').textContent = `${b.agingFactor || 12}/15`;
-  document.getElementById('m-bar-age-fill').style.width = `${Math.min(100, ((b.agingFactor || 12) / 15) * 100)}%`;
-
-  const imgCont = document.getElementById('m-image-container');
-  const photo = document.getElementById('m-photo');
-  if (r.imageUrl) {
-    photo.src = r.imageUrl;
-    imgCont.style.display = 'block';
-  } else {
-    imgCont.style.display = 'none';
+function switchTab(tabId, updateHash = true) {
+  if (updateHash && window.location.hash !== `#${tabId}`) {
+    window.location.hash = tabId;
   }
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
 
-  document.getElementById('incident-detail-modal').style.display = 'flex';
+  const targetTab = document.getElementById(`tab-${tabId}`);
+  const targetBtn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
+
+  if (targetTab) targetTab.classList.add('active');
+  if (targetBtn) targetBtn.classList.add('active');
+
+  if (tabId === 'map') {
+    setTimeout(() => { if (map) map.invalidateSize(); }, 150);
+  } else if (tabId === 'analytics') {
+    loadAnalyticsData();
+  } else if (tabId === 'budget') {
+    runBudgetOptimization();
+  }
 }
 
-function closeIncidentModal() {
-  document.getElementById('incident-detail-modal').style.display = 'none';
-}
-
-async function updateStatus(newStatus) {
-  if (!selectedReport) return;
-  try {
-    const res = await fetch((API ? API : '') + `/api/reports/${selectedReport.id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus })
-    });
-    if (res.ok) {
-      showToast(`Status updated to "${newStatus}"`);
-      await loadReports();
-      closeIncidentModal();
-    } else {
-      throw new Error();
-    }
-  } catch(e) {
-    selectedReport.status = newStatus;
-    showToast(`Status updated to "${newStatus}" (Local Mode)`);
-    renderIncidentCards();
-    closeIncidentModal();
-  }
+function startReportFromMap() {
+  switchTab('report');
+  showToast('📝 Describe the issue and tap on the Duhai map or use GPS.', 'info');
 }
 
 /* ---------------------------------------------------------------------
-   REPORT LODGING FORM (With Email Notification to awasthishailendra59@gmail.com)
+   TAB 2: REPORT ISSUE FORM & LOCATION PICKING
    --------------------------------------------------------------------- */
-function openReportModalForm() {
-  document.getElementById('report-form-modal').style.display = 'flex';
-}
-function closeReportModalForm() {
-  document.getElementById('report-form-modal').style.display = 'none';
-}
-function setQuickLocation(name, lat, lng) {
-  document.getElementById('form-location').value = name;
-  showToast('📍 Selected: ' + name);
-}
-
-async function submitReport() {
-  const cat = document.getElementById('form-category').value;
-  const loc = document.getElementById('form-location').value || 'Duhai, Ghaziabad';
-  const desc = document.getElementById('form-description').value.trim();
-  const file = document.getElementById('form-photo').files[0];
-  const lmk = document.getElementById('form-landmark').value;
-
-  if (!desc) {
-    showToast('Please enter defect description', 'error');
-    return;
-  }
-
-  const btn = document.getElementById('btn-submit-report');
-  btn.disabled = true;
-  btn.textContent = 'Dispatching alert to awasthishailendra59@gmail.com...';
-
-  try {
-    const fd = new FormData();
-    fd.append('category', cat);
-    fd.append('location', loc);
-    fd.append('landmark', lmk);
-    fd.append('description', desc);
-    fd.append('lat', 28.7285);
-    fd.append('lng', 77.4740);
-    fd.append('reporter', 'Citizen (Duhai Portal)');
-    if (file) fd.append('image', file);
-
-    const res = await fetch((API ? API : '') + '/api/reports', { method: 'POST', body: fd });
-    const saved = await res.json();
-    if (!res.ok) throw new Error(saved.error || 'Failed');
-
-    showToast(`🎉 Lodged ${saved.id}! Emailed to awasthishailendra59@gmail.com`, 'success');
-    closeReportModalForm();
-    await loadReports();
-  } catch(e) {
-    showToast(`🎉 Lodged! Alert emailed to awasthishailendra59@gmail.com (Simulation)`);
-    closeReportModalForm();
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Submit Civic Report & Dispatch Alert ✉️';
-  }
-}
-
-/* ---------------------------------------------------------------------
-   FULL VIEWS: ANALYTICS, BUDGET AI, WARDS DIRECTORY
-   --------------------------------------------------------------------- */
-let catChartInstance = null;
-let trendChartInstance = null;
-
-function closeOverlays() {
-  document.querySelectorAll('.view-overlay').forEach(v => v.style.display = 'none');
-  switchView('dashboard');
-}
-
-function openAnalyticsView() {
-  switchView('analytics');
-  document.getElementById('view-analytics').style.display = 'flex';
-  renderAnalyticsCharts();
-}
-
-function renderAnalyticsCharts() {
-  const ctxCat = document.getElementById('chart-cat').getContext('2d');
-  const ctxTrend = document.getElementById('chart-trend').getContext('2d');
-
-  if (catChartInstance) catChartInstance.destroy();
-  if (trendChartInstance) trendChartInstance.destroy();
-
-  catChartInstance = new Chart(ctxCat, {
-    type: 'doughnut',
-    data: {
-      labels: ['Potholes', 'Waterlogging', 'Streetlights', 'Manholes', 'Garbage'],
-      datasets: [{
-        data: [45, 25, 15, 10, 5],
-        backgroundColor: ['#e11d48', '#2563eb', '#f59e0b', '#111827', '#10b981']
-      }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-  });
-
-  trendChartInstance = new Chart(ctxTrend, {
-    type: 'line',
-    data: {
-      labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-      datasets: [{
-        label: 'Resolved Incidents',
-        data: [12, 19, 28, 35, 42, 58],
-        borderColor: '#10b981',
-        backgroundColor: 'rgba(16,185,129,0.1)',
-        fill: true,
-        tension: 0.3
-      }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-  });
-
-  const tbody = document.getElementById('analytics-ward-table');
-  tbody.innerHTML = DUHAI_WARDS.map(w => `
-    <tr style="border-bottom:1px solid #f3f4f6;">
-      <td style="padding:10px 6px;font-weight:600;">${w.name}</td>
-      <td style="padding:10px 6px;color:#4b5563;">${w.officer}</td>
-      <td style="padding:10px 6px;color:#e11d48;font-weight:700;">${Math.floor(Math.random() * 5 + 1)}</td>
-      <td style="padding:10px 6px;color:#10b981;font-weight:700;">${Math.floor(Math.random() * 20 + 80)}%</td>
-    </tr>
-  `).join('');
-}
-
-function openBudgetView() {
-  switchView('budget');
-  document.getElementById('view-budget').style.display = 'flex';
-}
-function setPresetBudget(amt) {
-  document.getElementById('budget-amount').value = amt;
-  runKnapsackOptimization();
-}
-function runKnapsackOptimization() {
-  const amt = Number(document.getElementById('budget-amount').value) || 250000;
-  const box = document.getElementById('budget-results-box');
-  const tbody = document.getElementById('budget-approved-rows');
-  box.style.display = 'block';
-
-  const approved = reports.slice(0, 4);
-  tbody.innerHTML = approved.map(r => `
-    <tr style="border-bottom:1px solid #f3f4f6;">
-      <td style="padding:8px 6px;font-weight:700;">${r.id}</td>
-      <td style="padding:8px 6px;">${esc(r.category)}</td>
-      <td style="padding:8px 6px;">${esc(r.location)}</td>
-      <td style="padding:8px 6px;"><span class="card-status-pill pill-action-needed">${r.priority}</span></td>
-      <td style="padding:8px 6px;font-weight:700;">₹ ${(r.estimatedCost || 30000).toLocaleString('en-IN')}</td>
-    </tr>
-  `).join('');
-  showToast(`⚡ Knapsack calculated: ${approved.length} projects approved within ₹ ${amt.toLocaleString('en-IN')}`);
-}
-
-function openWardsView() {
-  switchView('wards');
-  document.getElementById('view-wards').style.display = 'flex';
-  const grid = document.getElementById('wards-grid-container');
-  grid.innerHTML = DUHAI_WARDS.map(w => `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;display:flex;flex-direction:column;gap:8px;">
-      <div style="font-size:14px;font-weight:700;color:#111827;">${w.name}</div>
-      <div style="font-size:12px;color:#4b5563;"><b>Officer:</b> ${w.officer}</div>
-      <div style="font-size:12px;color:#4b5563;"><b>Email:</b> ${w.email}</div>
-      <div style="font-size:12px;color:#4b5563;"><b>Contractor:</b> ${w.contractor}</div>
-      <button class="btn-manage-black" onclick="closeOverlays(); flyToDuhai(${w.lat}, ${w.lng}, 17, '${w.name}');" style="margin-top:8px;">📍 View on Map</button>
+function initFormCategories() {
+  const categories = cfg.categories || ['Pothole', 'Road Crack', 'Surface Damage', 'Waterlogging', 'Fallen Tree', 'Garbage', 'Other'];
+  const grid = document.getElementById('category-cards');
+  grid.innerHTML = categories.map((cat, idx) => `
+    <div class="cat-card-opt ${idx === 0 ? 'selected' : ''}" data-cat="${esc(cat)}" onclick="selectCategory('${esc(cat)}')">
+      <span class="cat-icon">${CATEGORY_ICONS[cat] || '📍'}</span>
+      <span class="cat-name">${esc(cat)}</span>
     </div>
   `).join('');
 }
 
-function openEmailNotificationInfo() {
-  showToast('✉️ Automated Alert: All reports dispatched to awasthishailendra59@gmail.com');
+function selectCategory(cat) {
+  document.getElementById('form-category').value = cat;
+  document.querySelectorAll('.cat-card-opt').forEach(el => {
+    el.classList.toggle('selected', el.dataset.cat === cat);
+  });
 }
 
-function switchView(tab) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const el = document.getElementById('nav-' + tab);
-  if (el) el.classList.add('active');
-  if (tab === 'dashboard') {
-    closeOverlays();
+function pickLocationOnMap() {
+  switchTab('map');
+  isPickingLocation = true;
+  document.getElementById('pick-mode-banner').style.display = 'flex';
+  showToast('🎯 Map Picking Mode: Click the exact spot of the defect inside Duhai.', 'info');
+}
+
+function cancelPickingMode() {
+  isPickingLocation = false;
+  document.getElementById('pick-mode-banner').style.display = 'none';
+}
+
+function handlePickedLocation(lat, lng) {
+  const [s, w, n, e] = cfg.bounds || [28.700, 77.440, 28.760, 77.510];
+
+  if (lat < s || lat > n || lng < w || lng > e) {
+    showToast('⚠️ That spot is outside Duhai. Please choose a location inside the blue boundary.', 'warning');
+    return;
+  }
+
+  pickedLocation = { lat, lng };
+  cancelPickingMode();
+
+  // Update or create draggable pick marker
+  if (pickMarker) {
+    pickMarker.setLatLng([lat, lng]);
+  } else {
+    pickMarker = L.marker([lat, lng], { draggable: true, zIndexOffset: 1000 }).addTo(map);
+    pickMarker.on('dragend', ev => {
+      const q = ev.target.getLatLng();
+      handlePickedLocation(q.lat, q.lng);
+    });
+  }
+
+  // Update UI pill in report form
+  const pill = document.getElementById('location-status-pill');
+  pill.className = 'loc-display-pill valid';
+  pill.innerHTML = `<span>📍 Selected: <b>${lat.toFixed(5)}, ${lng.toFixed(5)}</b> (Duhai)</span>`;
+
+  showToast(`✅ Duhai location selected: ${lat.toFixed(4)}, ${lng.toFixed(4)}`, 'success');
+  switchTab('report');
+}
+
+function setQuickLocation(lat, lng, landmarkName, wardName) {
+  handlePickedLocation(lat, lng);
+  document.getElementById('form-landmark').value = landmarkName;
+  showToast(`📍 Set location to ${landmarkName}`, 'info');
+}
+
+function useCurrentGPS() {
+  if (!navigator.geolocation) {
+    showToast('Your browser does not support GPS geolocation. Tap on the Duhai map instead.', 'error');
+    return;
+  }
+  showToast('📡 Requesting GPS fix...', 'info');
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude, longitude } = pos.coords;
+      const [s, w, n, e] = cfg.bounds || [28.700, 77.440, 28.760, 77.510];
+
+      if (latitude < s || latitude > n || longitude < w || longitude > e) {
+        showToast(`GPS location (${latitude.toFixed(4)}, ${longitude.toFixed(4)}) is outside Duhai. SUDHARSARTHI only serves Duhai, Ghaziabad.`, 'warning');
+        return;
+      }
+      handlePickedLocation(latitude, longitude);
+    },
+    err => {
+      showToast('Could not acquire GPS position. Please pick your location directly on the Duhai map.', 'warning');
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+function handlePhotoSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('preview-img').src = e.target.result;
+    document.getElementById('preview-filename').textContent = file.name;
+    document.getElementById('upload-preview').style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+  document.getElementById('form-photo').value = '';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('ai-prescan-box').style.display = 'none';
+}
+
+async function runAIPrescan() {
+  const btn = document.getElementById('btn-prescan');
+  const file = document.getElementById('form-photo').files[0];
+  const desc = document.getElementById('form-description').value;
+  const category = document.getElementById('form-category').value;
+
+  if (!file && !desc) {
+    showToast('Provide a photo or description for the AI to analyze.', 'warning');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing...';
+
+  try {
+    const fd = new FormData();
+    if (file) fd.append('image', file);
+    fd.append('category', category);
+    fd.append('description', desc);
+
+    const res = await fetch(API + '/api/ai/classify', { method: 'POST', body: fd });
+    const d = await res.json();
+
+    if (!res.ok) throw new Error(d.error || 'AI assessment failed.');
+
+    const box = document.getElementById('ai-prescan-box');
+    const badge = document.getElementById('prescan-score-badge');
+    const details = document.getElementById('prescan-details');
+
+    badge.className = `card-urgency urgency-${d.priority}`;
+    badge.textContent = `${d.priority} Urgency (${d.urgencyScore}/100)`;
+
+    details.innerHTML = `
+      <b>Predicted Category:</b> ${esc(d.category)}<br>
+      <b>Estimated Repair Cost:</b> ₹ ${Number(d.estimatedCost || 0).toLocaleString('en-IN')}<br>
+      <b>Reasoning:</b> ${esc((d.reasons || []).join('; ') || 'Standard civic parameters.')}
+    `;
+    box.style.display = 'block';
+    showToast(`⚡ AI Urgency Check: ${d.priority} Urgency (${d.urgencyScore}/100)`, 'success');
+  } catch (err) {
+    showToast(`AI check failed: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⚡ Pre-scan AI';
+  }
+}
+
+async function submitReportForm() {
+  if (!pickedLocation) {
+    showToast('Please choose the issue location inside Duhai on the map first.', 'warning');
+    return;
+  }
+
+  const desc = document.getElementById('form-description').value.trim();
+  if (!desc) {
+    showToast('Please provide a description of the defect.', 'warning');
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳ Processing AI Urgency & Ward Routing...</span>';
+
+  try {
+    const fd = new FormData();
+    fd.append('category', document.getElementById('form-category').value);
+    fd.append('description', desc);
+    fd.append('lat', pickedLocation.lat);
+    fd.append('lng', pickedLocation.lng);
+    fd.append('landmark', document.getElementById('form-landmark').value);
+    fd.append('reporter', document.getElementById('form-reporter').value || 'Citizen (Duhai Portal)');
+
+    const file = document.getElementById('form-photo').files[0];
+    if (file) fd.append('image', file);
+
+    const res = await fetch(API + '/api/reports', { method: 'POST', body: fd });
+    const saved = await res.json();
+
+    if (!res.ok) throw new Error(saved.error || 'Failed to submit report.');
+
+    showToast(`🎉 Report ${saved.id} lodged successfully! Urgency: ${saved.priority} (${saved.riskScore}). Ward officer notified.`, 'success');
+
+    // Reset Form
+    document.getElementById('form-description').value = '';
+    document.getElementById('form-landmark').value = '';
+    removePhoto();
+    pickedLocation = null;
+    if (pickMarker) { map.removeLayer(pickMarker); pickMarker = null; }
+    document.getElementById('location-status-pill').className = 'loc-display-pill';
+    document.getElementById('location-status-pill').innerHTML = '<span>No location selected yet. Tap above or pick on Duhai map.</span>';
+
+    // Refresh data and switch to map view
+    await reloadReports();
+    switchTab('map');
+    focusReportOnMap(saved.id);
+  } catch (err) {
+    showToast(`Submission Error: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>Submit Civic Report to Duhai Ward Officer</span>';
   }
 }
 
 /* ---------------------------------------------------------------------
-   UTILITIES
+   TAB 3: CIVIC ANALYTICS ENGINE (Chart.js Integration)
    --------------------------------------------------------------------- */
-function showToast(msg, type) {
-  let t = document.querySelector('.toast-msg');
-  if (!t) {
-    t = document.createElement('div');
-    t.className = 'toast-msg';
-    document.body.appendChild(t);
+async function loadAnalyticsData() {
+  try {
+    const res = await fetch(API + '/api/analytics');
+    const d = await res.json();
+
+    document.getElementById('kpi-total').textContent = d.totalReports || 0;
+    document.getElementById('kpi-high').textContent = d.highPriority || 0;
+    document.getElementById('kpi-pending').textContent = d.pendingRepairs || 0;
+    document.getElementById('kpi-resolved').textContent = d.resolved || 0;
+    document.getElementById('kpi-avg-days').textContent = d.avgResolutionDays != null ? `${d.avgResolutionDays}d` : 'N/A';
+
+    // Render Categories Doughnut Chart
+    renderCategoryChart(d.byCategory || {});
+
+    // Render Monthly Trend Chart
+    renderTrendChart(d.monthlyTrend || []);
+
+    // Render Ward Leaderboard Table
+    renderWardTable(d.wards || []);
+  } catch (err) {
+    showToast('Failed to load civic analytics data.', 'error');
   }
-  t.textContent = msg;
-  t.style.opacity = '1';
-  clearTimeout(t.timer);
-  t.timer = setTimeout(() => { t.style.opacity = '0'; }, 3200);
 }
 
-function esc(s) {
-  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function renderCategoryChart(catData) {
+  const ctx = document.getElementById('chart-categories').getContext('2d');
+  const labels = Object.keys(catData);
+  const data = Object.values(catData);
+
+  if (categoryChartInstance) categoryChartInstance.destroy();
+
+  categoryChartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: [
+          '#dc2626', '#f59e0b', '#0ea5a4', '#2563eb',
+          '#16a34a', '#8b5cf6', '#64748b'
+        ],
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } }
+      }
+    }
+  });
 }
 
-/* Fallback Seed Reports */
-function getFallbackReports() {
-  return [
-    { id: "NS-2026-1042", category: "Pothole", priority: "High", riskScore: 92, location: "Road outside Duhai RRTS Station", date: "2026-10-14", description: "Deep 14cm pothole obstructing rapid transit corridor.", lat: 28.7273, lng: 77.4718, estimatedCost: 35000, ward: "Zone 2 (Duhai RRTS Station)", scoreBreakdown: { severity: 38, trafficVolume: 24, repeatReports: 18, agingFactor: 12 } },
-    { id: "NS-2026-1041", category: "Pothole", priority: "Medium", riskScore: 55, location: "Main road, Duhai Village", date: "2026-10-13", description: "Surface cracks and localized erosion near chowk.", lat: 28.7304, lng: 77.4759, estimatedCost: 20000, ward: "Zone 1 (Duhai Village)", scoreBreakdown: { severity: 22, trafficVolume: 15, repeatReports: 10, agingFactor: 8 } },
-    { id: "NS-2026-1040", category: "Waterlogging", priority: "High", riskScore: 88, location: "Delhi-Meerut Road (NH-34)", date: "2026-10-12", description: "Water accumulating in lower road segment.", lat: 28.7285, lng: 77.4740, estimatedCost: 48000, ward: "Zone 2 (Duhai RRTS Station)", scoreBreakdown: { severity: 34, trafficVolume: 24, repeatReports: 18, agingFactor: 12 } },
-    { id: "NS-2026-1039", category: "Streetlight Out", priority: "Medium", riskScore: 48, location: "Morti Link Road, South Duhai", date: "2026-10-11", description: "Two streetlight luminaires extinguished.", lat: 28.7130, lng: 77.4730, estimatedCost: 12000, ward: "Zone 4 (South Duhai)", scoreBreakdown: { severity: 20, trafficVolume: 14, repeatReports: 8, agingFactor: 6 } },
-    { id: "NS-2026-1038", category: "Open Manhole", priority: "High", riskScore: 95, location: "NH-34 Underpass Service Road", date: "2026-10-10", description: "Missing chamber lid on pedestrian pathway.", lat: 28.7360, lng: 77.4815, estimatedCost: 15000, ward: "Zone 3 (North Duhai)", scoreBreakdown: { severity: 40, trafficVolume: 25, repeatReports: 18, agingFactor: 12 } },
-    { id: "NS-2026-1037", category: "Pothole", priority: "Resolved", riskScore: 20, status: "Resolved", location: "Duhai Depot Eastern Gate", date: "2026-10-09", description: "Bitumen patch completed by division crew.", lat: 28.7290, lng: 77.4930, estimatedCost: 18000, ward: "Zone 5 (East Duhai)", scoreBreakdown: { severity: 8, trafficVolume: 6, repeatReports: 4, agingFactor: 2 } }
+function renderTrendChart(trendData) {
+  const ctx = document.getElementById('chart-trend').getContext('2d');
+  const labels = trendData.map(t => t.month);
+  const reported = trendData.map(t => t.reported);
+  const resolved = trendData.map(t => t.resolved);
+
+  if (trendChartInstance) trendChartInstance.destroy();
+
+  trendChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels.length ? labels : ['Current'],
+      datasets: [
+        { label: 'Reported', data: reported.length ? reported : [0], backgroundColor: '#3b82f6' },
+        { label: 'Resolved', data: resolved.length ? resolved : [0], backgroundColor: '#10b981' }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } }
+      },
+      plugins: {
+        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+function renderWardTable(wardList) {
+  const tbody = document.getElementById('ward-leaderboard-body');
+  if (!wardList.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--mut);">No ward data recorded yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = wardList.map(w => `
+    <tr>
+      <td><b>${esc(w.ward)}</b></td>
+      <td>${esc(w.total)}</td>
+      <td>${esc(w.resolved)}</td>
+      <td style="width:160px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" style="width:${w.resolutionRate || 0}%"></div>
+          </div>
+          <span style="font-size:11px;font-weight:600;">${w.resolutionRate || 0}%</span>
+        </div>
+      </td>
+      <td>
+        <span class="status-pill ${w.resolutionRate >= 70 ? 'status-Resolved' : 'status-Under-Review'}">
+          ${w.resolutionRate >= 70 ? 'High Efficiency' : 'Active Intake'}
+        </span>
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* ---------------------------------------------------------------------
+   TAB 4: KNAPSACK BUDGET OPTIMIZER
+   --------------------------------------------------------------------- */
+function setPresetBudget(amount) {
+  document.getElementById('budget-amount').value = amount;
+  runBudgetOptimization();
+}
+
+async function runBudgetOptimization() {
+  const budget = parseInt(document.getElementById('budget-amount').value, 10);
+  const strategy = document.getElementById('budget-strategy').value;
+
+  if (!budget || budget <= 0) {
+    showToast('Please enter a valid budget amount in ₹ rupees.', 'warning');
+    return;
+  }
+
+  try {
+    const res = await fetch(API + '/api/budget/optimize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ budget, strategy })
+    });
+    const d = await res.json();
+
+    if (!res.ok) throw new Error(d.error || 'Optimization error.');
+
+    document.getElementById('budget-stats-grid').style.display = 'grid';
+    document.getElementById('budget-results-tables').style.display = 'block';
+
+    document.getElementById('b-stat-allocated').textContent = `₹ ${Number(d.allocatedCost || 0).toLocaleString('en-IN')}`;
+    document.getElementById('b-stat-remaining').textContent = `₹ ${Number(d.remaining || 0).toLocaleString('en-IN')}`;
+    document.getElementById('b-stat-critical').textContent = `${d.criticalEliminated || 0} / ${d.criticalTotal || 0}`;
+    document.getElementById('b-stat-count').textContent = `${(d.selected || []).length} Defects`;
+
+    // Render Approved
+    const approvedBody = document.getElementById('budget-approved-body');
+    approvedBody.innerHTML = (d.selected || []).map(r => `
+      <tr>
+        <td><code>${esc(r.id)}</code></td>
+        <td><b>${esc(r.title)}</b></td>
+        <td>${esc(r.ward)}</td>
+        <td><span class="card-urgency urgency-${r.priority}">${esc(r.priority)} (${esc(r.riskScore)})</span></td>
+        <td><b>₹ ${Number(r.cost || 0).toLocaleString('en-IN')}</b></td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--mut);">No projects fit in this budget allocation.</td></tr>';
+
+    // Render Deferred
+    const deferredBody = document.getElementById('budget-deferred-body');
+    deferredBody.innerHTML = (d.deferred || []).map(r => `
+      <tr>
+        <td><code>${esc(r.id)}</code></td>
+        <td><b>${esc(r.title)}</b></td>
+        <td>${esc(r.ward)}</td>
+        <td><span class="card-urgency urgency-${r.priority}">${esc(r.priority)} (${esc(r.riskScore)})</span></td>
+        <td>₹ ${Number(r.cost || 0).toLocaleString('en-IN')}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--mut);">All open defects covered under current allocation!</td></tr>';
+
+    showToast(`⚡ Optimal schedule calculated: ${(d.selected || []).length} projects approved.`, 'success');
+  } catch (err) {
+    showToast(`Budget calculation error: ${err.message}`, 'error');
+  }
+}
+
+/* ---------------------------------------------------------------------
+   TAB 5: DUHAI WARDS & SLA DIRECTORY
+   --------------------------------------------------------------------- */
+function renderWardsDirectory() {
+  const wards = cfg.wardDetails || [
+    { name: "Zone 1 (Duhai Village)", lat: 28.7304, lng: 77.4759, officer: "Zone 1 Officer", email: "zone1.officer@example.org" },
+    { name: "Zone 2 (Duhai RRTS Station)", lat: 28.7273, lng: 77.4718, officer: "Zone 2 Officer", email: "zone2.officer@example.org" },
+    { name: "Zone 3 (North Duhai)", lat: 28.7420, lng: 77.4730, officer: "Zone 3 Officer", email: "zone3.officer@example.org" },
+    { name: "Zone 4 (South Duhai)", lat: 28.7130, lng: 77.4730, officer: "Zone 4 Officer", email: "zone4.officer@example.org" },
+    { name: "Zone 5 (East Duhai)", lat: 28.7290, lng: 77.4930, officer: "Zone 5 Officer", email: "zone5.officer@example.org" },
+    { name: "Zone 6 (West Duhai)", lat: 28.7290, lng: 77.4550, officer: "Zone 6 Officer", email: "zone6.officer@example.org" }
   ];
+
+  const grid = document.getElementById('wards-cards-list');
+  grid.innerHTML = wards.map(w => `
+    <div class="ward-card">
+      <div>
+        <div class="ward-card-header">
+          <span class="ward-zone-badge">🏛️ Civic Zone</span>
+          <b style="font-size:15px;color:var(--ink);">${esc(w.name)}</b>
+        </div>
+        <div style="font-size:12px;color:var(--mut);line-height:1.7;">
+          <div><b>Jurisdiction Centre:</b> ${w.lat.toFixed(4)}°N, ${w.lng.toFixed(4)}°E</div>
+          <div><b>Assigned Engineer:</b> ${esc(w.officer)}</div>
+          <div><b>Email Alert:</b> <code>${esc(w.email)}</code></div>
+          <div style="margin-top:6px;padding:6px 8px;background:#f8fafc;border-radius:6px;font-size:11px;">
+            ⏱️ <b>Response SLA:</b> High Urgency &lt;48h &bull; Medium &lt;7d
+          </div>
+        </div>
+      </div>
+      <button class="loc-btn" style="margin-top:14px;width:100%;justify-content:center;" onclick="viewWardOnMap(${w.lat}, ${w.lng}, '${esc(w.name)}')">
+        🗺️ View Zone on Duhai Map
+      </button>
+    </div>
+  `).join('');
 }
+
+function viewWardOnMap(lat, lng, name) {
+  switchTab('map');
+  flyToDuhai(lat, lng, 16.5, name);
+  if (!showWards) toggleWardLayer();
+}
+
+/* ---------------------------------------------------------------------
+   ISSUE DETAIL MODAL & STATUS UPDATER
+   --------------------------------------------------------------------- */
+function openReportModal(id) {
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+  selectedReport = r;
+
+  document.getElementById('m-title').textContent = r.title || 'Civic Defect';
+  document.getElementById('m-id-date').textContent = `${r.id} • Reported on ${r.date || 'Recent'}`;
+
+  // Image
+  const imgWrapper = document.getElementById('m-img-wrapper');
+  if (r.imageUrl) {
+    document.getElementById('m-image').src = r.imageUrl;
+    imgWrapper.style.display = 'block';
+  } else {
+    imgWrapper.style.display = 'none';
+  }
+
+  // Score & Urgency
+  const level = r.status === 'Resolved' ? 'Resolved' : r.priority;
+  const scoreCircle = document.getElementById('m-score-circle');
+  scoreCircle.style.background = COLORS[level] || COLORS.Low;
+  document.getElementById('m-score-val').textContent = r.riskScore || 0;
+
+  const priLabel = document.getElementById('m-priority-label');
+  priLabel.textContent = `${level} Urgency`;
+  priLabel.style.color = COLORS[level] || COLORS.Low;
+
+  const statusTag = document.getElementById('m-status-tag');
+  statusTag.className = `status-pill status-${(r.status||'').replace(/\s+/g,'-')}`;
+  statusTag.textContent = r.status || 'Reported';
+
+  document.getElementById('m-category-location').textContent = `${r.category} • ${r.location || 'Duhai'}`;
+
+  // Breakdown Bars
+  const b = r.scoreBreakdown || {};
+  document.getElementById('m-breakdown-bars').innerHTML = `
+    <div class="popup-bar-item">
+      <div class="popup-bar-label"><span>Severity Factor</span><span>${b.severity || 0}/40</span></div>
+      <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.severity||0)/40)*100)}%"></div></div>
+    </div>
+    <div class="popup-bar-item">
+      <div class="popup-bar-label"><span>Traffic Exposure</span><span>${b.trafficVolume || 0}/25</span></div>
+      <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.trafficVolume||0)/25)*100)}%"></div></div>
+    </div>
+    <div class="popup-bar-item">
+      <div class="popup-bar-label"><span>Repeat Complaints</span><span>${b.repeatReports || 0}/20</span></div>
+      <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.repeatReports||0)/20)*100)}%"></div></div>
+    </div>
+    <div class="popup-bar-item">
+      <div class="popup-bar-label"><span>Aging Factor</span><span>${b.agingFactor || 0}/15</span></div>
+      <div class="popup-meter"><div class="popup-meter-fill" style="width:${Math.min(100,((b.agingFactor||0)/15)*100)}%"></div></div>
+    </div>
+  `;
+
+  // AI Classification
+  const ai = r.aiClassification || {};
+  document.getElementById('m-ai-analysis').innerHTML = `
+    <div><b>AI Model Assessment:</b> ${esc(ai.severityGrade || 'Standard Evaluation')} (${ai.confidence || 90}% confidence)</div>
+    <div><b>Detected Defect Type:</b> ${esc(ai.predictedType || r.category)}</div>
+    <div><b>Bounding Surface Area:</b> ${esc(ai.boundingArea || r.dimensions || 'Localized defect')}</div>
+    <div><b>Description:</b> ${esc(r.description)}</div>
+  `;
+
+  // Ward & Cost
+  document.getElementById('m-ward').textContent = r.ward || 'Zone 2 (Duhai RRTS Station)';
+  document.getElementById('m-cost').textContent = `₹ ${Number(r.estimatedCost || 0).toLocaleString('en-IN')}`;
+  document.getElementById('m-officer').textContent = `${r.inspectorName || 'Junior Engineer'} (${r.contractor || 'Contractor Pending'})`;
+
+  // Active Status Buttons
+  document.querySelectorAll('.status-change-btn').forEach(btn => {
+    btn.classList.toggle('current', btn.dataset.st === r.status);
+  });
+
+  document.getElementById('issue-modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('issue-modal').style.display = 'none';
+  selectedReport = null;
+}
+
+async function updateCurrentReportStatus(newStatus) {
+  if (!selectedReport) return;
+  const id = selectedReport.id;
+
+  try {
+    const res = await fetch(`${API}/api/reports/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+    const updated = await res.json();
+
+    if (!res.ok) throw new Error(updated.error || 'Failed to update status.');
+
+    showToast(`Status updated to "${newStatus}" for report ${id}`, 'success');
+
+    // Update local state
+    const idx = reports.findIndex(x => x.id === id);
+    if (idx !== -1) reports[idx] = updated;
+
+    selectedReport = updated;
+    openReportModal(id);
+    renderMarkers();
+    renderFilteredReports();
+    updateHeaderCounters();
+  } catch (err) {
+    showToast(`Could not update status: ${err.message}`, 'error');
+  }
+}
+
+// Start Application on Load
+window.addEventListener('DOMContentLoaded', initApp);
+
+// Backend connection dialog
+function configureBackendUrl() {
+  const current = localStorage.getItem('SUDHARSARTHI_BACKEND_URL') || API || 'https://your-service.onrender.com';
+  const val = prompt('Enter your Render Backend URL (e.g. https://sudharsarthi-1.onrender.com):', current);
+  if (val !== null) {
+    const cleaned = val.trim().replace(/\/+$/, '');
+    if (cleaned) {
+      localStorage.setItem('SUDHARSARTHI_BACKEND_URL', cleaned);
+      API = cleaned;
+      showToast('Connecting to: ' + cleaned, 'info');
+      checkBackendHealth();
+      fetchReports();
+    } else {
+      localStorage.removeItem('SUDHARSARTHI_BACKEND_URL');
+      API = '';
+      showToast('Reset backend URL to default', 'info');
+      checkBackendHealth();
+    }
+  }
+}
+
+async function checkBackendHealth() {
+  const dot = document.getElementById('backend-dot');
+  const label = document.getElementById('backend-label');
+  if (!dot || !label) return;
+  try {
+    const res = await fetch((API || '') + '/api/health', { signal: AbortSignal.timeout(6000) });
+    if (res.ok) {
+      const data = await res.json();
+      dot.style.background = '#16a34a';
+      dot.style.boxShadow = '0 0 0 2px rgba(22, 163, 74, 0.3)';
+      label.textContent = 'Backend: Online';
+    } else {
+      dot.style.background = '#f59e0b';
+      label.textContent = 'Backend: HTTP ' + res.status;
+    }
+  } catch (err) {
+    dot.style.background = '#dc2626';
+    label.textContent = 'Backend: Tap to Connect';
+  }
+}
+
+// Hook health check into boot
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(checkBackendHealth, 1000);
+});
+
 </script>
 </body>
 </html>
