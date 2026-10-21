@@ -53,7 +53,7 @@ def officer_for(ward_name):
 def build_message(report, reasons=None, image_path=None):
     name, to_addr = officer_for(report.get("ward"))
     urgency = report.get("priority", "Medium")
-    sender = os.environ.get("MAIL_FROM", "sudharsarthi@localhost")
+    sender = os.environ.get("MAIL_FROM") or os.environ.get("SMTP_USER") or "sudharsarthi.alerts@gmail.com"
     msg = EmailMessage()
     target_email = os.environ.get("ALERT_RECIPIENT_EMAIL", DEFAULT_ALERT_EMAIL)
     msg["From"] = sender
@@ -94,6 +94,13 @@ def build_message(report, reasons=None, image_path=None):
 
 def _deliver(msg, report_id):
     host = os.environ.get("SMTP_HOST")
+    user = os.environ.get("SMTP_USER")
+    password = os.environ.get("SMTP_PASSWORD", "")
+
+    # Auto-detect Gmail if SMTP_USER is provided and SMTP_HOST was omitted
+    if not host and user and "gmail.com" in user.lower():
+        host = "smtp.gmail.com"
+
     if not host:
         os.makedirs(OUTBOX, exist_ok=True)
         path = os.path.join(OUTBOX, f"{report_id}.txt")
@@ -103,13 +110,24 @@ def _deliver(msg, report_id):
             f.write(f"To: {msg['To']}{cc_hdr}\nSubject: {msg['Subject']}\n\n{body}")
         log.info("SMTP not configured - saved email to %s", path)
         return "saved-to-outbox"
+
     port = int(os.environ.get("SMTP_PORT", "587"))
-    with smtplib.SMTP(host, port, timeout=20) as smtp:
-        if os.environ.get("SMTP_STARTTLS", "1") == "1":
-            smtp.starttls()
-        if os.environ.get("SMTP_USER"):
-            smtp.login(os.environ["SMTP_USER"], os.environ.get("SMTP_PASSWORD", ""))
-        smtp.send_message(msg)
+    use_ssl = (port == 465) or (os.environ.get("SMTP_SSL", "0") == "1")
+
+    if use_ssl:
+        with smtplib.SMTP_SSL(host, port, timeout=25) as smtp:
+            if user:
+                smtp.login(user, password)
+            smtp.send_message(msg)
+    else:
+        with smtplib.SMTP(host, port, timeout=25) as smtp:
+            if os.environ.get("SMTP_STARTTLS", "1") == "1":
+                smtp.starttls()
+            if user:
+                smtp.login(user, password)
+            smtp.send_message(msg)
+
+    log.info("Real email successfully dispatched to %s for report %s", msg["To"], report_id)
     return "emailed"
 
 

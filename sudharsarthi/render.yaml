@@ -3,12 +3,12 @@ services:
     name: sudharsarthi
     runtime: python
     plan: free
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: ALERT_RECIPIENT_EMAIL
         value: awasthishailendra59@gmail.com
       - key: CORS_ORIGIN
         value: "*"
       - key: ALLOW_DEMO_RESET
-        value: "0"
+        value: "1"
