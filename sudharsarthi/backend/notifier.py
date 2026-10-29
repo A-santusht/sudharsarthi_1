@@ -21,7 +21,12 @@ from email.message import EmailMessage
 from database import haversine_m
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTBOX = os.path.join(BASE_DIR, "outbox")
+def _resolve_outbox():
+    if os.environ.get("VERCEL") or not os.access(BASE_DIR, os.W_OK):
+        return "/tmp/outbox"
+    return os.path.join(BASE_DIR, "outbox")
+
+OUTBOX = _resolve_outbox()
 WARDS_PATH = os.path.join(BASE_DIR, "wards.json")
 DEFAULT_ALERT_EMAIL = "awasthishailendra59@gmail.com"
 log = logging.getLogger("sudharsarthi.notifier")

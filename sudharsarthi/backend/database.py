@@ -21,8 +21,26 @@ from contextlib import contextmanager
 from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.environ.get("SUDHARSARTHI_DB", os.path.join(BASE_DIR, "sudharsarthi.db"))
 SEED_PATH = os.path.join(BASE_DIR, "seed_reports.json")
+
+def _resolve_db_path():
+    if os.environ.get("SUDHARSARTHI_DB"):
+        return os.environ.get("SUDHARSARTHI_DB")
+    # On serverless platforms like Vercel or AWS Lambda, the app directory is read-only.
+    # We must write to /tmp to allow SQLite reads and writes.
+    if os.environ.get("VERCEL") or not os.access(BASE_DIR, os.W_OK):
+        import shutil
+        tmp_db = os.path.join("/tmp", "sudharsarthi.db")
+        orig_db = os.path.join(BASE_DIR, "sudharsarthi.db")
+        if os.path.exists(orig_db) and not os.path.exists(tmp_db):
+            try:
+                shutil.copyfile(orig_db, tmp_db)
+            except Exception:
+                pass
+        return tmp_db
+    return os.path.join(BASE_DIR, "sudharsarthi.db")
+
+DB_PATH = _resolve_db_path()
 
 _write_lock = threading.Lock()
 

@@ -1,18 +1,11 @@
 [build]
-  publish = "sudharsarthi/frontend"
+  publish = "."
 
-# Fallback proxy to deployed backend or local
+# Proxies API requests to the Vercel/serverless endpoint or custom backend
 [[redirects]]
   from = "/api/*"
-  to = "https://sudharsarthi.onrender.com/api/:splat"
+  to = "/api/:splat"
   status = 200
-  force = true
-
-[[redirects]]
-  from = "/uploads/*"
-  to = "https://sudharsarthi.onrender.com/uploads/:splat"
-  status = 200
-  force = true
 
 [[redirects]]
   from = "/*"

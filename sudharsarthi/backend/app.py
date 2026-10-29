@@ -59,7 +59,14 @@ import database as db  # noqa: E402
 import notifier  # noqa: E402
 import urgency_ai  # noqa: E402
 
-UPLOAD_DIR = os.environ.get("UPLOAD_DIR", os.path.join(BASE_DIR, "uploads"))
+def _resolve_upload_dir():
+    if os.environ.get("UPLOAD_DIR"):
+        return os.environ.get("UPLOAD_DIR")
+    if os.environ.get("VERCEL") or not os.access(BASE_DIR, os.W_OK):
+        return "/tmp/uploads"
+    return os.path.join(BASE_DIR, "uploads")
+
+UPLOAD_DIR = _resolve_upload_dir()
 _default_front = os.path.join(os.path.dirname(BASE_DIR), "frontend")
 FRONTEND_DIR = os.environ.get("FRONTEND_DIR") or (_default_front if os.path.isdir(_default_front) else None)
 STATUSES = ["Reported", "Under Review", "Repair in Progress", "Resolved"]

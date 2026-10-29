@@ -1,36 +1,13 @@
 {
-  "version": 2,
   "cleanUrls": true,
-  "builds": [
+  "rewrites": [
     {
-      "src": "api/index.py",
-      "use": "@vercel/python"
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
     },
     {
-      "src": "sudharsarthi/frontend/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/uploads/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/sudharsarthi/frontend/assets/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/sudharsarthi/frontend/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/sudharsarthi/frontend/$1"
+      "source": "/uploads/(.*)",
+      "destination": "/api/index.py"
     }
   ]
 }
