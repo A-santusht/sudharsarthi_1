@@ -702,11 +702,48 @@ def uploads(filename):
     return send_from_directory(UPLOAD_DIR, filename)
 
 
-if FRONTEND_DIR:
+# Mirror all /api/* routes to /* (and /uploads/* to /api/uploads/*) so all endpoints work
+# seamlessly whether Vercel preserves or strips the /api/ prefix.
+for rule in list(app.url_map.iter_rules()):
+    endpoint_func = app.view_functions.get(rule.endpoint)
+    if not endpoint_func:
+        continue
+    methods = list(rule.methods - {"HEAD", "OPTIONS"})
+    if rule.rule.startswith("/api/"):
+        alt_rule = rule.rule[len("/api"):]
+        endpoint = f"mirror_{rule.endpoint}"
+        try:
+            app.add_url_rule(alt_rule, endpoint=endpoint, view_func=endpoint_func, methods=methods)
+        except AssertionError:
+            pass
+    elif rule.rule.startswith("/uploads/"):
+        alt_rule = "/api" + rule.rule
+        endpoint = f"mirror_{rule.endpoint}"
+        try:
+            app.add_url_rule(alt_rule, endpoint=endpoint, view_func=endpoint_func, methods=methods)
+        except AssertionError:
+            pass
+
+
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({
+        "success": False,
+        "error": "Not Found",
+        "path": request.path,
+        "method": request.method
+    }), 404
+
+
+if FRONTEND_DIR and not os.environ.get("VERCEL"):
     @app.get("/", defaults={"path": "index.html"})
-    @app.get("/<path:path>")
-    def frontend(path):
+    def frontend_root(path):
         return send_from_directory(FRONTEND_DIR, path)
+
+    @app.get("/assets/<path:path>")
+    def frontend_assets(path):
+        assets_dir = os.path.join(FRONTEND_DIR, "assets")
+        return send_from_directory(assets_dir, path)
 
 
 if __name__ == "__main__":

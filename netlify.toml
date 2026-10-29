@@ -1,11 +1,18 @@
 [build]
   publish = "."
 
-# Proxies API requests to the Vercel/serverless endpoint or custom backend
+# Netlify: Proxy /api and /uploads to live serverless Vercel backend
 [[redirects]]
   from = "/api/*"
-  to = "/api/:splat"
+  to = "https://sudharsarthi.vercel.app/api/:splat"
   status = 200
+  force = true
+
+[[redirects]]
+  from = "/uploads/*"
+  to = "https://sudharsarthi.vercel.app/uploads/:splat"
+  status = 200
+  force = true
 
 [[redirects]]
   from = "/*"
