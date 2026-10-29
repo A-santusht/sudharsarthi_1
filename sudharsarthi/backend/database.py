@@ -77,9 +77,22 @@ CREATE TABLE IF NOT EXISTS users (
     role TEXT DEFAULT 'citizen',
     avatar TEXT,
     google_id TEXT,
+    is_verified INTEGER DEFAULT 0,
+    last_login_at TEXT,
     created_at TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+
+CREATE TABLE IF NOT EXISTS otps (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    code_hash TEXT NOT NULL,
+    expires_at REAL NOT NULL,
+    attempts INTEGER DEFAULT 0,
+    used INTEGER DEFAULT 0,
+    created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_otps_user ON otps(user_id);
 
 CREATE TABLE IF NOT EXISTS comments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -152,6 +165,28 @@ def _migrate_db(conn):
             conn.execute("ALTER TABLE reports ADD COLUMN reporter_email TEXT")
         if "upvotes" not in cols:
             conn.execute("ALTER TABLE reports ADD COLUMN upvotes INTEGER DEFAULT 0")
+
+        # Migrate users table columns if missing
+        cur_u = conn.execute("PRAGMA table_info(users)")
+        u_cols = {row["name"] for row in cur_u.fetchall()}
+        if "is_verified" not in u_cols:
+            conn.execute("ALTER TABLE users ADD COLUMN is_verified INTEGER DEFAULT 0")
+        if "last_login_at" not in u_cols:
+            conn.execute("ALTER TABLE users ADD COLUMN last_login_at TEXT")
+
+        # Ensure otps table exists
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS otps (
+                id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                code_hash TEXT NOT NULL,
+                expires_at REAL NOT NULL,
+                attempts INTEGER DEFAULT 0,
+                used INTEGER DEFAULT 0,
+                created_at TEXT NOT NULL
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_otps_user ON otps(user_id)")
     except Exception:
         pass
 
@@ -389,6 +424,76 @@ def upsert_otp_user(email: str, name: str = None):
         return existing
     default_name = name or email_clean.split("@")[0].replace(".", " ").capitalize()
     return create_user(name=default_name, email=email_clean, role="citizen")
+
+
+def save_otp(user_id: str, code_hash: str, expires_at: float) -> str:
+    """Store a new hashed OTP, marking any older active codes as used."""
+    otp_id = f"otp_{secrets.token_hex(8)}"
+    now = datetime.now().isoformat()
+    with _write_lock, connect() as conn:
+        conn.execute("UPDATE otps SET used = 1 WHERE user_id = ? AND used = 0", (user_id,))
+        conn.execute(
+            "INSERT INTO otps (id, user_id, code_hash, expires_at, attempts, used, created_at) "
+            "VALUES (?, ?, ?, ?, 0, 0, ?)",
+            (otp_id, user_id, code_hash, float(expires_at), now)
+        )
+    return otp_id
+
+
+def get_active_otp(user_id: str):
+    """Retrieve the latest unused OTP record for a user."""
+    with connect() as conn:
+        row = conn.execute(
+            "SELECT * FROM otps WHERE user_id = ? AND used = 0 ORDER BY created_at DESC LIMIT 1",
+            (user_id,)
+        ).fetchone()
+    return dict(row) if row else None
+
+
+def increment_otp_attempts(otp_id: str):
+    """Increment the failed attempts counter on an OTP."""
+    with _write_lock, connect() as conn:
+        conn.execute("UPDATE otps SET attempts = attempts + 1 WHERE id = ?", (otp_id,))
+
+
+def mark_otp_used(otp_id: str):
+    """Mark an OTP as consumed."""
+    with _write_lock, connect() as conn:
+        conn.execute("UPDATE otps SET used = 1 WHERE id = ?", (otp_id,))
+
+
+def mark_user_verified_and_logged_in(user_id: str):
+    """Update verified status and set last login timestamp."""
+    now = datetime.now().isoformat()
+    with _write_lock, connect() as conn:
+        conn.execute(
+            "UPDATE users SET is_verified = 1, last_login_at = ? WHERE id = ?",
+            (now, user_id)
+        )
+
+
+def get_all_users_for_admin():
+    """Retrieve complete user directory for admin view with verified status and stats."""
+    with connect() as conn:
+        rows = conn.execute("""
+            SELECT u.id, u.name, u.email, u.role, u.avatar,
+                   COALESCE(u.is_verified, 0) as is_verified,
+                   u.last_login_at, u.created_at,
+                   (SELECT COUNT(*) FROM reports r WHERE r.user_id = u.id OR LOWER(r.reporter_email) = LOWER(u.email)) as reports_count
+            FROM users u
+            ORDER BY u.created_at DESC
+        """).fetchall()
+
+    users = []
+    for r in rows:
+        d = dict(r)
+        d.pop("password_hash", None)
+        d["isVerified"] = bool(d.get("is_verified", 0))
+        d["reportsCount"] = d.get("reports_count", 0)
+        d["lastLoginAt"] = d.get("last_login_at")
+        d["createdAt"] = d.get("created_at")
+        users.append(d)
+    return users
 
 
 def upsert_google_user(email: str, name: str, avatar: str = None, google_id: str = None):

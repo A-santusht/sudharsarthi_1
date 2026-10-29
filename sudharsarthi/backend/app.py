@@ -184,9 +184,11 @@ def make_token(user_id: str) -> str:
 
 
 def get_current_user():
-    """Extract authenticated user from Authorization header or return None."""
+    """Extract authenticated user from Authorization header or cookie, or return None."""
     auth = request.headers.get("Authorization", "")
     token = auth.replace("Bearer ", "").strip() if auth.startswith("Bearer ") else ""
+    if not token:
+        token = request.cookies.get("token", "").strip()
     if not token or token.count(":") != 2:
         return None
     user_id, ts_str, sig = token.split(":")
@@ -295,22 +297,72 @@ def google_auth():
     return jsonify({"success": True, "token": token, "user": user})
 
 
-_otp_cache = {}
+ADMIN_EMAILS = [e.strip().lower() for e in os.environ.get(
+    "ADMIN_EMAILS",
+    "admin@example.com,awasthishailendra59@gmail.com,santusht.dev@gmail.com"
+).split(",") if e.strip()]
+
+
+def is_admin(user: dict | None) -> bool:
+    if not user or not user.get("email"):
+        return False
+    return user["email"].strip().lower() in ADMIN_EMAILS
+
+
+_email_otp_limits = defaultdict(list)
+_ip_otp_limits = defaultdict(list)
+_rate_lock = threading.Lock()
+
+
+def check_otp_rate_limit(email: str, ip: str) -> tuple[bool, str]:
+    now = datetime.now().timestamp()
+    with _rate_lock:
+        # IP check: max 10 per hour (3600s)
+        ip_history = [t for t in _ip_otp_limits[ip] if now - t < 3600]
+        _ip_otp_limits[ip] = ip_history
+        if len(ip_history) >= 10:
+            return False, "Too many OTP requests from this IP address. Please wait an hour."
+
+        # Email check: max 3 per 15 mins (900s)
+        em_history = [t for t in _email_otp_limits[email] if now - t < 900]
+        _email_otp_limits[email] = em_history
+        if len(em_history) >= 3:
+            wait_sec = int(900 - (now - em_history[0]))
+            return False, f"Too many requests for this email. Please wait {max(1, wait_sec)}s before requesting another code."
+
+        _ip_otp_limits[ip].append(now)
+        _email_otp_limits[email].append(now)
+        return True, ""
 
 
 @app.post("/api/auth/send-otp")
+@app.post("/api/auth/request-otp")
 def auth_send_otp():
-    """Generate and dispatch a 6-digit email verification OTP."""
+    """Generate and dispatch a 6-digit email verification OTP with rate limiting & hashing."""
     data = request.get_json(silent=True) or {}
     email = (data.get("email") or "").strip().lower()
     if not email or "@" not in email or "." not in email:
         return bad("Please provide a valid email address.")
 
+    client_ip = (
+        request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+        or request.remote_addr
+        or "unknown"
+    )
+    allowed, err_msg = check_otp_rate_limit(email, client_ip)
+    if not allowed:
+        return jsonify({"success": False, "error": err_msg}), 429
+
+    # Auto-ensure citizen record exists in database
+    user = db.upsert_otp_user(email=email)
+
+    # Generate cryptographically secure 6-digit passcode & hash
     code = f"{secrets.randbelow(900000) + 100000}"
-    _otp_cache[email] = {
-        "code": code,
-        "expires": datetime.now().timestamp() + 600  # 10 minutes
-    }
+    code_hash = hashlib.sha256(code.encode("utf-8")).hexdigest()
+    expires_at = datetime.now().timestamp() + 600  # 10 minutes
+
+    # Store in database with single-use flag and attempts counter
+    db.save_otp(user["id"], code_hash, expires_at)
 
     # Dispatch email
     notifier.send_otp_email(email, code)
@@ -318,7 +370,8 @@ def auth_send_otp():
     return jsonify({
         "success": True,
         "message": f"Verification code sent to {email}",
-        "code": code  # returned so citizens can see code immediately even if SMTP is not configured
+        "code": code,    # returned so citizens can see code immediately even if SMTP is not configured
+        "devOtp": code
     })
 
 
@@ -327,44 +380,104 @@ def auth_verify_otp():
     """Verify 6-digit email OTP and authenticate/register the citizen."""
     data = request.get_json(silent=True) or {}
     email = (data.get("email") or "").strip().lower()
-    code = (data.get("code") or "").strip()
+    code = (data.get("otp") or data.get("code") or "").strip()
     name = (data.get("name") or "").strip()
+
+    generic_error = "Invalid or expired verification code. Please check your email or request a new code."
 
     if not email or not code:
         return bad("Email and verification code are required.")
 
-    record = _otp_cache.get(email)
+    user = db.get_user_by_email(email)
+    if not user:
+        user = db.upsert_otp_user(email=email, name=name)
+
     now = datetime.now().timestamp()
+    otp_rec = db.get_active_otp(user["id"])
 
+    code_hash = hashlib.sha256(code.encode("utf-8")).hexdigest()
     is_valid = False
-    if record and record["code"] == code and now <= record["expires"]:
-        is_valid = True
-    elif code in ("123456", "999999", "582914"):  # demo emergency passcodes
-        is_valid = True
-    elif record and record["code"] == code:
-        is_valid = True
 
-    if not is_valid:
-        return bad("Invalid or expired verification code. Please check your email or request a new code.")
+    if otp_rec:
+        if otp_rec.get("attempts", 0) >= 5:
+            return bad("Too many failed attempts. Please request a new verification code.")
+        if now > otp_rec.get("expires_at", 0):
+            return bad(generic_error)
 
-    # Clean up OTP
-    _otp_cache.pop(email, None)
+        if otp_rec.get("code_hash") == code_hash:
+            is_valid = True
+        elif code in ("123456", "999999", "582914"):  # demo emergency passcodes
+            is_valid = True
+        else:
+            db.increment_otp_attempts(otp_rec["id"])
+            return bad(generic_error)
+    elif code in ("123456", "999999", "582914"):
+        is_valid = True
+    else:
+        return bad(generic_error)
 
-    user = db.upsert_otp_user(email=email, name=name)
-    token = make_token(user["id"])
+    if otp_rec and is_valid:
+        db.mark_otp_used(otp_rec["id"])
+
+    # Mark user verified and record login
+    db.mark_user_verified_and_logged_in(user["id"])
+    user = db.get_user_by_id(user["id"])
     user.pop("password_hash", None)
-    return jsonify({"success": True, "token": token, "user": user})
+    user["isVerified"] = True
+    user["isAdmin"] = is_admin(user)
+
+    token = make_token(user["id"])
+    resp = jsonify({"success": True, "token": token, "user": user})
+
+    # Set 7-day httpOnly session cookie
+    resp.set_cookie(
+        "token",
+        token,
+        max_age=7 * 86400,
+        httponly=True,
+        samesite="Lax",
+        secure=bool(os.environ.get("VERCEL")),
+        path="/"
+    )
+    return resp
 
 
 @app.get("/api/auth/me")
 def auth_me():
     user = get_current_user()
+    if user:
+        user["isAdmin"] = is_admin(user)
     return jsonify({"success": True, "user": user})
 
 
 @app.post("/api/auth/logout")
 def logout():
-    return jsonify({"success": True})
+    resp = jsonify({"success": True, "message": "Signed out successfully"})
+    resp.delete_cookie("token", path="/")
+    return resp
+
+
+# ------------------------------------------------------------------ Admin Users Registry
+
+@app.get("/api/admin/users")
+def admin_users_list():
+    """Restricted endpoint: returns registered users directory for administrators only."""
+    user = get_current_user()
+    if not user:
+        return jsonify({"success": False, "error": "Authentication required. Please sign in."}), 401
+
+    if not is_admin(user):
+        return jsonify({"success": False, "error": "Access denied: Administrator privileges required."}), 403
+
+    all_users = db.get_all_users_for_admin()
+    for u in all_users:
+        u["isAdmin"] = is_admin(u)
+
+    return jsonify({
+        "success": True,
+        "count": len(all_users),
+        "users": all_users
+    })
 
 
 # ------------------------------------------------------------------ Civic Reports Routes

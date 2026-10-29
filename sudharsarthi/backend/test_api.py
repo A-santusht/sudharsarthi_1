@@ -309,6 +309,47 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(d["scoreBreakdown"]["trafficVolume"], 25)
         self.assertEqual(d["notifiedEmail"], "awasthishailendra59@gmail.com")
 
+
+    def test_21_otp_auth_flow(self):
+        # 1. Request OTP
+        r = self.c.post('/api/auth/send-otp', json={'email': 'newcitizen@duhai.gov.in'})
+        self.assertEqual(r.status_code, 200)
+        d = r.get_json()
+        self.assertTrue(d['success'])
+        code = d['code']
+        self.assertEqual(len(code), 6)
+
+        # 2. Reject bad code
+        r_bad = self.c.post('/api/auth/verify-otp', json={'email': 'newcitizen@duhai.gov.in', 'otp': '000000'})
+        self.assertEqual(r_bad.status_code, 400)
+
+        # 3. Verify valid code
+        r_good = self.c.post('/api/auth/verify-otp', json={'email': 'newcitizen@duhai.gov.in', 'otp': code})
+        self.assertEqual(r_good.status_code, 200)
+        user = r_good.get_json()['user']
+        self.assertEqual(user['email'], 'newcitizen@duhai.gov.in')
+        self.assertTrue(user['isVerified'])
+
+    def test_22_admin_users_protection(self):
+        # 1. Unauthenticated gets 401
+        r = self.c.get('/api/admin/users')
+        self.assertEqual(r.status_code, 401)
+
+        # 2. Citizen user gets 403 Forbidden
+        r_citizen = self.c.post('/api/auth/verify-otp', json={'email': 'citizen@example.com', 'code': '123456'}).get_json()
+        token = r_citizen['token']
+        r_forbidden = self.c.get('/api/admin/users', headers={'Authorization': f'Bearer {token}'})
+        self.assertEqual(r_forbidden.status_code, 403)
+
+        # 3. Admin user gets 200 OK
+        r_admin = self.c.post('/api/auth/verify-otp', json={'email': 'awasthishailendra59@gmail.com', 'code': '123456'}).get_json()
+        admin_token = r_admin['token']
+        r_ok = self.c.get('/api/admin/users', headers={'Authorization': f'Bearer {admin_token}'})
+        self.assertEqual(r_ok.status_code, 200)
+        data = r_ok.get_json()
+        self.assertTrue(data['success'])
+        self.assertGreaterEqual(data['count'], 1)
+
     @staticmethod
     def _year():
         from datetime import datetime

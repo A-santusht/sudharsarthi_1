@@ -1683,6 +1683,28 @@ textarea.form-control {
   header { flex-wrap: wrap; }
   .nav-tabs { order: 3; width: 100%; justify-content: space-around; margin-top: 8px; }
 }
+
+/* 6-DIGIT OTP PASSCODE INPUT BOXES (STRIPE / LINEAR STYLE) */
+.otp-digit-box {
+  width: 44px;
+  height: 52px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace, ui-monospace, Consolas;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  transition: all 0.15s ease;
+  outline: none;
+}
+.otp-digit-box:focus {
+  border-color: #0ea5a4;
+  box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.2);
+  background: #ffffff;
+}
+
 </style>
 </head>
 <body>
@@ -1721,6 +1743,9 @@ textarea.form-control {
     </div>
 
         <!-- TRANSPARENT CIVIC AI DECISION ENGINE BUTTON -->
+    <button type="button" class="btn-login-header" id="btn-hdr-admin" onclick="openAdminUsersModal()" style="display:none;background:#faf5ff;border-color:#c084fc;color:#7e22ce;font-weight:700;" title="Auditing Registered Citizens Directory">
+      <span>🛡️ Admin Registry</span>
+    </button>
     <button type="button" class="btn-login-header" id="btn-hdr-decision" onclick="openDecisionModal()" style="display:flex;background:#f0fdfa;border-color:#0ea5a4;color:#0f766e;font-weight:700;" title="Transparent Explainable AI Range & Urgency Decision Formula">
       <span>🔬 AI Decision Engine</span>
     </button>
@@ -1746,6 +1771,9 @@ textarea.form-control {
             <small id="dd-user-email">citizen@duhai.in</small>
           </div>
           <hr style="border:0;border-top:1px solid #e2e8f0;margin:6px 0;">
+          <button class="dd-item" id="dd-admin-users-btn" onclick="openAdminUsersModal();toggleUserDropdown(false);" style="display:none;color:#7e22ce;font-weight:600;">
+            <span>🛡️ Registered Users Registry</span>
+          </button>
           <button class="dd-item" onclick="switchTab('my-reports');toggleUserDropdown(false);">
             <span>📋 My Lodged Complaints</span>
             <span class="badge" id="dd-my-reports-count">0</span>
@@ -2095,6 +2123,55 @@ textarea.form-control {
       </div>
     </div>
   </section>
+
+<!-- ADMIN USERS REGISTRY MODAL (ACCESSIBLE ONLY TO ADMIN_EMAILS) -->
+<div class="modal-backdrop" id="admin-users-modal" onclick="if(event.target===this)closeAdminUsersModal()" style="display:none;z-index:2300;">
+  <div class="modal-dialog" style="max-width:880px;width:95%;border-radius:20px;overflow:hidden;background:#fff;box-shadow:var(--shadow-lg);max-height:90vh;display:flex;flex-direction:column;">
+    <div style="background:linear-gradient(135deg,#581c87 0%,#7e22ce 100%);padding:20px 24px;color:#fff;position:relative;">
+      <button class="modal-close-btn" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.2);color:#fff;" onclick="closeAdminUsersModal()">&times;</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span style="font-size:24px;">🛡️</span>
+        <div>
+          <b style="font-family:'Poppins',sans-serif;font-size:18px;">SUDHARSARTHI USER REGISTRY &bull; ADMIN CONSOLE</b>
+          <div style="font-size:12px;opacity:0.9;">Restricted Internal Registry &bull; Access controlled by ADMIN_EMAILS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Count Bar -->
+    <div style="padding:14px 24px;background:#faf5ff;border-bottom:1px solid #f3e8ff;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">
+      <div style="position:relative;flex:1;min-width:240px;max-width:360px;">
+        <input type="text" id="admin-user-search" oninput="filterAdminUsersTable()" placeholder="Search registered emails..." style="width:100%;padding:8px 12px 8px 32px;font-size:12px;border:1px solid #d8b4fe;border-radius:8px;outline:none;">
+        <span style="position:absolute;left:10px;top:8px;color:#a855f7;font-size:12px;">🔍</span>
+      </div>
+      <div style="display:flex;gap:8px;font-size:12px;align-items:center;">
+        <span class="preset-chip" style="background:#f3e8ff;color:#6b21a8;font-weight:700;">Total Users: <b id="admin-total-users-cnt">0</b></span>
+        <span class="preset-chip" style="background:#dcfce7;color:#15803d;font-weight:700;">Verified: <b id="admin-verified-users-cnt">0</b></span>
+        <button type="button" class="preset-chip" onclick="loadAdminUsersDirectory()" style="background:#7e22ce;color:#fff;cursor:pointer;border:0;">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <!-- Table Body -->
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;text-align:left;">
+        <thead>
+          <tr style="border-bottom:2px solid #e2e8f0;color:#64748b;font-size:11px;text-transform:uppercase;">
+            <th style="padding:10px 8px;">User / Email</th>
+            <th style="padding:10px 8px;">Verification</th>
+            <th style="padding:10px 8px;">Role</th>
+            <th style="padding:10px 8px;">Registered At</th>
+            <th style="padding:10px 8px;">Last Login</th>
+            <th style="padding:10px 8px;text-align:right;">Complaints</th>
+          </tr>
+        </thead>
+        <tbody id="admin-users-table-body">
+          <tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8;">Loading user directory...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 </main>
 
 <!-- ISSUE DETAIL MODAL -->
@@ -2408,9 +2485,9 @@ textarea.form-control {
       <form id="form-otp" onsubmit="handleSendOtp(event)">
         <div id="otp-step-1">
           <div style="margin-bottom:12px;">
-            <label class="form-label" style="font-size:12px;">Email Address</label>
-            <input type="email" id="otp-email" name="email" autocomplete="email" class="form-control" required placeholder="Select or type your email address" style="font-size:14px;padding:12px;">
-            <small style="color:var(--mut);font-size:11px;display:block;margin-top:4px;">We will send a 6-digit one-time verification code to this address.</small>
+            <label class="form-label" style="font-size:12px;font-weight:600;">Email Address</label>
+            <input type="email" id="otp-email" name="email" autocomplete="email" class="form-control" required placeholder="name@domain.com" style="font-size:14px;padding:12px;">
+            <small style="color:var(--mut);font-size:11px;display:block;margin-top:4px;">We will send a 6-digit security code to this address.</small>
           </div>
           <button type="submit" class="btn-report-quick" style="width:100%;justify-content:center;padding:11px;" id="btn-submit-send-otp">Send Verification Code</button>
         </div>
@@ -2419,17 +2496,34 @@ textarea.form-control {
           <div id="otp-banner" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#1e40af;">
             <span>Verification code sent!</span>
           </div>
+
           <div style="margin-bottom:12px;">
-            <label class="form-label" style="font-size:12px;">Enter 6-Digit Verification Code</label>
-            <input type="text" id="otp-code-input" class="form-control" maxlength="6" placeholder="e.g. 582914" style="font-size:18px;letter-spacing:4px;text-align:center;font-weight:700;">
+            <label class="form-label" style="font-size:12px;font-weight:600;text-align:center;display:block;">Enter 6-Digit Passcode</label>
+            <div style="display:flex;justify-content:center;gap:6px;margin:12px 0;" onpaste="handleOtpPaste(event)">
+              <input type="text" inputmode="numeric" maxlength="1" class="otp-digit-box" id="otp-box-0" oninput="handleOtpBoxInput(0, this.value)" onkeydown="handleOtpBoxKeyDown(0, event)">
+              <input type="text" inputmode="numeric" maxlength="1" class="otp-digit-box" id="otp-box-1" oninput="handleOtpBoxInput(1, this.value)" onkeydown="handleOtpBoxKeyDown(1, event)">
+              <input type="text" inputmode="numeric" maxlength="1" class="otp-digit-box" id="otp-box-2" oninput="handleOtpBoxInput(2, this.value)" onkeydown="handleOtpBoxKeyDown(2, event)">
+              <input type="text" inputmode="numeric" maxlength="1" class="otp-digit-box" id="otp-box-3" oninput="handleOtpBoxInput(3, this.value)" onkeydown="handleOtpBoxKeyDown(3, event)">
+              <input type="text" inputmode="numeric" maxlength="1" class="otp-digit-box" id="otp-box-4" oninput="handleOtpBoxInput(4, this.value)" onkeydown="handleOtpBoxKeyDown(4, event)">
+              <input type="text" inputmode="numeric" maxlength="1" class="otp-digit-box" id="otp-box-5" oninput="handleOtpBoxInput(5, this.value)" onkeydown="handleOtpBoxKeyDown(5, event)">
+            </div>
           </div>
+
+          <!-- Dev OTP quick autofill banner -->
+          <div id="dev-otp-pill" style="display:none;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#92400e;justify-content:space-between;align-items:center;">
+            <span>Dev Code: <b id="dev-otp-code-val" style="font-family:monospace;letter-spacing:2px;font-size:13px;"></b></span>
+            <button type="button" onclick="autoFillDevOtp()" style="background:#f59e0b;color:#fff;border:0;border-radius:4px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;">Auto-fill</button>
+          </div>
+
           <div style="margin-bottom:14px;">
-            <label class="form-label" style="font-size:12px;">Your Name (for profile setup)</label>
+            <label class="form-label" style="font-size:12px;">Your Name (optional)</label>
             <input type="text" id="otp-name-input" class="form-control" placeholder="Duhai Citizen">
           </div>
           <button type="button" class="btn-report-quick" style="width:100%;justify-content:center;padding:11px;" id="btn-submit-verify-otp" onclick="handleVerifyOtp()">Verify Code & Sign In</button>
-          <div style="text-align:center;margin-top:10px;">
-            <a href="javascript:void(0)" onclick="resetOtpStep()" style="font-size:11px;color:var(--primary);text-decoration:underline;">Re-enter email address</a>
+          
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:11px;">
+            <a href="javascript:void(0)" onclick="resetOtpStep()" style="color:var(--primary);text-decoration:underline;">Re-enter email</a>
+            <button type="button" id="btn-otp-resend" onclick="handleResendOtp()" style="background:none;border:none;color:#0ea5a4;font-weight:600;cursor:pointer;padding:0;">Resend code</button>
           </div>
         </div>
       </form>
@@ -3507,6 +3601,14 @@ function updateAuthUI() {
     loginOpenBtn.style.display = 'none';
     profileBox.style.display = 'block';
 
+    // Show Admin Registry button ONLY if authenticated user is admin
+    const adminHdrBtn = document.getElementById('btn-hdr-admin');
+    const adminDdBtn = document.getElementById('dd-admin-users-btn');
+    const isAdmin = currentUser && (currentUser.isAdmin || currentUser.email === 'awasthishailendra59@gmail.com' || currentUser.email === 'santusht.dev@gmail.com' || currentUser.email === 'admin@example.com');
+    if (adminHdrBtn) adminHdrBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+    if (adminDdBtn) adminDdBtn.style.display = isAdmin ? 'flex' : 'none';
+
+
     const initials = currentUser.name ? currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase() : 'SC';
     document.getElementById('hdr-user-avatar').textContent = initials;
     document.getElementById('hdr-user-name').textContent = currentUser.name;
@@ -3521,6 +3623,10 @@ function updateAuthUI() {
   } else {
     loginOpenBtn.style.display = 'flex';
     profileBox.style.display = 'none';
+    const adminHdrBtn = document.getElementById('btn-hdr-admin');
+    const adminDdBtn = document.getElementById('dd-admin-users-btn');
+    if (adminHdrBtn) adminHdrBtn.style.display = 'none';
+    if (adminDdBtn) adminDdBtn.style.display = 'none';
   }
 }
 
@@ -4433,6 +4539,333 @@ async function checkBackendHealth() {
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(checkBackendHealth, 1000);
 });
+
+
+/* =====================================================================
+   PASSWORDLESS EMAIL OTP & ADMIN USER REGISTRY LOGIC
+   ===================================================================== */
+let otpResendTimer = null;
+let otpCooldownSeconds = 0;
+let adminUsersCache = [];
+
+function handleOtpBoxInput(idx, val) {
+  const clean = val.replace(/\D/g, '');
+  const box = document.getElementById(`otp-box-${idx}`);
+  box.value = clean.slice(-1);
+  if (box.value && idx < 5) {
+    const nextBox = document.getElementById(`otp-box-${idx + 1}`);
+    if (nextBox) nextBox.focus();
+  }
+  const full = getEnteredOtp();
+  if (full.length === 6) {
+    handleVerifyOtp();
+  }
+}
+
+function handleOtpBoxKeyDown(idx, ev) {
+  if (ev.key === 'Backspace') {
+    const box = document.getElementById(`otp-box-${idx}`);
+    if (!box.value && idx > 0) {
+      const prev = document.getElementById(`otp-box-${idx - 1}`);
+      if (prev) {
+        prev.focus();
+        prev.value = '';
+      }
+    }
+  } else if (ev.key === 'ArrowLeft' && idx > 0) {
+    document.getElementById(`otp-box-${idx - 1}`)?.focus();
+  } else if (ev.key === 'ArrowRight' && idx < 5) {
+    document.getElementById(`otp-box-${idx + 1}`)?.focus();
+  }
+}
+
+function handleOtpPaste(ev) {
+  ev.preventDefault();
+  const text = (ev.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+  if (!text) return;
+  for (let i = 0; i < 6; i++) {
+    const box = document.getElementById(`otp-box-${i}`);
+    if (box) box.value = text[i] || '';
+  }
+  if (text.length >= 6) {
+    handleVerifyOtp();
+  } else {
+    document.getElementById(`otp-box-${text.length}`)?.focus();
+  }
+}
+
+function getEnteredOtp() {
+  let s = '';
+  for (let i = 0; i < 6; i++) {
+    const b = document.getElementById(`otp-box-${i}`);
+    if (b) s += b.value || '';
+  }
+  return s;
+}
+
+function autoFillDevOtp() {
+  const codeVal = document.getElementById('dev-otp-code-val').textContent.trim();
+  if (!codeVal) return;
+  for (let i = 0; i < 6; i++) {
+    const b = document.getElementById(`otp-box-${i}`);
+    if (b) b.value = codeVal[i] || '';
+  }
+  handleVerifyOtp();
+}
+
+function startOtpCooldown(seconds = 60) {
+  otpCooldownSeconds = seconds;
+  const resendBtn = document.getElementById('btn-otp-resend');
+  if (otpResendTimer) clearInterval(otpResendTimer);
+  
+  const updateBtn = () => {
+    if (otpCooldownSeconds <= 0) {
+      clearInterval(otpResendTimer);
+      if (resendBtn) {
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'Resend code';
+        resendBtn.style.opacity = '1';
+        resendBtn.style.cursor = 'pointer';
+      }
+    } else {
+      if (resendBtn) {
+        resendBtn.disabled = true;
+        resendBtn.textContent = `Resend in ${otpCooldownSeconds}s`;
+        resendBtn.style.opacity = '0.5';
+        resendBtn.style.cursor = 'not-allowed';
+      }
+      otpCooldownSeconds--;
+    }
+  };
+  updateBtn();
+  otpResendTimer = setInterval(updateBtn, 1000);
+}
+
+async function handleResendOtp() {
+  if (otpCooldownSeconds > 0) return;
+  const email = document.getElementById('otp-email').value.trim();
+  if (!email) return;
+  showToast('Requesting fresh verification code...', 'info');
+  await executeSendOtp(email);
+}
+
+async function handleSendOtp(e) {
+  e.preventDefault();
+  const email = document.getElementById('otp-email').value.trim();
+  if (!email || !email.includes('@')) {
+    showToast('Please enter a valid email address.', 'warning');
+    return;
+  }
+  await executeSendOtp(email);
+}
+
+async function executeSendOtp(email) {
+  const btn = document.getElementById('btn-submit-send-otp');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Sending Verification Code...';
+  }
+
+  try {
+    const res = await fetch(API + '/api/auth/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to dispatch verification code.');
+
+    document.getElementById('otp-step-1').style.display = 'none';
+    document.getElementById('otp-step-2').style.display = 'block';
+    document.getElementById('otp-banner').innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">📧</span>
+        <div>
+          <strong style="color:#1e3a8a;">Passcode Sent</strong><br>
+          <span style="color:#1e40af;font-size:12px;">We dispatched a 6-digit passcode to <b>${esc(email)}</b>.</span>
+        </div>
+      </div>
+    `;
+
+    // Reset boxes
+    for (let i = 0; i < 6; i++) {
+      const b = document.getElementById(`otp-box-${i}`);
+      if (b) b.value = '';
+    }
+    setTimeout(() => { document.getElementById('otp-box-0')?.focus(); }, 150);
+
+    // Show dev OTP pill if returned
+    const devPill = document.getElementById('dev-otp-pill');
+    const devVal = document.getElementById('dev-otp-code-val');
+    if (data.code && devPill && devVal) {
+      devVal.textContent = data.code;
+      devPill.style.display = 'flex';
+    }
+
+    startOtpCooldown(60);
+    showToast(`Passcode sent to ${email}`, 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Send Verification Code';
+    }
+  }
+}
+
+async function handleVerifyOtp() {
+  const email = document.getElementById('otp-email').value.trim();
+  const code = getEnteredOtp();
+  const name = document.getElementById('otp-name-input').value.trim() || email.split('@')[0].replace('.', ' ');
+
+  if (!code || code.length !== 6) {
+    showToast('Please enter the full 6-digit verification code.', 'warning');
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit-verify-otp');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Verifying Passcode...';
+  }
+
+  try {
+    const res = await fetch(API + '/api/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code, name })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Invalid or expired verification code.');
+
+    authToken = data.token;
+    currentUser = data.user;
+    localStorage.setItem('sudharsarthi_token', authToken);
+    localStorage.setItem('sudharsarthi_user', JSON.stringify(currentUser));
+    updateAuthUI();
+    closeLoginModal();
+    resetOtpStep();
+    showToast(`Signed in successfully as ${currentUser.name}!`, 'success');
+    if (window.location.hash === '#my-reports') switchTab('my-reports');
+  } catch (err) {
+    showToast(`Verification Failed: ${err.message}`, 'error');
+    // Clear boxes on failure and refocus
+    for (let i = 0; i < 6; i++) {
+      const b = document.getElementById(`otp-box-${i}`);
+      if (b) b.value = '';
+    }
+    document.getElementById('otp-box-0')?.focus();
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Verify Code & Sign In';
+    }
+  }
+}
+
+/* =====================================================================
+   ADMIN USERS DIRECTORY (RESTRICTED TO ADMIN_EMAILS)
+   ===================================================================== */
+function openAdminUsersModal() {
+  const modal = document.getElementById('admin-users-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    loadAdminUsersDirectory();
+  }
+}
+
+function closeAdminUsersModal() {
+  const modal = document.getElementById('admin-users-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function loadAdminUsersDirectory() {
+  const tbody = document.getElementById('admin-users-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8;">Loading user directory from server...</td></tr>';
+
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+
+    const res = await fetch(API + '/api/admin/users', { headers });
+    if (!res.ok) {
+      if (res.status === 403) {
+        throw new Error('Access denied: Administrator privileges required.');
+      }
+      throw new Error('Failed to load user directory.');
+    }
+    const data = await res.json();
+    adminUsersCache = data.users || [];
+    renderAdminUsersTable(adminUsersCache);
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:#ef4444;font-weight:600;">⚠️ ${esc(err.message)}</td></tr>`;
+    showToast(err.message, 'error');
+  }
+}
+
+function filterAdminUsersTable() {
+  const q = (document.getElementById('admin-user-search')?.value || '').toLowerCase().trim();
+  const filtered = adminUsersCache.filter(u => (u.email || '').toLowerCase().includes(q) || (u.name || '').toLowerCase().includes(q));
+  renderAdminUsersTable(filtered);
+}
+
+function renderAdminUsersTable(users) {
+  const tbody = document.getElementById('admin-users-table-body');
+  const totalCnt = document.getElementById('admin-total-users-cnt');
+  const verifCnt = document.getElementById('admin-verified-users-cnt');
+
+  if (totalCnt) totalCnt.textContent = adminUsersCache.length;
+  if (verifCnt) verifCnt.textContent = adminUsersCache.filter(u => u.isVerified).length;
+
+  if (!users || users.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8;">No registered users match your search.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = users.map(u => {
+    const isCurrent = currentUser && currentUser.email === u.email;
+    const isVer = u.isVerified;
+    const regDate = u.createdAt ? u.createdAt.substring(0, 10) : 'Pre-seeded';
+    const lastLogin = u.lastLoginAt ? u.lastLoginAt.substring(0, 16).replace('T', ' ') : 'Never';
+    const initial = (u.name || u.email || 'U')[0].toUpperCase();
+
+    return `
+      <tr style="border-bottom:1px solid #f1f5f9;transition:background 0.15s;" onmouseover="this.style.background='#faf5ff'" onmouseout="this.style.background='transparent'">
+        <td style="padding:12px 8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:#f3e8ff;color:#7e22ce;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">
+              ${initial}
+            </div>
+            <div>
+              <div style="font-weight:600;color:#0f172a;display:flex;align-items:center;gap:6px;">
+                <span>${esc(u.email)}</span>
+                ${isCurrent ? '<span style="font-size:10px;background:#e2e8f0;padding:1px 6px;border-radius:4px;font-weight:700;">YOU</span>' : ''}
+              </div>
+              <div style="font-size:11px;color:#64748b;">${esc(u.name || 'Citizen')}</div>
+            </div>
+          </div>
+        </td>
+        <td style="padding:12px 8px;">
+          ${isVer 
+            ? '<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:999px;font-weight:600;font-size:11px;">✓ Verified</span>'
+            : '<span style="display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;color:#64748b;padding:2px 8px;border-radius:999px;font-weight:600;font-size:11px;">Unverified</span>'
+          }
+        </td>
+        <td style="padding:12px 8px;">
+          ${u.isAdmin
+            ? '<span style="background:#fae8ff;color:#86198f;padding:2px 8px;border-radius:999px;font-weight:700;font-size:11px;">🛡️ Admin</span>'
+            : '<span style="color:#64748b;font-size:11px;">Citizen</span>'
+          }
+        </td>
+        <td style="padding:12px 8px;font-family:monospace;color:#475569;font-size:11px;">${regDate}</td>
+        <td style="padding:12px 8px;font-family:monospace;color:#475569;font-size:11px;">${lastLogin}</td>
+        <td style="padding:12px 8px;text-align:right;font-weight:700;font-family:monospace;color:#0f172a;">${u.reportsCount || 0}</td>
+      </tr>
+    `;
+  }).join('');
+}
 
 </script>
 </body>
