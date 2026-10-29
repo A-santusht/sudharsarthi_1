@@ -1,26 +1,36 @@
 """
 SUDHARSARTHI - Flask API.
 
-Same endpoints the front end (js/api.js) was designed for:
-
+Endpoints:
   GET   /api/health
-  GET   /api/reports                 ?category=&priority=&status=&ward=&search=
+  GET   /api/config
+  GET   /api/reports                 ?category=&priority=&status=&ward=&search=&user_id=
   GET   /api/reports/<id>
   POST  /api/reports                 multipart (image + fields) or JSON (imageData data-URL)
   PATCH /api/reports/<id>/status
+  GET   /api/reports/<id>/comments   fetch interactive report updates and comments
+  POST  /api/reports/<id>/comments   post community or officer comment
+  POST  /api/reports/<id>/upvote     toggle community upvote on issue
+  POST  /api/auth/register           citizen or officer registration
+  POST  /api/auth/login              email + password authentication
+  POST  /api/auth/google             Google OAuth authentication (GIS / token)
+  GET   /api/auth/me                 current user profile session
+  POST  /api/auth/logout             sign out
   POST  /api/ai/classify             photo in, urgency assessment out (nothing saved)
   GET   /api/analytics
-  POST  /api/budget/optimize         true 0/1 knapsack
-  POST  /api/demo/reset              reload the demo reports (for presentations)
+  POST  /api/reports/rescore         re-calculate urgency based on age and repeat reports
+  POST  /api/demo/reset              reload demo reports
   GET   /uploads/<file>              citizen photos
-
-Run:  python app.py        (see README.md)
 """
 import base64
 import duhai
+import hashlib
+import hmac
+import json
 import math
 import os
 import re
+import secrets
 import threading
 from collections import Counter, defaultdict
 from datetime import datetime
@@ -54,6 +64,7 @@ _default_front = os.path.join(os.path.dirname(BASE_DIR), "frontend")
 FRONTEND_DIR = os.environ.get("FRONTEND_DIR") or (_default_front if os.path.isdir(_default_front) else None)
 STATUSES = ["Reported", "Under Review", "Repair in Progress", "Resolved"]
 MAX_UPLOAD_MB = 5
+SESSION_SECRET = os.environ.get("SESSION_SECRET", "sudharsarthi-secure-auth-salt-duhai-2026")
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = (MAX_UPLOAD_MB + 1) * 1024 * 1024
@@ -152,7 +163,141 @@ def days_since(date_text):
         return 0
 
 
-# ------------------------------------------------------------------ routes
+# ------------------------------------------------------------------ Auth & Token Helpers
+
+def make_token(user_id: str) -> str:
+    """Create a signed HMAC session token."""
+    ts = str(int(datetime.now().timestamp()))
+    raw = f"{user_id}:{ts}"
+    sig = hmac.new(SESSION_SECRET.encode(), raw.encode(), hashlib.sha256).hexdigest()
+    return f"{raw}:{sig}"
+
+
+def get_current_user():
+    """Extract authenticated user from Authorization header or return None."""
+    auth = request.headers.get("Authorization", "")
+    token = auth.replace("Bearer ", "").strip() if auth.startswith("Bearer ") else ""
+    if not token or token.count(":") != 2:
+        return None
+    user_id, ts_str, sig = token.split(":")
+    expected = hmac.new(SESSION_SECRET.encode(), f"{user_id}:{ts_str}".encode(), hashlib.sha256).hexdigest()
+    if not secrets.compare_digest(sig, expected):
+        return None
+    try:
+        ts = int(ts_str)
+        if datetime.now().timestamp() - ts > 30 * 86400:  # 30 days
+            return None
+    except ValueError:
+        return None
+    user = db.get_user_by_id(user_id)
+    if user:
+        user.pop("password_hash", None)
+    return user
+
+
+def decode_jwt_unverified(token: str):
+    """Safely decode JWT payload claims (RFC 7519) without external dependencies."""
+    try:
+        parts = token.split(".")
+        if len(parts) != 3:
+            return None
+        payload_b64 = parts[1]
+        pad = 4 - (len(payload_b64) % 4)
+        if pad != 4:
+            payload_b64 += "=" * pad
+        raw = base64.urlsafe_b64decode(payload_b64.encode("utf-8"))
+        return json.loads(raw.decode("utf-8"))
+    except Exception:
+        return None
+
+
+# ------------------------------------------------------------------ Authentication Routes
+
+@app.post("/api/auth/register")
+def register():
+    data = request.get_json(silent=True) or {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+    role = data.get("role") or "citizen"
+    avatar = data.get("avatar")
+
+    if not name or len(name) < 2:
+        return bad("Please provide your full name.")
+    if not email or "@" not in email or "." not in email:
+        return bad("Please provide a valid email address.")
+    if not password or len(password) < 4:
+        return bad("Password must be at least 4 characters.")
+    if role not in ("citizen", "officer", "admin"):
+        role = "citizen"
+
+    if db.get_user_by_email(email):
+        return bad("An account with this email already exists. Please log in.")
+
+    user = db.create_user(name=name, email=email, password=password, role=role, avatar=avatar)
+    token = make_token(user["id"])
+    user.pop("password_hash", None)
+    return jsonify({"success": True, "token": token, "user": user}), 201
+
+
+@app.post("/api/auth/login")
+def login():
+    data = request.get_json(silent=True) or {}
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+
+    if not email or not password:
+        return bad("Email and password are required.")
+
+    user = db.authenticate_user(email, password)
+    if not user:
+        return bad("Invalid email or password.", 401)
+
+    token = make_token(user["id"])
+    return jsonify({"success": True, "token": token, "user": user})
+
+
+@app.post("/api/auth/google")
+def google_auth():
+    """Handle Google Sign-In via Google Identity Services (GIS) credential or direct payload."""
+    data = request.get_json(silent=True) or {}
+    credential = data.get("credential")
+
+    email = data.get("email")
+    name = data.get("name")
+    avatar = data.get("avatar")
+    google_id = data.get("googleId")
+
+    if credential:
+        claims = decode_jwt_unverified(credential)
+        if claims:
+            email = claims.get("email") or email
+            name = claims.get("name") or claims.get("given_name") or name
+            avatar = claims.get("picture") or avatar
+            google_id = claims.get("sub") or google_id
+
+    if not email:
+        return bad("Google account email could not be retrieved.")
+
+    name = name or email.split("@")[0].capitalize()
+    user = db.upsert_google_user(email=email, name=name, avatar=avatar, google_id=google_id)
+    token = make_token(user["id"])
+    user.pop("password_hash", None)
+    return jsonify({"success": True, "token": token, "user": user})
+
+
+@app.get("/api/auth/me")
+def auth_me():
+    user = get_current_user()
+    return jsonify({"success": True, "user": user})
+
+
+@app.post("/api/auth/logout")
+def logout():
+    return jsonify({"success": True})
+
+
+# ------------------------------------------------------------------ Civic Reports Routes
 
 @app.get("/api/health")
 def health():
@@ -166,23 +311,65 @@ def health():
 
 @app.get("/api/config")
 def config():
-    return jsonify({"area": duhai.AREA_NAME, "center": duhai.CENTER, "bounds": duhai.BOUNDS,
-                    "categories": urgency_ai.CATEGORIES,
-                    "wards": [w["name"] for w in notifier._load_wards()],
-                    "wardDetails": notifier._load_wards()})
+    return jsonify({
+        "area": duhai.AREA_NAME, "center": duhai.CENTER, "bounds": duhai.BOUNDS,
+        "categories": urgency_ai.CATEGORIES,
+        "wards": [w["name"] for w in notifier._load_wards()],
+        "wardDetails": notifier._load_wards()
+    })
+
+
+@app.get("/api/system/decision-logic")
+def decision_logic():
+    """Transparent algorithmic breakdown for Ward Officers: Range and Priority logic."""
+    return jsonify({
+        "formula": "Urgency (0-100) = Severity (40) + Traffic (25) + Repeat Complaints (20) + Aging Factor (15)",
+        "weights": {
+            "severityMax": 40,
+            "trafficExposureMax": 25,
+            "repeatReportsMax": 20,
+            "agingFactorMax": 15
+        },
+        "rangeDecision": {
+            "spatialClusterMeters": 25,
+            "algorithm": "Haversine Geodesic Distance",
+            "duplicateThresholdMeters": 25,
+            "wardZones": 6,
+            "areaComputation": "Defect bounding surface area in square meters (width x length)"
+        },
+        "urgencyClassification": {
+            "high": {"minScore": 60, "slaHours": 24, "highwayOverride": True},
+            "medium": {"minScore": 40, "maxScore": 59, "slaHours": 72},
+            "low": {"maxScore": 39, "slaHours": 168}
+        },
+        "highwayRule": {
+            "rule": "All highway and expressway issues automatically receive High Priority (25/25 traffic points & <24h SLA).",
+            "corridors": getattr(urgency_ai, "HIGHWAY_WORDS", ["highway", "nh-34", "nh 34", "nh-", "delhi-meerut", "meerut road", "expressway", "flyover", "bypass"])
+        },
+        "alertTarget": "awasthishailendra59@gmail.com"
+    })
 
 
 @app.get("/api/reports")
 def get_reports():
     a = request.args
-    return jsonify(db.list_reports(a.get("category"), a.get("priority"), a.get("status"),
-                                   a.get("ward"), a.get("search")))
+    user_id = a.get("user_id") or a.get("userId")
+    return jsonify(db.list_reports(
+        a.get("category"), a.get("priority"), a.get("status"),
+        a.get("ward"), a.get("search"), user_id=user_id
+    ))
 
 
 @app.get("/api/reports/<report_id>")
 def get_report(report_id):
     report = db.get_report(report_id)
-    return jsonify(report) if report else bad("Report not found.", 404)
+    if not report:
+        return bad("Report not found.", 404)
+    report["comments"] = db.get_comments(report_id)
+    curr_user = get_current_user()
+    voter = curr_user["id"] if curr_user else (request.remote_addr or "anon_guest")
+    report["hasUpvoted"] = db.user_has_upvoted(report_id, voter)
+    return jsonify(report)
 
 
 @app.post("/api/reports")
@@ -209,13 +396,18 @@ def create_report():
         w = notifier.nearest_ward(lat, lng)
         ward_name = w["name"] if w else "Unassigned"
 
-    # Same issue already open within 25 m?  Then this is a repeat complaint.
+    # Same issue already open within 25 m? Then this is a repeat complaint.
     nearby = db.find_nearby_open(lat, lng, category)
 
     assessment = urgency_ai.assess(
         image_bytes, category, description, location, landmark,
         repeat_count=len(nearby), age_days=0,
     )
+
+    curr_user = get_current_user()
+    user_id = (curr_user.get("id") if curr_user else None) or data.get("userId")
+    reporter_email = (curr_user.get("email") if curr_user else None) or data.get("reporterEmail")
+    reporter_name = (curr_user.get("name") if curr_user else None) or (data.get("reporter") or "Citizen (Web Portal)")[:80]
 
     now = datetime.now()
     with _create_lock:
@@ -238,7 +430,7 @@ def create_report():
             "priority": assessment["priority"],
             "status": "Under Review" if assessment["flagged"] else "Reported",
             "date": now.strftime("%Y-%m-%d"),
-            "reporter": (data.get("reporter") or "Citizen (Web Portal)")[:80],
+            "reporter": reporter_name,
             "description": description or "Civic issue reported by resident.",
             "imageUrl": image_url,
             "afterImageUrl": "",
@@ -255,6 +447,9 @@ def create_report():
             "lastUpdated": now.strftime("%Y-%m-%d %H:%M"),
             "duplicateOf": nearby[0]["id"] if nearby else None,
             "repeatCount": len(nearby),
+            "userId": user_id,
+            "reporterEmail": reporter_email,
+            "upvotes": 0,
         }
         saved = db.insert_report(report)
 
@@ -283,8 +478,74 @@ def patch_status(report_id):
             return bad("'estimatedCost' must be a whole number.")
     body["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M")
     updated = db.update_report(report_id, body)
-    return jsonify({**updated, "success": True}) if updated else bad("Report not found.", 404)
+    if not updated:
+        return bad("Report not found.", 404)
 
+    # Automatically add a system comment for status change
+    curr_user = get_current_user()
+    actor_name = curr_user["name"] if curr_user else (body.get("inspectorName") or "Ward Officer")
+    actor_role = curr_user["role"] if curr_user else "officer"
+    if "status" in body:
+        db.add_comment(
+            report_id=report_id,
+            comment_text=f"Status updated to '{body['status']}'. Assigned: {body.get('contractor', updated.get('contractor', 'Unassigned'))}",
+            user_id=curr_user["id"] if curr_user else None,
+            user_name=actor_name,
+            user_role=actor_role
+        )
+
+    return jsonify({**updated, "success": True})
+
+
+# ------------------------------------------------------------------ Interactive Comments & Upvoting
+
+@app.get("/api/reports/<report_id>/comments")
+def get_report_comments(report_id):
+    report = db.get_report(report_id)
+    if not report:
+        return bad("Report not found.", 404)
+    return jsonify(db.get_comments(report_id))
+
+
+@app.post("/api/reports/<report_id>/comments")
+def post_report_comment(report_id):
+    report = db.get_report(report_id)
+    if not report:
+        return bad("Report not found.", 404)
+    body = request.get_json(silent=True) or {}
+    text = (body.get("comment") or "").strip()
+    if not text:
+        return bad("Comment text cannot be empty.")
+
+    curr_user = get_current_user()
+    user_id = curr_user["id"] if curr_user else None
+    user_name = curr_user["name"] if curr_user else (body.get("userName") or "Citizen").strip()
+    user_role = curr_user["role"] if curr_user else (body.get("userRole") or "citizen")
+    avatar = curr_user.get("avatar") if curr_user else body.get("avatar")
+
+    new_comment = db.add_comment(
+        report_id=report_id,
+        comment_text=text,
+        user_id=user_id,
+        user_name=user_name,
+        user_role=user_role,
+        avatar=avatar
+    )
+    return jsonify({**new_comment, "success": True}), 201
+
+
+@app.post("/api/reports/<report_id>/upvote")
+def upvote_report(report_id):
+    report = db.get_report(report_id)
+    if not report:
+        return bad("Report not found.", 404)
+    curr_user = get_current_user()
+    voter_id = curr_user["id"] if curr_user else (request.remote_addr or "anon_guest")
+    res = db.toggle_upvote(report_id, voter_id)
+    return jsonify({"success": True, **res})
+
+
+# ------------------------------------------------------------------ AI & Analytics
 
 @app.post("/api/ai/classify")
 def classify():
@@ -335,9 +596,11 @@ def analytics():
     })
 
 
+# ------------------------------------------------------------------ Legacy knapsack helper (kept for tests)
+
 def knapsack(items, budget):
     """0/1 knapsack. items = [(id, cost, value)]. Returns the set of chosen ids."""
-    unit = max(500, math.ceil(budget / 4000))           # keep the DP table small
+    unit = max(500, math.ceil(budget / 4000))
     cap = int(budget // unit)
     w = [max(1, math.ceil(c / unit)) for _, c, _ in items]
     n = len(items)
@@ -372,8 +635,8 @@ def optimize_budget():
     tasks = [r for r in db.list_reports()
              if r["status"] != "Resolved" and not r.get("duplicateOf") and r["estimatedCost"]]
     value_of = {
-        "priority": lambda r: r["riskScore"] ** 2,       # most dangerous first
-        "coverage": lambda r: 1000 + r["riskScore"],     # most repairs; risk breaks ties
+        "priority": lambda r: r["riskScore"] ** 2,
+        "coverage": lambda r: 1000 + r["riskScore"],
         "balanced": lambda r: r["riskScore"] + 40,
     }[strategy]
     chosen = knapsack([(r["id"], r["estimatedCost"], value_of(r)) for r in tasks], budget)
@@ -395,11 +658,6 @@ def optimize_budget():
 
 @app.post("/api/reports/rescore")
 def rescore():
-    """Re-age open reports: recount repeat complaints and days open, raise priority if earned.
-
-    Call it from a daily cron job or a button. Only reports scored by this backend are
-    touched (demo reports keep their hand-set scores). Priority is only ever raised here.
-    """
     rank = {"Low": 0, "Medium": 1, "High": 2}
     changed = []
     for r in db.list_reports():

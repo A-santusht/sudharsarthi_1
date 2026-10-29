@@ -218,6 +218,97 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(r["reports"], 12)
         self.assertEqual(self.c.get("/api/health").get_json()["reports"], 12)
 
+    def test_17_auth_registration_and_login(self):
+        reg = self.c.post("/api/auth/register", json={
+            "name": "Santusht Citizen",
+            "email": "santusht@duhai.in",
+            "password": "mypassword123",
+            "role": "citizen"
+        })
+        self.assertEqual(reg.status_code, 201)
+        data = reg.get_json()
+        self.assertTrue(data["success"])
+        self.assertTrue("token" in data)
+        token = data["token"]
+
+        me = self.c.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"}).get_json()
+        self.assertEqual(me["user"]["email"], "santusht@duhai.in")
+
+        dup = self.c.post("/api/auth/register", json={
+            "name": "Santusht Citizen",
+            "email": "santusht@duhai.in",
+            "password": "mypassword123"
+        })
+        self.assertEqual(dup.status_code, 400)
+
+        login_res = self.c.post("/api/auth/login", json={
+            "email": "santusht@duhai.in",
+            "password": "mypassword123"
+        })
+        self.assertEqual(login_res.status_code, 200)
+
+        bad_login = self.c.post("/api/auth/login", json={
+            "email": "santusht@duhai.in",
+            "password": "wrongpassword"
+        })
+        self.assertEqual(bad_login.status_code, 401)
+
+    def test_18_google_auth(self):
+        g_res = self.c.post("/api/auth/google", json={
+            "email": "googleuser@gmail.com",
+            "name": "Google Resident",
+            "googleId": "goog-123456",
+            "avatar": "https://example.com/avatar.png"
+        })
+        self.assertEqual(g_res.status_code, 200)
+        d = g_res.get_json()
+        self.assertTrue(d["success"])
+        self.assertEqual(d["user"]["email"], "googleuser@gmail.com")
+        self.assertEqual(d["user"]["google_id"], "goog-123456")
+
+    def test_19_comments_and_upvotes(self):
+        c_res = self.c.post("/api/reports/NS-2026-1042/comments", json={
+            "comment": "Ward team has started surface filling.",
+            "userName": "Officer Sharma",
+            "userRole": "officer"
+        })
+        self.assertEqual(c_res.status_code, 201)
+        comments = self.c.get("/api/reports/NS-2026-1042/comments").get_json()
+        self.assertTrue(len(comments) >= 1)
+        self.assertEqual(comments[-1]["comment"], "Ward team has started surface filling.")
+
+        up1 = self.c.post("/api/reports/NS-2026-1042/upvote").get_json()
+        self.assertTrue(up1["success"])
+        self.assertEqual(up1["upvotes"], 1)
+        self.assertTrue(up1["hasUpvoted"])
+
+        up2 = self.c.post("/api/reports/NS-2026-1042/upvote").get_json()
+        self.assertEqual(up2["upvotes"], 0)
+
+        self.assertFalse(up2["hasUpvoted"])
+
+    def test_20_highway_preference_and_decision_logic(self):
+        # 1. Test decision-logic endpoint
+        dl = self.c.get("/api/system/decision-logic").get_json()
+        self.assertIn("weights", dl)
+        self.assertEqual(dl["rangeDecision"]["spatialClusterMeters"], 25)
+        self.assertEqual(dl["alertTarget"], "awasthishailendra59@gmail.com")
+
+        # 2. Highway hazard receives automatic High Priority & 25 exposure pts
+        r = self.c.post("/api/reports", json={
+            "category": "Road Crack",
+            "lat": 28.7285,
+            "lng": 77.4740,
+            "location": "NH-34 Highway near Duhai Flyover",
+            "description": "Crack spreading across the expressway fast lane"
+        })
+        self.assertEqual(r.status_code, 201)
+        d = r.get_json()
+        self.assertEqual(d["priority"], "High")
+        self.assertGreaterEqual(d["riskScore"], 65)
+        self.assertEqual(d["scoreBreakdown"]["trafficVolume"], 25)
+        self.assertEqual(d["notifiedEmail"], "awasthishailendra59@gmail.com")
+
     @staticmethod
     def _year():
         from datetime import datetime

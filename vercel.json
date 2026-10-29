@@ -1,26 +1,36 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/:path*",
-      "destination": "https://sudharsarthi.onrender.com/api/:path*"
+      "src": "api/index.py",
+      "use": "@vercel/python"
     },
     {
-      "source": "/uploads/:path*",
-      "destination": "https://sudharsarthi.onrender.com/uploads/:path*"
+      "src": "sudharsarthi/frontend/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
     },
     {
-      "source": "/assets/:path*",
-      "destination": "/sudharsarthi/frontend/assets/:path*"
+      "src": "/uploads/(.*)",
+      "dest": "/api/index.py"
     },
     {
-      "source": "/",
-      "destination": "/sudharsarthi/frontend/index.html"
+      "src": "/assets/(.*)",
+      "dest": "/sudharsarthi/frontend/assets/$1"
     },
     {
-      "source": "/(.*)",
-      "destination": "/sudharsarthi/frontend/$1"
+      "src": "/",
+      "dest": "/sudharsarthi/frontend/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/sudharsarthi/frontend/$1"
     }
   ]
 }

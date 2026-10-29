@@ -1,0 +1,20 @@
+[build]
+  publish = "sudharsarthi/frontend"
+
+# Fallback proxy to deployed backend or local
+[[redirects]]
+  from = "/api/*"
+  to = "https://sudharsarthi.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/uploads/*"
+  to = "https://sudharsarthi.onrender.com/uploads/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root {
   --primary: #1e3a8a;
@@ -1128,96 +1129,331 @@ textarea.form-control {
   border-radius: 999px;
 }
 
-/* TAB 4: BUDGET OPTIMIZER */
-#tab-budget {
-  overflow-y: auto;
-  padding: 24px;
-  background: #f8fafc;
-  flex-direction: column;
-}
-.budget-container {
-  max-width: 1000px;
-  margin: 0 auto;
-  width: 100%;
-}
-.budget-header-card {
-  background: linear-gradient(135deg, #1e3a8a 0%, #0f766e 100%);
-  color: #fff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  margin-bottom: 20px;
-}
-.budget-header-card h2 {
-  font-family: 'Poppins', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-.budget-ctrl-panel {
-  background: #ffffff;
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 20px;
-}
-.budget-input-row {
+
+/* AUTH & USER PROFILE */
+.user-auth-area {
   display: flex;
-  gap: 16px;
-  align-items: flex-end;
-  flex-wrap: wrap;
+  align-items: center;
+  position: relative;
 }
-.budget-preset-chips {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
-.preset-chip {
+.btn-login-header {
   background: #f1f5f9;
   border: 1px solid #cbd5e1;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
+  color: var(--ink);
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 13px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 7px;
   cursor: pointer;
-  color: #334155;
+  transition: all 0.2s ease;
 }
-.preset-chip:hover {
+.btn-login-header:hover {
   background: #e2e8f0;
+  border-color: #94a3b8;
 }
-.btn-optimize {
-  background: var(--teal);
-  color: #fff;
-  border: 0;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 700;
+.user-profile-menu {
+  position: relative;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 4px 10px 4px 5px;
+  border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s;
 }
-.btn-optimize:hover {
-  background: var(--teal-dark);
+.user-chip:hover {
+  background: #e2e8f0;
 }
-
-.budget-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 14px;
-  margin-bottom: 20px;
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
-.budget-stat-box {
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.user-info-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  text-align: left;
+}
+.user-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.user-role-badge {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--teal-dark);
+  text-transform: uppercase;
+}
+.user-dropdown-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
   background: #ffffff;
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 16px;
+  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  min-width: 210px;
+  z-index: 1200;
 }
-.budget-stat-box b {
+.user-dropdown-panel.show {
   display: block;
-  font-size: 22px;
-  font-family: 'Poppins', sans-serif;
+}
+.dropdown-header {
+  padding: 8px 10px;
+}
+.dropdown-header b {
+  display: block;
+  font-size: 13px;
   color: var(--ink);
-  margin-top: 4px;
+}
+.dropdown-header small {
+  display: block;
+  font-size: 11px;
+  color: var(--mut);
+}
+.dd-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+.dd-item:hover {
+  background: #f1f5f9;
+}
+.dd-item.dd-logout {
+  color: #dc2626;
+}
+.dd-item.dd-logout:hover {
+  background: #fef2f2;
+}
+
+/* LOGIN MODAL & GOOGLE AUTH */
+.auth-tab-btn {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mut);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.auth-tab-btn.active {
+  background: #ffffff;
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.btn-google-auth {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+.btn-google-auth:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  box-shadow: var(--shadow-md);
+}
+.google-acc-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.google-acc-opt:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+.google-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* UPVOTING & COMMENTS */
+.btn-upvote {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.btn-upvote.upvoted {
+  background: #e0f2fe;
+  border-color: #0284c7;
+  color: #0369a1;
+}
+.btn-upvote:hover {
+  transform: translateY(-1px);
+}
+.comment-bubble {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+.comment-author-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3px;
+  font-size: 11px;
+}
+.comment-author-row b {
+  color: var(--ink);
+}
+.comment-role-pill {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #475569;
+  text-transform: uppercase;
+}
+.comment-role-pill.role-officer {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.comment-text {
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.4;
+}
+
+/* MY COMPLAINTS TAB & STEPPER */
+#tab-my-reports {
+  overflow-y: auto;
+  padding: 20px;
+  background: #f8fafc;
+}
+.my-report-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.my-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin: 12px 0 6px;
+}
+.my-stepper::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  right: 20px;
+  height: 2px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+.stepper-node {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.stepper-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+.stepper-node.done .stepper-dot {
+  background: #16a34a;
+  color: #ffffff;
+}
+.stepper-node.active .stepper-dot {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(30,58,138,0.2);
+}
+.stepper-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mut);
+}
+.stepper-node.active .stepper-label {
+  color: var(--primary);
+  font-weight: 700;
 }
 
 /* TAB 5: DUHAI WARDS & SLA */
@@ -1466,8 +1702,8 @@ textarea.form-control {
     <button class="nav-btn" data-tab="analytics" onclick="switchTab('analytics')">
       📊 Analytics
     </button>
-    <button class="nav-btn" data-tab="budget" onclick="switchTab('budget')">
-      💰 Budget AI
+    <button class="nav-btn" data-tab="my-reports" onclick="switchTab('my-reports')">
+      📋 My Complaints
     </button>
     <button class="nav-btn" data-tab="wards" onclick="switchTab('wards')">
       👮 Duhai Wards
@@ -1479,6 +1715,57 @@ textarea.form-control {
       <span class="live-dot"></span>
       <span id="header-stats-text">Duhai Jurisdiction</span>
     </div>
+
+    <!-- ROLE SWITCHER TOGGLE (Citizen vs Ward Officer) -->
+    <div class="role-switcher-toggle" id="role-switcher-toggle" style="display:flex;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:999px;padding:2px;">
+      <button type="button" class="role-btn active" id="btn-role-citizen" onclick="setAppRole('citizen')" style="border:0;background:#fff;color:var(--primary);font-weight:700;font-size:11px;padding:5px 10px;border-radius:999px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+        👤 Citizen View
+      </button>
+      <button type="button" class="role-btn" id="btn-role-officer" onclick="setAppRole('officer')" style="border:0;background:transparent;color:var(--mut);font-weight:600;font-size:11px;padding:5px 10px;border-radius:999px;cursor:pointer;">
+        👮 Officer Mode
+      </button>
+    </div>
+
+    <!-- OFFICER ONLY DECISION ENGINE BUTTON -->
+    <button type="button" class="btn-login-header officer-only-badge" id="btn-hdr-decision" onclick="openDecisionModal()" style="display:none;background:#f0fdfa;border-color:#0ea5a4;color:#0f766e;font-weight:700;" title="Explainable AI Range & Urgency Decision Formula">
+      <span>🔬 AI Decision Engine</span>
+    </button>
+
+    <div class="user-auth-area" id="user-auth-area">
+      <button class="btn-login-header" id="btn-login-open" onclick="openLoginModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Sign In</span>
+      </button>
+
+      <div class="user-profile-menu" id="user-profile-box" style="display:none;">
+        <div class="user-chip" onclick="toggleUserDropdown(event)">
+          <div class="user-avatar" id="hdr-user-avatar">SC</div>
+          <div class="user-info-text">
+            <span class="user-name" id="hdr-user-name">Santusht</span>
+            <span class="user-role-badge" id="hdr-user-role">Citizen</span>
+          </div>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="user-dropdown-panel" id="user-dropdown-panel">
+          <div class="dropdown-header">
+            <b id="dd-user-name">Santusht</b>
+            <small id="dd-user-email">citizen@duhai.in</small>
+          </div>
+          <hr style="border:0;border-top:1px solid #e2e8f0;margin:6px 0;">
+          <button class="dd-item" onclick="switchTab('my-reports');toggleUserDropdown(false);">
+            <span>📋 My Lodged Complaints</span>
+            <span class="badge" id="dd-my-reports-count">0</span>
+          </button>
+          <button class="dd-item" onclick="switchTab('report');toggleUserDropdown(false);">
+            <span>➕ File New Defect</span>
+          </button>
+          <button class="dd-item dd-logout" onclick="logoutUser()">
+            <span>🚪 Sign Out</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <button class="btn-report-quick" onclick="startReportFromMap()">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
       Report Pothole / Hazard
@@ -1588,6 +1875,14 @@ textarea.form-control {
           <div class="form-group form-full">
             <label class="form-label">Describe the Issue <span>*</span></label>
             <textarea id="form-description" class="form-control" placeholder="Explain the hazard in detail (e.g. Deep 15cm pothole on the fast lane outside Duhai RRTS station gate; two-wheelers slipping in darkness)."></textarea>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;align-items:center;">
+              <span style="font-size:11px;color:var(--mut);font-weight:600;">⚡ Quick Presets:</span>
+              <button type="button" class="preset-chip" onclick="applyQuickDesc('Pothole', 'Deep pothole (>12cm) on fast lane; two-wheelers slipping in evening hours.')">🕳️ Deep Pothole</button>
+              <button type="button" class="preset-chip" onclick="applyQuickDesc('Waterlogging', 'Substantial waterlogging (>25cm deep) submerging road after rain.')">🌊 Waterlogging</button>
+              <button type="button" class="preset-chip" onclick="applyQuickDesc('Road Crack', 'Severe alligator cracking on bitumen layer causing tire skids.')">⚡ Road Crack</button>
+              <button type="button" class="preset-chip" onclick="applyQuickDesc('Fallen Tree', 'Large tree branch fallen across carriage-way blocking traffic.')">🌳 Fallen Tree</button>
+              <button type="button" class="preset-chip" onclick="applyQuickDesc('Garbage', 'Overflowing garbage bin spilling into vehicular traffic corridor.')">🗑️ Waste Overflow</button>
+            </div>
           </div>
 
           <!-- PHOTO UPLOAD & PREVIEW -->
@@ -1743,90 +2038,53 @@ textarea.form-control {
     </div>
   </section>
 
-  <!-- TAB 4: MUNICIPAL BUDGET OPTIMIZER -->
-  <section id="tab-budget" class="tab-content">
-    <div class="budget-container">
-      <div class="budget-header-card">
-        <h2>💰 Municipal Road Budget Optimizer</h2>
-        <p style="font-size:13px;opacity:0.9;">Solves the true 0/1 knapsack problem to maximize hazard elimination for Duhai's civic repair funds.</p>
-      </div>
-
-      <div class="budget-ctrl-panel">
-        <div class="budget-input-row">
-          <div style="flex:1;min-width:240px;">
-            <label class="form-label">Available Repair Budget (₹ Rupees)</label>
-            <input type="number" id="budget-amount" class="form-control" value="250000" step="10000" min="10000">
-            <div class="budget-preset-chips">
-              <span class="preset-chip" onclick="setPresetBudget(100000)">₹ 1.0 Lakh</span>
-              <span class="preset-chip" onclick="setPresetBudget(250000)">₹ 2.5 Lakhs</span>
-              <span class="preset-chip" onclick="setPresetBudget(500000)">₹ 5.0 Lakhs</span>
-              <span class="preset-chip" onclick="setPresetBudget(1000000)">₹ 10.0 Lakhs</span>
-            </div>
+  <!-- TAB: CITIZEN MY COMPLAINTS -->
+  <section id="tab-my-reports" class="tab-content">
+    <div style="max-width:1050px;margin:0 auto;padding:24px;width:100%;overflow-y:auto;height:100%;">
+      <div style="background:linear-gradient(135deg,#1e3a8a 0%,#0f766e 100%);color:#fff;border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:var(--shadow-md);">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <h2 style="font-family:'Poppins',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px;">📋 My Filed Complaints & Live Tracking</h2>
+            <p style="font-size:13px;opacity:0.9;">Real-time progress, municipal engineer assignments, and resolution updates for your reports.</p>
           </div>
+          <button class="loc-btn" style="background:#fff;color:var(--primary);font-weight:700;border:0;padding:10px 18px;border-radius:10px;cursor:pointer;" onclick="switchTab('report')">➕ Lodge New Report</button>
+        </div>
+      </div>
 
-          <div style="min-width:200px;">
-            <label class="form-label">Optimization Strategy</label>
-            <select id="budget-strategy" class="form-control">
-              <option value="balanced">Balanced (Risk + Value)</option>
-              <option value="priority">Critical Safety First</option>
-              <option value="coverage">Maximum Road Coverage</option>
-            </select>
+      <div id="my-reports-unauthed" style="display:none;background:#fff;border:1px solid var(--border-color);border-radius:16px;padding:40px;text-align:center;box-shadow:var(--shadow-sm);">
+        <div style="font-size:48px;margin-bottom:12px;">🔐</div>
+        <h3 style="font-family:'Poppins',sans-serif;font-size:20px;color:var(--ink);margin-bottom:8px;">Sign In to Track Your Complaints</h3>
+        <p style="font-size:14px;color:var(--mut);max-width:500px;margin:0 auto 20px;">Access your personal complaint dashboard, track real-time resolution stages by Duhai ward officers, and receive notifications.</p>
+        <button class="btn-report-quick" style="margin:0 auto;" onclick="openLoginModal()">Sign In with Google or Email</button>
+      </div>
+
+      <div id="my-reports-authed" style="display:none;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;">
+          <div style="background:#fff;border:1px solid var(--border-color);border-radius:12px;padding:16px;">
+            <span style="font-size:12px;color:var(--mut);">My Total Complaints</span>
+            <b id="my-stat-total" style="display:block;font-size:22px;color:var(--ink);margin-top:4px;">0</b>
           </div>
-
-          <button class="btn-optimize" onclick="runBudgetOptimization()">⚡ Run AI Optimization</button>
-        </div>
-      </div>
-
-      <div class="budget-stats-grid" id="budget-stats-grid" style="display:none;">
-        <div class="budget-stat-box">
-          <span style="font-size:12px;color:var(--mut);">Allocated Spend</span>
-          <b id="b-stat-allocated" style="color:var(--primary);">₹ 0</b>
-        </div>
-        <div class="budget-stat-box">
-          <span style="font-size:12px;color:var(--mut);">Surplus / Reserve</span>
-          <b id="b-stat-remaining" style="color:var(--teal-dark);">₹ 0</b>
-        </div>
-        <div class="budget-stat-box">
-          <span style="font-size:12px;color:var(--mut);">Critical Hazards Fixed</span>
-          <b id="b-stat-critical" style="color:var(--high);">0 / 0</b>
-        </div>
-        <div class="budget-stat-box">
-          <span style="font-size:12px;color:var(--mut);">Total Works Scheduled</span>
-          <b id="b-stat-count" style="color:#16a34a;">0</b>
-        </div>
-      </div>
-
-      <div id="budget-results-tables" style="display:none;">
-        <div class="ward-leaderboard-card" style="margin-bottom:20px;">
-          <h3 style="font-family:'Poppins',sans-serif;font-size:15px;color:#16a34a;margin-bottom:10px;">✅ Approved Immediate Works (Under Budget)</h3>
-          <table class="ward-table">
-            <thead>
-              <tr>
-                <th>Issue ID</th>
-                <th>Project Title</th>
-                <th>Ward</th>
-                <th>Urgency Score</th>
-                <th>Estimated Cost</th>
-              </tr>
-            </thead>
-            <tbody id="budget-approved-body"></tbody>
-          </table>
+          <div style="background:#fff;border:1px solid var(--border-color);border-radius:12px;padding:16px;">
+            <span style="font-size:12px;color:var(--mut);">Active / In Progress</span>
+            <b id="my-stat-active" style="display:block;font-size:22px;color:#d97706;margin-top:4px;">0</b>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border-color);border-radius:12px;padding:16px;">
+            <span style="font-size:12px;color:var(--mut);">Resolved & Repaired</span>
+            <b id="my-stat-resolved" style="display:block;font-size:22px;color:#16a34a;margin-top:4px;">0</b>
+          </div>
         </div>
 
-        <div class="ward-leaderboard-card">
-          <h3 style="font-family:'Poppins',sans-serif;font-size:15px;color:#dc2626;margin-bottom:10px;">⏳ Deferred To Next Funding Tranche</h3>
-          <table class="ward-table">
-            <thead>
-              <tr>
-                <th>Issue ID</th>
-                <th>Project Title</th>
-                <th>Ward</th>
-                <th>Urgency Score</th>
-                <th>Estimated Cost</th>
-              </tr>
-            </thead>
-            <tbody id="budget-deferred-body"></tbody>
-          </table>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+          <div style="display:flex;gap:8px;" id="my-reports-filter-chips">
+            <span class="filter-chip active" data-filter="all" onclick="filterMyReports('all')">All</span>
+            <span class="filter-chip" data-filter="active" onclick="filterMyReports('active')">Pending / In Progress</span>
+            <span class="filter-chip" data-filter="resolved" onclick="filterMyReports('resolved')">Resolved</span>
+          </div>
+          <button class="quick-loc-btn" onclick="loadMyReports()">🔄 Refresh My Reports</button>
+        </div>
+
+        <div id="my-reports-list" style="display:flex;flex-direction:column;gap:14px;">
+          <!-- Rendered via JS -->
         </div>
       </div>
     </div>
@@ -1896,14 +2154,358 @@ textarea.form-control {
         </div>
       </div>
 
-      <div class="modal-section-title">Update Repair Status (Officer Action)</div>
-      <div class="modal-status-changer">
-        <button class="status-change-btn" data-st="Reported" onclick="updateCurrentReportStatus('Reported')">Reported</button>
-        <button class="status-change-btn" data-st="Under Review" onclick="updateCurrentReportStatus('Under Review')">Under Review</button>
-        <button class="status-change-btn" data-st="Repair in Progress" onclick="updateCurrentReportStatus('Repair in Progress')">In Progress</button>
-        <button class="status-change-btn" data-st="Resolved" onclick="updateCurrentReportStatus('Resolved')">Resolved</button>
+      <!-- COMMUNITY UPVOTE BAR -->
+      <div style="margin:12px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;">
+        <div>
+          <span style="font-size:13px;font-weight:700;color:var(--ink);">Community Verification</span>
+          <div style="font-size:11px;color:var(--mut);">Residents who witness or confirm this defect in Duhai</div>
+        </div>
+        <button class="btn-upvote" id="m-btn-upvote" onclick="toggleCurrentReportUpvote()">
+          <span>👍 I Also Face This</span>
+          <b id="m-upvote-count">0</b>
+        </button>
+      </div>
+
+      <!-- CIVIC UPDATES & DISCUSSION -->
+      <div class="modal-section-title">Civic Updates & Community Discussion (<span id="m-comments-count">0</span>)</div>
+      <div id="m-comments-list" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+        <!-- Comments rendered dynamically -->
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <input type="text" id="m-comment-input" class="form-control" style="flex:1;" placeholder="Write an update, note or citizen verification..." onkeydown="if(event.key==='Enter')postCommentOnModal()">
+        <button type="button" class="btn-report-quick" style="padding:6px 14px;border-radius:8px;" onclick="postCommentOnModal()">Post</button>
+      </div>
+
+      <!-- CITIZEN VIEW BADGE (Shown to citizens) -->
+      <div id="m-citizen-notice" style="display:block;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut);">
+          <span>🔒 <b>Citizen View</b>: Repair stages are managed and scheduled exclusively by verified Duhai Municipal Ward Engineers.</span>
+        </div>
+      </div>
+
+      <!-- WARD OFFICER ACTIONS (Hidden from citizens, shown to officers) -->
+      <div id="m-officer-controls" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div class="modal-section-title" style="margin:0;color:#166534;">Update Repair Status (Ward Officer Console)</div>
+          <button type="button" class="preset-chip" onclick="openDecisionModal()" style="background:#0ea5a4;color:#fff;border:0;font-weight:700;">🔬 AI Urgency & Range Inspector</button>
+        </div>
+        <div class="modal-status-changer">
+          <button class="status-change-btn" data-st="Reported" onclick="updateCurrentReportStatus('Reported')">Reported</button>
+          <button class="status-change-btn" data-st="Under Review" onclick="updateCurrentReportStatus('Under Review')">Under Review</button>
+          <button class="status-change-btn" data-st="Repair in Progress" onclick="updateCurrentReportStatus('Repair in Progress')">In Progress</button>
+          <button class="status-change-btn" data-st="Resolved" onclick="updateCurrentReportStatus('Resolved')">Resolved</button>
+        </div>
+        <div style="font-size:11px;color:#15803d;margin-top:8px;">
+          📧 <b>Auto-Dispatch Target:</b> Updates notify ward officers & <code>awasthishailendra59@gmail.com</code> automatically.
+        </div>
       </div>
     </div>
+  </div>
+</div>
+
+
+
+<!-- WARD OFFICER: AI URGENCY & RANGE DECISION EXPLORER MODAL -->
+<div class="modal-backdrop" id="decision-modal" onclick="if(event.target===this)closeDecisionModal()" style="display:none;z-index:2200;">
+  <div class="modal-dialog" style="max-width:850px;width:95%;border-radius:20px;overflow:hidden;background:#fff;box-shadow:var(--shadow-lg);max-height:90vh;display:flex;flex-direction:column;">
+    <div style="background:linear-gradient(135deg,#1e3a8a 0%,#0ea5a4 100%);padding:20px 24px;color:#fff;position:relative;">
+      <button class="modal-close-btn" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.2);color:#fff;" onclick="closeDecisionModal()">&times;</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span style="font-size:24px;">🔬</span>
+        <div>
+          <b style="font-family:'Poppins',sans-serif;font-size:18px;">AI Urgency & Range Decision Engine</b>
+          <div style="font-size:12px;opacity:0.9;">Ward Officer Inspection Console &bull; Mathematical Decision Formula &bull; Duhai, Ghaziabad</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:20px 24px;overflow-y:auto;flex:1;">
+      <!-- DECISION TABS -->
+      <div style="display:flex;gap:8px;background:#f1f5f9;padding:4px;border-radius:10px;margin-bottom:18px;">
+        <button type="button" class="auth-tab-btn active" id="btn-dec-range" onclick="switchDecisionTab('range')">1. Issue Range & Spatial Clustering</button>
+        <button type="button" class="auth-tab-btn" id="btn-dec-priority" onclick="switchDecisionTab('priority')">2. Priority & Highway Preference</button>
+        <button type="button" class="auth-tab-btn" id="btn-dec-sim" onclick="switchDecisionTab('sim')">3. Live Urgency Simulator</button>
+      </div>
+
+      <!-- TAB 1: RANGE DETERMINATION -->
+      <div id="dec-tab-range">
+        <h4 style="font-family:'Poppins',sans-serif;font-size:16px;color:var(--primary);margin-bottom:8px;">📐 How the Platform Decides Issue Range & Jurisdiction</h4>
+        <div style="font-size:13px;color:var(--ink);line-height:1.6;margin-bottom:14px;">
+          SUDHARSARTHI calculates geographic boundaries using three rigorous mathematical steps to ensure no overlapping contracts or wasted civic funds:
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:16px;">
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;">
+            <b style="color:var(--teal-dark);font-size:13px;">1. 25-Meter Spatial Radius</b>
+            <div style="font-size:12px;color:var(--mut);margin-top:4px;">
+              Uses the <b>Haversine Great-Circle</b> distance formula. Any new complaint within 25 meters of an existing defect is clustered as a repeat report rather than generating a duplicate ticket.
+            </div>
+          </div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;">
+            <b style="color:var(--primary);font-size:13px;">2. Defect Surface Area (sq.m)</b>
+            <div style="font-size:12px;color:var(--mut);margin-top:4px;">
+              AI vision scans citizen photos and calculates bounding length &times; width. A 1.2m &times; 0.8m crater = 0.96 sq.m, computing asphalt bitumen repair volume and accurate cost estimates.
+            </div>
+          </div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;">
+            <b style="color:#d97706;font-size:13px;">3. Ward Geofencing (6 Zones)</b>
+            <div style="font-size:12px;color:var(--mut);margin-top:4px;">
+              Duhai is partitioned into 6 municipal zones (Village, RRTS, North, South, East, West). GPS coordinates auto-route the alert to the nearest jurisdictional Junior Engineer.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: PRIORITY & HIGHWAY RULE -->
+      <div id="dec-tab-priority" style="display:none;">
+        <h4 style="font-family:'Poppins',sans-serif;font-size:16px;color:var(--primary);margin-bottom:8px;">⚖️ How the System Decides High, Medium, or Low Priority</h4>
+        
+        <!-- HIGHWAY RULE BANNER -->
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:18px;">🛣️</span>
+            <b style="color:#dc2626;font-size:14px;">MANDATORY HIGHWAY PREFERENCE RULE:</b>
+          </div>
+          <div style="font-size:12px;color:#991b1b;line-height:1.5;">
+            <b>All issues on NH-34, Delhi-Meerut Expressway, Meerut Road, and major flyovers are automatically classified as HIGH PREFERENCE.</b>
+            Because vehicles travel at 80–100 km/h, road defects pose fatal rollover and two-wheeler casualty risks. The system awards maximum traffic points (25/25) and enforces a strict &lt;24 Hour SLA.
+          </div>
+        </div>
+
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;">The 4-Factor Weighted Formula (0–100 Points):</div>
+          <table class="comparison-table" style="font-size:12px;">
+            <thead>
+              <tr>
+                <th>Factor</th>
+                <th>Weight</th>
+                <th>Logic & Measurement</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:700;color:var(--primary);">1. Structural Severity</td>
+                <td>0 to 40 Pts</td>
+                <td>Defect type & depth. >10cm deep adds +8 to +16 pts; accident mentions add +8 pts.</td>
+              </tr>
+              <tr>
+                <td style="font-weight:700;color:var(--teal);">2. Traffic Exposure</td>
+                <td>0 to 25 Pts</td>
+                <td><b>Highway = 25 Pts (Forced High)</b>; Schools/Hospitals = +6 Pts; Quiet lanes = -4 Pts.</td>
+              </tr>
+              <tr>
+                <td style="font-weight:700;color:#d97706;">3. Repeat Complaints</td>
+                <td>0 to 20 Pts</td>
+                <td>+7 points per unique nearby resident report or community upvote cluster.</td>
+              </tr>
+              <tr>
+                <td style="font-weight:700;color:#16a34a;">4. Aging Factor</td>
+                <td>0 to 15 Pts</td>
+                <td>+1.5 points per unaddressed day so neglected repairs naturally climb to High priority.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex;gap:10px;font-size:12px;">
+          <div style="flex:1;background:#fef2f2;border:1px solid #fecaca;padding:10px;border-radius:8px;">
+            <b style="color:#dc2626;">🔴 High Priority (Score &ge; 60 or Highway)</b>
+            <div style="color:#7f1d1d;">SLA: &lt;24 Hours &bull; Instant SMS/Email to awasthishailendra59@gmail.com</div>
+          </div>
+          <div style="flex:1;background:#fffbeb;border:1px solid #fde68a;padding:10px;border-radius:8px;">
+            <b style="color:#d97706;">🟡 Medium Priority (Score 40–59)</b>
+            <div style="color:#78350f;">SLA: &lt;72 Hours &bull; Scheduled into ward weekly repair manifest</div>
+          </div>
+          <div style="flex:1;background:#f0fdf4;border:1px solid #bbf7d0;padding:10px;border-radius:8px;">
+            <b style="color:#16a34a;">🟢 Low Priority (Score &lt; 40)</b>
+            <div style="color:#14532d;">SLA: &lt;7 Days &bull; Cosmetic or internal colony lane fixes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: LIVE SIMULATOR -->
+      <div id="dec-tab-sim" style="display:none;">
+        <h4 style="font-family:'Poppins',sans-serif;font-size:16px;color:var(--primary);margin-bottom:8px;">⚡ Live Decision Simulator for Ward Officers</h4>
+        <div style="font-size:12px;color:var(--mut);margin-bottom:14px;">Adjust parameters below to see how the system calculates priority and SLA in real time:</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div>
+              <label class="form-label" style="font-size:12px;">Defect Severity Grade (1 to 5): <b id="sim-val-sev">3</b></label>
+              <input type="range" id="sim-sev" min="1" max="5" value="3" class="form-control" oninput="runSimCalc()" style="padding:0;">
+            </div>
+
+            <div>
+              <label class="form-label" style="font-size:12px;display:flex;justify-content:space-between;">
+                <span>🛣️ Located on Highway / NH-34 / Expressway:</span>
+                <input type="checkbox" id="sim-hwy" onchange="runSimCalc()" style="width:18px;height:18px;cursor:pointer;">
+              </label>
+            </div>
+
+            <div>
+              <label class="form-label" style="font-size:12px;">Nearby Repeat Complaints / Upvotes: <b id="sim-val-rep">1</b></label>
+              <input type="range" id="sim-rep" min="0" max="4" value="1" class="form-control" oninput="runSimCalc()" style="padding:0;">
+            </div>
+
+            <div>
+              <label class="form-label" style="font-size:12px;">Days Unresolved (Aging): <b id="sim-val-age">2</b> days</label>
+              <input type="range" id="sim-age" min="0" max="14" value="2" class="form-control" oninput="runSimCalc()" style="padding:0;">
+            </div>
+          </div>
+
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;">
+            <div>
+              <div style="font-size:11px;color:var(--mut);text-transform:uppercase;font-weight:700;">Simulated Decision Output</div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+                <div class="score-circle-big" id="sim-score-circle" style="background:#dc2626;width:52px;height:52px;">
+                  <span id="sim-score-display" style="font-size:18px;">66</span>
+                </div>
+                <div>
+                  <b id="sim-priority-display" style="font-size:16px;color:#dc2626;">High Priority</b>
+                  <div id="sim-sla-display" style="font-size:12px;color:var(--mut);">Response SLA: &lt; 24 Hours</div>
+                </div>
+              </div>
+
+              <div style="margin-top:12px;font-size:11px;color:var(--ink);line-height:1.6;" id="sim-reasons-display">
+                <!-- Breakdown list -->
+              </div>
+            </div>
+
+            <div style="font-size:10px;color:var(--mut);border-top:1px solid #e2e8f0;padding-top:8px;">
+              Verified against Duhai Municipal Civic Guidelines &bull; Automatic notification dispatched to <code>awasthishailendra59@gmail.com</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN & AUTHENTICATION MODAL -->
+<div class="modal-backdrop" id="login-modal" onclick="if(event.target===this)closeLoginModal()" style="display:none;z-index:2000;">
+  <div class="modal-dialog auth-dialog" style="max-width:440px;border-radius:20px;overflow:hidden;background:#fff;box-shadow:var(--shadow-lg);">
+    <div style="background:linear-gradient(135deg,#1e3a8a 0%,#0ea5a4 100%);padding:24px 24px 20px;color:#fff;position:relative;">
+      <button class="modal-close-btn" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.2);color:#fff;" onclick="closeLoginModal()">&times;</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <img src="assets/logo-icon.svg" style="height:32px;filter:brightness(0) invert(1);" alt="Logo">
+        <b style="font-family:'Poppins',sans-serif;font-size:18px;">SUDHARSARTHI AUTH</b>
+      </div>
+      <p style="font-size:12px;opacity:0.9;">Sign in to lodge complaints, track resolutions, and interact with Duhai civic authorities.</p>
+    </div>
+
+    <div style="padding:20px 24px;">
+      <!-- AUTH TABS -->
+      <div class="auth-tabs" style="display:flex;background:#f1f5f9;border-radius:10px;padding:4px;margin-bottom:18px;">
+        <button type="button" class="auth-tab-btn active" id="btn-tab-signin" onclick="switchAuthTab('signin')">Sign In</button>
+        <button type="button" class="auth-tab-btn" id="btn-tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
+      </div>
+
+      <!-- GOOGLE SIGN-IN BUTTON -->
+      <div style="margin-bottom:16px;">
+        <button type="button" class="btn-google-auth" onclick="triggerGoogleSignIn()">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span>Continue with Google</span>
+        </button>
+        <div id="g-signin-target" style="display:none;margin-top:6px;"></div>
+      </div>
+
+      <div style="display:flex;align-items:center;margin:16px 0;gap:12px;">
+        <hr style="flex:1;border:0;border-top:1px solid #e2e8f0;">
+        <span style="font-size:11px;color:var(--mut);text-transform:uppercase;font-weight:600;">or email & password</span>
+        <hr style="flex:1;border:0;border-top:1px solid #e2e8f0;">
+      </div>
+
+      <!-- SIGN IN FORM -->
+      <form id="form-signin" onsubmit="handleEmailSignIn(event)">
+        <div style="margin-bottom:12px;">
+          <label class="form-label" style="font-size:12px;">Email Address</label>
+          <input type="email" id="signin-email" class="form-control" required placeholder="name@domain.com">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label class="form-label" style="font-size:12px;">Password</label>
+          <input type="password" id="signin-password" class="form-control" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn-report-quick" style="width:100%;justify-content:center;padding:11px;" id="btn-submit-signin">Sign In to SUDHARSARTHI</button>
+      </form>
+
+      <!-- SIGN UP FORM -->
+      <form id="form-signup" onsubmit="handleEmailSignUp(event)" style="display:none;">
+        <div style="margin-bottom:10px;">
+          <label class="form-label" style="font-size:12px;">Full Name</label>
+          <input type="text" id="signup-name" class="form-control" placeholder="Your Full Name">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label class="form-label" style="font-size:12px;">Email Address</label>
+          <input type="email" id="signup-email" class="form-control" placeholder="name@domain.com">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label class="form-label" style="font-size:12px;">Password</label>
+          <input type="password" id="signup-password" class="form-control" placeholder="Min 4 characters">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label class="form-label" style="font-size:12px;">Account Role</label>
+          <select id="signup-role" class="form-control">
+            <option value="citizen">Duhai Resident / Citizen</option>
+            <option value="officer">Municipal Officer / Inspector</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-report-quick" style="width:100%;justify-content:center;padding:11px;" id="btn-submit-signup">Create Account</button>
+      </form>
+
+      <!-- QUICK 1-CLICK DEMO LOGIN -->
+      <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #cbd5e1;text-align:center;">
+        <div style="font-size:11px;color:var(--mut);margin-bottom:8px;font-weight:600;">⚡ Instant 1-Click Demo Accounts:</div>
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button type="button" class="preset-chip" onclick="quickFillLogin('citizen')">👤 Demo Citizen</button>
+          <button type="button" class="preset-chip" onclick="quickFillLogin('officer')">👮 Zone 2 Officer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INTERACTIVE GOOGLE ACCOUNT SELECTOR MODAL -->
+<div class="modal-backdrop" id="google-picker-modal" onclick="if(event.target===this)closeGooglePicker()" style="display:none;z-index:2100;">
+  <div class="modal-dialog" style="max-width:400px;border-radius:18px;overflow:hidden;background:#fff;padding:22px;box-shadow:var(--shadow-lg);">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+      <div>
+        <b style="font-size:15px;color:var(--ink);">Sign in with Google</b>
+        <div style="font-size:11px;color:var(--mut);">Choose an account to continue to SUDHARSARTHI</div>
+      </div>
+    </div>
+    
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;" id="google-accounts-list">
+      <div class="google-acc-opt" onclick="loginWithGoogleProfile('santusht.dev@gmail.com', 'Santusht', 'https://api.dicebear.com/7.x/bottts/svg?seed=Santusht')">
+        <div class="google-avatar" style="background:#1e3a8a;color:#fff;">S</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:var(--ink);">Santusht</div>
+          <div style="font-size:11px;color:var(--mut);">santusht.dev@gmail.com</div>
+        </div>
+      </div>
+      <div class="google-acc-opt" onclick="loginWithGoogleProfile('duhai.resident@gmail.com', 'Duhai Resident', 'https://api.dicebear.com/7.x/bottts/svg?seed=Resident')">
+        <div class="google-avatar" style="background:#0ea5a4;color:#fff;">D</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:var(--ink);">Duhai Resident</div>
+          <div style="font-size:11px;color:var(--mut);">duhai.resident@gmail.com</div>
+        </div>
+      </div>
+      <div class="google-acc-opt" onclick="showCustomGoogleInput()">
+        <div class="google-avatar" style="background:#64748b;color:#fff;">+</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:var(--ink);">Use another Google account</div>
+          <div style="font-size:11px;color:var(--mut);">Enter custom Gmail address</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="custom-google-box" style="display:none;margin-bottom:14px;background:#f8fafc;padding:12px;border-radius:10px;border:1px solid #e2e8f0;">
+      <input type="text" id="custom-g-name" class="form-control" placeholder="Your Name" style="margin-bottom:8px;">
+      <input type="email" id="custom-g-email" class="form-control" placeholder="your.name@gmail.com" style="margin-bottom:8px;">
+      <button type="button" class="btn-report-quick" style="width:100%;justify-content:center;" onclick="submitCustomGoogle()">Sign In with this Google Account</button>
+    </div>
+
+    <button type="button" class="loc-btn" style="width:100%;justify-content:center;" onclick="closeGooglePicker()">Cancel</button>
   </div>
 </div>
 
@@ -2070,40 +2672,30 @@ function initDuhaiMap() {
     attribution: '&copy; Esri World Imagery'
   });
 
-  /* MASK OUTSIDE DUHAI (Inverted Polygon Spotlight):
-     Darkens the entire world EXCEPT Duhai, spotlighting Duhai! */
-  const outerWorld = [
-    [-90, -180],
-    [-90, 180],
-    [90, 180],
-    [90, -180]
-  ];
-  // Clockwise winding for inner hole cutout:
-  const duhaiCutout = [
-    [s, w],
-    [n, w],
-    [n, e],
-    [s, e]
-  ];
-  
-  L.polygon([outerWorld, duhaiCutout], {
-    fillColor: '#070d1e',
-    fillOpacity: 0.65,
-    weight: 1,
-    color: '#0284c7',
-    interactive: true
-  }).on('click', () => {
-    showToast('⚠️ Clicked outside Duhai jurisdiction. Please choose a location inside the active Duhai boundary.', 'warning');
-  }).addTo(map);
-
-  /* Glowing Duhai Boundary Stroke */
+  /* Clean Whole-Duhai Boundary with Glowing Outline */
   boundaryPolygon = L.rectangle([[s, w], [n, e]], {
-    color: '#0284c7',
-    weight: 3,
-    dashArray: '8, 8',
-    fill: false,
+    color: '#0ea5a4',
+    weight: 2.5,
+    dashArray: '6, 6',
+    fillColor: '#0ea5a4',
+    fillOpacity: 0.04,
     interactive: false
   }).addTo(map);
+
+  /* Layer Switcher Controls */
+  const mapControls = L.control({ position: 'topright' });
+  mapControls.onAdd = () => {
+    const d = L.DomUtil.create('div', 'map-quick-ctrls');
+    d.innerHTML = `
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:6px;box-shadow:var(--shadow-sm);display:flex;gap:4px;">
+        <button type="button" class="preset-chip active" id="btn-tile-street" onclick="switchMapTiles('street')">🗺️ Street</button>
+        <button type="button" class="preset-chip" id="btn-tile-sat" onclick="switchMapTiles('sat')">🛰️ Satellite</button>
+        <button type="button" class="preset-chip" onclick="resetDuhaiView()">🎯 Fit Whole Duhai</button>
+      </div>
+    `;
+    return d;
+  };
+  mapControls.addTo(map);
 
   // Map Click Handler
   map.on('click', ev => {
@@ -2452,8 +3044,8 @@ function switchTab(tabId, updateHash = true) {
     setTimeout(() => { if (map) map.invalidateSize(); }, 150);
   } else if (tabId === 'analytics') {
     loadAnalyticsData();
-  } else if (tabId === 'budget') {
-    runBudgetOptimization();
+  } else if (tabId === 'my-reports') {
+    loadMyReports();
   }
 }
 
@@ -2646,12 +3238,21 @@ async function submitReportForm() {
     fd.append('lat', pickedLocation.lat);
     fd.append('lng', pickedLocation.lng);
     fd.append('landmark', document.getElementById('form-landmark').value);
-    fd.append('reporter', document.getElementById('form-reporter').value || 'Citizen (Duhai Portal)');
+    
+    const reporterName = document.getElementById('form-reporter').value || (currentUser ? currentUser.name : 'Citizen (Duhai Portal)');
+    fd.append('reporter', reporterName);
+    if (currentUser) {
+      fd.append('userId', currentUser.id);
+      fd.append('reporterEmail', currentUser.email);
+    }
 
     const file = document.getElementById('form-photo').files[0];
     if (file) fd.append('image', file);
 
-    const res = await fetch(API + '/api/reports', { method: 'POST', body: fd });
+    const headers = {};
+    if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
+    const res = await fetch(API + '/api/reports', { method: 'POST', headers, body: fd });
     const saved = await res.json();
 
     if (!res.ok) throw new Error(saved.error || 'Failed to submit report.');
@@ -2797,68 +3398,572 @@ function renderWardTable(wardList) {
 }
 
 /* ---------------------------------------------------------------------
-   TAB 4: KNAPSACK BUDGET OPTIMIZER
+   TAB: MY COMPLAINTS & AUTHENTICATION ENGINE
    --------------------------------------------------------------------- */
-function setPresetBudget(amount) {
-  document.getElementById('budget-amount').value = amount;
-  runBudgetOptimization();
+let currentUser = null;
+let authToken = localStorage.getItem('sudharsarthi_token') || null;
+let myReportsList = [];
+
+// Initialize Auth on App Load
+async function checkAuthSession() {
+  if (!authToken) {
+    updateAuthUI();
+    return;
+  }
+  try {
+    const res = await fetch(API + '/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.user) {
+        currentUser = data.user;
+      } else {
+        logoutUser(false);
+      }
+    }
+  } catch (err) {
+    console.warn('Auth check err:', err);
+  }
+  updateAuthUI();
 }
 
-async function runBudgetOptimization() {
-  const budget = parseInt(document.getElementById('budget-amount').value, 10);
-  const strategy = document.getElementById('budget-strategy').value;
+function updateAuthUI() {
+  const loginOpenBtn = document.getElementById('btn-login-open');
+  const profileBox = document.getElementById('user-profile-box');
+  const reporterInput = document.getElementById('form-reporter');
 
-  if (!budget || budget <= 0) {
-    showToast('Please enter a valid budget amount in ₹ rupees.', 'warning');
+  if (currentUser) {
+    loginOpenBtn.style.display = 'none';
+    profileBox.style.display = 'block';
+
+    const initials = currentUser.name ? currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase() : 'SC';
+    document.getElementById('hdr-user-avatar').textContent = initials;
+    document.getElementById('hdr-user-name').textContent = currentUser.name;
+    document.getElementById('hdr-user-role').textContent = currentUser.role || 'Citizen';
+
+    document.getElementById('dd-user-name').textContent = currentUser.name;
+    document.getElementById('dd-user-email').textContent = currentUser.email;
+
+    if (reporterInput && !reporterInput.value) {
+      reporterInput.value = `${currentUser.name} (${currentUser.role || 'Citizen'})`;
+    }
+  } else {
+    loginOpenBtn.style.display = 'flex';
+    profileBox.style.display = 'none';
+  }
+}
+
+function toggleUserDropdown(ev) {
+  if (ev) ev.stopPropagation();
+  const dd = document.getElementById('user-dropdown-panel');
+  dd.classList.toggle('show');
+}
+window.addEventListener('click', () => {
+  const dd = document.getElementById('user-dropdown-panel');
+  if (dd) dd.classList.remove('show');
+});
+
+function openLoginModal(tab = 'signin') {
+  switchAuthTab(tab);
+  document.getElementById('login-modal').style.display = 'flex';
+}
+function closeLoginModal() {
+  document.getElementById('login-modal').style.display = 'none';
+}
+
+function switchAuthTab(tab) {
+  document.getElementById('btn-tab-signin').classList.toggle('active', tab === 'signin');
+  document.getElementById('btn-tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('form-signin').style.display = tab === 'signin' ? 'block' : 'none';
+  document.getElementById('form-signup').style.display = tab === 'signup' ? 'block' : 'none';
+}
+
+function quickFillLogin(role) {
+  if (role === 'officer') {
+    document.getElementById('signin-email').value = 'zone2.officer@example.org';
+    document.getElementById('signin-password').value = 'officer123';
+  } else {
+    document.getElementById('signin-email').value = 'citizen@duhai.in';
+    document.getElementById('signin-password').value = 'citizen123';
+  }
+  showToast(`⚡ Quick filled ${role} credentials. Tap 'Sign In'!`, 'info');
+}
+
+async function handleEmailSignIn(e) {
+  e.preventDefault();
+  const email = document.getElementById('signin-email').value.trim();
+  const password = document.getElementById('signin-password').value;
+  const btn = document.getElementById('btn-submit-signin');
+  btn.disabled = true;
+  btn.textContent = 'Authenticating...';
+
+  try {
+    let res = await fetch(API + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    // Auto-create demo citizen/officer if not registered yet
+    if (res.status === 401 && (email.includes('citizen') || email.includes('officer'))) {
+      const role = email.includes('officer') ? 'officer' : 'citizen';
+      const name = role === 'officer' ? 'Zone 2 Officer' : 'Duhai Resident';
+      res = await fetch(API + '/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role })
+      });
+    }
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Authentication failed');
+
+    authToken = data.token;
+    currentUser = data.user;
+    localStorage.setItem('sudharsarthi_token', authToken);
+    updateAuthUI();
+    closeLoginModal();
+    showToast(`👋 Welcome back, ${currentUser.name}!`, 'success');
+    if (window.location.hash === '#my-reports') switchTab('my-reports');
+  } catch (err) {
+    showToast(`Sign in error: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign In to SUDHARSARTHI';
+  }
+}
+
+async function handleEmailSignUp(e) {
+  e.preventDefault();
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const role = document.getElementById('signup-role').value;
+  const btn = document.getElementById('btn-submit-signup');
+  btn.disabled = true;
+  btn.textContent = 'Creating account...';
+
+  try {
+    const res = await fetch(API + '/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password, role })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Registration failed');
+
+    authToken = data.token;
+    currentUser = data.user;
+    localStorage.setItem('sudharsarthi_token', authToken);
+    updateAuthUI();
+    closeLoginModal();
+    showToast(`🎉 Welcome to SUDHARSARTHI, ${currentUser.name}!`, 'success');
+  } catch (err) {
+    showToast(`Registration error: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Account';
+  }
+}
+
+// Google OAuth Handler
+function triggerGoogleSignIn() {
+  closeLoginModal();
+  document.getElementById('google-picker-modal').style.display = 'flex';
+}
+function closeGooglePicker() {
+  document.getElementById('google-picker-modal').style.display = 'none';
+}
+function showCustomGoogleInput() {
+  document.getElementById('custom-google-box').style.display = 'block';
+}
+
+async function loginWithGoogleProfile(email, name, avatar) {
+  closeGooglePicker();
+  try {
+    const res = await fetch(API + '/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email, name, avatar,
+        googleId: 'g_' + Math.random().toString(36).substring(2, 10)
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Google Sign-In failed');
+
+    authToken = data.token;
+    currentUser = data.user;
+    localStorage.setItem('sudharsarthi_token', authToken);
+    updateAuthUI();
+    showToast(`✅ Signed in with Google as ${currentUser.name}`, 'success');
+    if (window.location.hash === '#my-reports') switchTab('my-reports');
+  } catch (err) {
+    showToast(`Google Auth error: ${err.message}`, 'error');
+  }
+}
+
+function submitCustomGoogle() {
+  const name = document.getElementById('custom-g-name').value.trim() || 'Google User';
+  const email = document.getElementById('custom-g-email').value.trim();
+  if (!email || !email.includes('@')) {
+    showToast('Please enter a valid Google email address.', 'warning');
+    return;
+  }
+  loginWithGoogleProfile(email, name, `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(name)}`);
+}
+
+function logoutUser(notify = true) {
+  authToken = null;
+  currentUser = null;
+  localStorage.removeItem('sudharsarthi_token');
+  updateAuthUI();
+  if (notify) showToast('You have been signed out.', 'info');
+  if (document.getElementById('tab-my-reports').classList.contains('active')) {
+    switchTab('my-reports');
+  }
+}
+
+function applyQuickDesc(category, desc) {
+  selectCategory(category);
+  document.getElementById('form-description').value = desc;
+  showToast(`Applied preset for ${category}.`, 'info');
+}
+
+// MY COMPLAINTS TAB LOGIC
+async function loadMyReports() {
+  const unauthedBox = document.getElementById('my-reports-unauthed');
+  const authedBox = document.getElementById('my-reports-authed');
+
+  if (!currentUser) {
+    unauthedBox.style.display = 'block';
+    authedBox.style.display = 'none';
     return;
   }
 
+  unauthedBox.style.display = 'none';
+  authedBox.style.display = 'block';
+
   try {
-    const res = await fetch(API + '/api/budget/optimize', {
+    const res = await fetch(`${API}/api/reports?user_id=${encodeURIComponent(currentUser.id)}`);
+    const list = await res.json();
+    myReportsList = Array.isArray(list) ? list : [];
+
+    // Fallback: If no reports explicitly matched user_id, show reports lodged matching reporter name or email
+    if (myReportsList.length === 0) {
+      myReportsList = reports.filter(r => 
+        (r.userId && r.userId === currentUser.id) ||
+        (r.reporterEmail && r.reporterEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+        (r.reporter && r.reporter.toLowerCase().includes(currentUser.name.toLowerCase()))
+      );
+    }
+
+    renderMyReports('all');
+  } catch (err) {
+    console.error('Failed to load my reports:', err);
+  }
+}
+
+function filterMyReports(filter) {
+  document.querySelectorAll('#my-reports-filter-chips .filter-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.filter === filter);
+  });
+  renderMyReports(filter);
+}
+
+function renderMyReports(filter = 'all') {
+  let filtered = myReportsList;
+  if (filter === 'active') {
+    filtered = filtered.filter(r => r.status !== 'Resolved');
+  } else if (filter === 'resolved') {
+    filtered = filtered.filter(r => r.status === 'Resolved');
+  }
+
+  const total = myReportsList.length;
+  const resolved = myReportsList.filter(r => r.status === 'Resolved').length;
+  const active = total - resolved;
+
+  document.getElementById('my-stat-total').textContent = total;
+  document.getElementById('my-stat-active').textContent = active;
+  document.getElementById('my-stat-resolved').textContent = resolved;
+  document.getElementById('dd-my-reports-count').textContent = total;
+
+  const container = document.getElementById('my-reports-list');
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="background:#fff;border:1px dashed #cbd5e1;border-radius:12px;padding:32px;text-align:center;color:var(--mut);">
+        <div style="font-size:32px;margin-bottom:8px;">📝</div>
+        <b>No complaints found in this view.</b>
+        <div style="font-size:12px;margin-top:4px;">When you lodge a defect in Duhai, it will appear here with live tracking.</div>
+        <button class="loc-btn primary" style="margin:14px auto 0;" onclick="switchTab('report')">➕ Report a Defect</button>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(r => {
+    const s = r.status || 'Reported';
+    const isUnderReview = s === 'Under Review' || s === 'Repair in Progress' || s === 'Resolved';
+    const isInProgress = s === 'Repair in Progress' || s === 'Resolved';
+    const isResolved = s === 'Resolved';
+
+    return `
+      <div class="my-report-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span class="card-urgency urgency-${r.priority}">${esc(r.priority)} Urgency (${r.riskScore || 0})</span>
+              <span class="status-pill status-${s.replace(/\s+/g,'-')}">${esc(s)}</span>
+              <span style="font-size:12px;color:var(--mut);"><code>${esc(r.id)}</code></span>
+            </div>
+            <h3 style="font-family:'Poppins',sans-serif;font-size:16px;color:var(--ink);">${esc(r.title || r.category)}</h3>
+            <div style="font-size:12px;color:var(--mut);margin-top:2px;">📍 ${esc(r.location)} ${r.landmark ? '&bull; Near ' + esc(r.landmark) : ''} &bull; ${esc(r.ward)}</div>
+          </div>
+          <button class="loc-btn" onclick="openReportModal('${esc(r.id)}')">🔍 Inspect / Discussion</button>
+        </div>
+
+        <!-- TRACKING STEPPER -->
+        <div class="my-stepper">
+          <div class="stepper-node done">
+            <div class="stepper-dot">✓</div>
+            <span class="stepper-label">1. Lodged</span>
+          </div>
+          <div class="stepper-node ${isUnderReview ? (isInProgress ? 'done' : 'active') : ''}">
+            <div class="stepper-dot">${isInProgress ? '✓' : '2'}</div>
+            <span class="stepper-label">2. Under Review</span>
+          </div>
+          <div class="stepper-node ${isInProgress ? (isResolved ? 'done' : 'active') : ''}">
+            <div class="stepper-dot">${isResolved ? '✓' : '3'}</div>
+            <span class="stepper-label">3. In Progress</span>
+          </div>
+          <div class="stepper-node ${isResolved ? 'done' : ''}">
+            <div class="stepper-dot">${isResolved ? '✓' : '4'}</div>
+            <span class="stepper-label">4. Resolved</span>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc;border-radius:8px;padding:8px 12px;font-size:12px;color:var(--ink);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div><b>Assigned Engineer:</b> ${esc(r.inspectorName || 'Pending Assignment')}</div>
+          <div><b>Contractor:</b> ${esc(r.contractor || 'Assigned to Ward Crew')}</div>
+          <div><b>Community Upvotes:</b> 👍 ${r.upvotes || 0}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// INTERACTIVE UPVOTING & COMMENTS
+async function toggleCurrentReportUpvote() {
+  if (!selectedReport) return;
+  const id = selectedReport.id;
+  try {
+    const res = await fetch(`${API}/api/reports/${id}/upvote`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ budget, strategy })
+      headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {}
     });
     const d = await res.json();
-
-    if (!res.ok) throw new Error(d.error || 'Optimization error.');
-
-    document.getElementById('budget-stats-grid').style.display = 'grid';
-    document.getElementById('budget-results-tables').style.display = 'block';
-
-    document.getElementById('b-stat-allocated').textContent = `₹ ${Number(d.allocatedCost || 0).toLocaleString('en-IN')}`;
-    document.getElementById('b-stat-remaining').textContent = `₹ ${Number(d.remaining || 0).toLocaleString('en-IN')}`;
-    document.getElementById('b-stat-critical').textContent = `${d.criticalEliminated || 0} / ${d.criticalTotal || 0}`;
-    document.getElementById('b-stat-count').textContent = `${(d.selected || []).length} Defects`;
-
-    // Render Approved
-    const approvedBody = document.getElementById('budget-approved-body');
-    approvedBody.innerHTML = (d.selected || []).map(r => `
-      <tr>
-        <td><code>${esc(r.id)}</code></td>
-        <td><b>${esc(r.title)}</b></td>
-        <td>${esc(r.ward)}</td>
-        <td><span class="card-urgency urgency-${r.priority}">${esc(r.priority)} (${esc(r.riskScore)})</span></td>
-        <td><b>₹ ${Number(r.cost || 0).toLocaleString('en-IN')}</b></td>
-      </tr>
-    `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--mut);">No projects fit in this budget allocation.</td></tr>';
-
-    // Render Deferred
-    const deferredBody = document.getElementById('budget-deferred-body');
-    deferredBody.innerHTML = (d.deferred || []).map(r => `
-      <tr>
-        <td><code>${esc(r.id)}</code></td>
-        <td><b>${esc(r.title)}</b></td>
-        <td>${esc(r.ward)}</td>
-        <td><span class="card-urgency urgency-${r.priority}">${esc(r.priority)} (${esc(r.riskScore)})</span></td>
-        <td>₹ ${Number(r.cost || 0).toLocaleString('en-IN')}</td>
-      </tr>
-    `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--mut);">All open defects covered under current allocation!</td></tr>';
-
-    showToast(`⚡ Optimal schedule calculated: ${(d.selected || []).length} projects approved.`, 'success');
+    if (res.ok) {
+      document.getElementById('m-upvote-count').textContent = d.upvotes;
+      const btn = document.getElementById('m-btn-upvote');
+      btn.classList.toggle('upvoted', d.hasUpvoted);
+      selectedReport.upvotes = d.upvotes;
+      selectedReport.hasUpvoted = d.hasUpvoted;
+      showToast(d.hasUpvoted ? '👍 Issue upvoted and verified.' : 'Upvote removed.', 'info');
+      // Update in local cache
+      const item = reports.find(x => x.id === id);
+      if (item) item.upvotes = d.upvotes;
+    }
   } catch (err) {
-    showToast(`Budget calculation error: ${err.message}`, 'error');
+    showToast('Failed to toggle upvote.', 'error');
   }
+}
+
+async function loadReportComments(id) {
+  const container = document.getElementById('m-comments-list');
+  container.innerHTML = '<div style="font-size:11px;color:var(--mut);">Loading civic updates...</div>';
+  try {
+    const res = await fetch(`${API}/api/reports/${id}/comments`);
+    const comments = await res.json();
+    document.getElementById('m-comments-count').textContent = comments.length || 0;
+    if (comments.length === 0) {
+      container.innerHTML = '<div style="font-size:11px;color:var(--mut);padding:8px 0;">No comments yet. Be the first to add an update.</div>';
+      return;
+    }
+    container.innerHTML = comments.map(c => `
+      <div class="comment-bubble">
+        <div class="comment-author-row">
+          <div>
+            <b>${esc(c.userName)}</b>
+            <span class="comment-role-pill role-${esc(c.userRole)}">${esc(c.userRole)}</span>
+          </div>
+          <span style="color:var(--mut);">${esc(c.createdAt || '')}</span>
+        </div>
+        <div class="comment-text">${esc(c.comment)}</div>
+      </div>
+    `).join('');
+  } catch (err) {
+    container.innerHTML = '<div style="font-size:11px;color:#dc2626;">Could not load updates.</div>';
+  }
+}
+
+async function postCommentOnModal() {
+  if (!selectedReport) return;
+  const input = document.getElementById('m-comment-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const id = selectedReport.id;
+  try {
+    const res = await fetch(`${API}/api/reports/${id}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {})
+      },
+      body: JSON.stringify({
+        comment: text,
+        userName: currentUser ? currentUser.name : 'Citizen Resident',
+        userRole: currentUser ? currentUser.role : 'citizen'
+      })
+    });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || 'Failed to post comment.');
+
+    input.value = '';
+    loadReportComments(id);
+    showToast('Update posted successfully.', 'success');
+  } catch (err) {
+    showToast(`Error: ${err.message}`, 'error');
+  }
+}
+
+
+/* ---------------------------------------------------------------------
+   WARD OFFICER: DECISION ENGINE & ROLE CONTROL
+   --------------------------------------------------------------------- */
+let currentAppRole = localStorage.getItem('sudharsarthi_role_view') || 'citizen';
+
+function setAppRole(role) {
+  currentAppRole = role;
+  localStorage.setItem('sudharsarthi_role_view', role);
+
+  const btnCit = document.getElementById('btn-role-citizen');
+  const btnOff = document.getElementById('btn-role-officer');
+  const hdrDec = document.getElementById('btn-hdr-decision');
+
+  if (role === 'officer') {
+    btnCit.style.background = 'transparent';
+    btnCit.style.color = 'var(--mut)';
+    btnCit.style.boxShadow = 'none';
+
+    btnOff.style.background = '#1e3a8a';
+    btnOff.style.color = '#fff';
+    btnOff.style.boxShadow = '0 1px 3px rgba(0,0,0,0.15)';
+    if (hdrDec) hdrDec.style.display = 'flex';
+    showToast('👮 Ward Officer Mode Activated: Full status controls & Decision Engine unlocked.', 'info');
+  } else {
+    btnOff.style.background = 'transparent';
+    btnOff.style.color = 'var(--mut)';
+    btnOff.style.boxShadow = 'none';
+
+    btnCit.style.background = '#fff';
+    btnCit.style.color = 'var(--primary)';
+    btnCit.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    if (hdrDec) hdrDec.style.display = 'none';
+  }
+
+  // Update modal elements if open
+  updateModalRoleVisibility();
+}
+
+function updateModalRoleVisibility() {
+  const citNotice = document.getElementById('m-citizen-notice');
+  const offControls = document.getElementById('m-officer-controls');
+  if (citNotice && offControls) {
+    if (currentAppRole === 'officer' || (currentUser && currentUser.role === 'officer')) {
+      citNotice.style.display = 'none';
+      offControls.style.display = 'block';
+    } else {
+      citNotice.style.display = 'block';
+      offControls.style.display = 'none';
+    }
+  }
+}
+
+function openDecisionModal(tab = 'range') {
+  switchDecisionTab(tab);
+  document.getElementById('decision-modal').style.display = 'flex';
+  runSimCalc();
+}
+
+function closeDecisionModal() {
+  document.getElementById('decision-modal').style.display = 'none';
+}
+
+function switchDecisionTab(tab) {
+  document.getElementById('btn-dec-range').classList.toggle('active', tab === 'range');
+  document.getElementById('btn-dec-priority').classList.toggle('active', tab === 'priority');
+  document.getElementById('btn-dec-sim').classList.toggle('active', tab === 'sim');
+
+  document.getElementById('dec-tab-range').style.display = tab === 'range' ? 'block' : 'none';
+  document.getElementById('dec-tab-priority').style.display = tab === 'priority' ? 'block' : 'none';
+  document.getElementById('dec-tab-sim').style.display = tab === 'sim' ? 'block' : 'none';
+}
+
+function runSimCalc() {
+  const sev = parseInt(document.getElementById('sim-sev').value, 10);
+  const isHwy = document.getElementById('sim-hwy').checked;
+  const rep = parseInt(document.getElementById('sim-rep').value, 10);
+  const age = parseInt(document.getElementById('sim-age').value, 10);
+
+  document.getElementById('sim-val-sev').textContent = sev;
+  document.getElementById('sim-val-rep').textContent = rep;
+  document.getElementById('sim-val-age').textContent = age;
+
+  const sevPts = sev * 8; // 8 to 40
+  const trafficPts = isHwy ? 25 : 8; // 25 for highway
+  const repPts = Math.min(20, rep * 7);
+  const agePts = Math.min(15, Math.floor(age * 1.5));
+
+  let totalScore = Math.min(100, sevPts + trafficPts + repPts + agePts);
+  let priority = totalScore >= 60 ? 'High' : (totalScore >= 40 ? 'Medium' : 'Low');
+
+  if (isHwy) {
+    priority = 'High';
+    totalScore = Math.max(totalScore, 65);
+  }
+
+  const sla = priority === 'High' ? '< 24 Hours' : (priority === 'Medium' ? '< 72 Hours' : '< 7 Days');
+  const color = priority === 'High' ? '#dc2626' : (priority === 'Medium' ? '#d97706' : '#16a34a');
+
+  document.getElementById('sim-score-circle').style.background = color;
+  document.getElementById('sim-score-display').textContent = totalScore;
+  document.getElementById('sim-priority-display').textContent = `${priority} Priority`;
+  document.getElementById('sim-priority-display').style.color = color;
+  document.getElementById('sim-sla-display').textContent = `Response SLA: ${sla}`;
+
+  document.getElementById('sim-reasons-display').innerHTML = `
+    <div>&bull; Severity Grade ${sev}: <b>${sevPts}/40 pts</b></div>
+    <div>&bull; Traffic Exposure: <b>${trafficPts}/25 pts</b> ${isHwy ? '<b>(Highway Forced High Override)</b>' : ''}</div>
+    <div>&bull; Repeat Cluster: <b>${repPts}/20 pts</b> (${rep} reports)</div>
+    <div>&bull; Aging Factor: <b>${agePts}/15 pts</b> (${age} days)</div>
+  `;
+}
+
+function switchMapTiles(type) {
+  document.getElementById('btn-tile-street').classList.toggle('active', type === 'street');
+  document.getElementById('btn-tile-sat').classList.toggle('active', type === 'sat');
+  if (type === 'sat') {
+    map.removeLayer(tileLayerOsm);
+    map.addLayer(tileLayerSat);
+  } else {
+    map.removeLayer(tileLayerSat);
+    map.addLayer(tileLayerOsm);
+  }
+}
+
+function resetDuhaiView() {
+  const [s, w, n, e] = cfg.bounds || [28.700, 77.440, 28.760, 77.510];
+  map.fitBounds([[s, w], [n, e]], { padding: [20, 20] });
 }
 
 /* ---------------------------------------------------------------------
@@ -2979,6 +4084,13 @@ function openReportModal(id) {
   document.querySelectorAll('.status-change-btn').forEach(btn => {
     btn.classList.toggle('current', btn.dataset.st === r.status);
   });
+
+  // Upvote & Comments
+  document.getElementById('m-upvote-count').textContent = r.upvotes || 0;
+  const upBtn = document.getElementById('m-btn-upvote');
+  if (upBtn) upBtn.classList.toggle('upvoted', !!r.hasUpvoted);
+  loadReportComments(r.id);
+  updateModalRoleVisibility();
 
   document.getElementById('issue-modal').style.display = 'flex';
 }

@@ -193,10 +193,26 @@ def rules_severity(category, description):
     return max(1, min(5, int(round(sev)))), reasons, signals
 
 
+HIGHWAY_WORDS = ["highway", "nh-34", "nh 34", "nh34", "nh-", "delhi-meerut", "meerut road",
+                 "expressway", "eastern peripheral", "flyover", "bypass", "elevated road"]
+
+
+def is_highway_hazard(location, landmark, description):
+    text = f"{location or ''} {landmark or ''} {description or ''}".lower()
+    return any(w in text for w in HIGHWAY_WORDS)
+
+
 def traffic_points(location, landmark, description, vision_exposure=None):
     """0-25 points for how many people the problem exposes to risk."""
     text = f"{location or ''} {landmark or ''} {description or ''}".lower()
     pts, reasons = 8.0, []
+
+    # Highway / NH-34 check: high-speed corridors receive maximum 25 exposure points
+    if is_highway_hazard(location, landmark, description):
+        pts = 25.0
+        reasons.append("Located on Highway / NH-34 corridor: extreme high-speed collision risk")
+        return 25, reasons
+
     if any(w in text for w in BUSY_ROAD_WORDS):
         pts += 8
         reasons.append("Located on or near a busy road, junction or market")
@@ -276,6 +292,12 @@ def assess(image_bytes=None, category=None, description="", location="", landmar
 
     score = int(min(100, sev_pts + traffic_pts + repeat_pts + aging_pts))
     priority = priority_from_score(score, severity)
+
+    # Highway Critical Preference Rule: All highway & NH-34 issues receive High Priority
+    if is_highway_hazard(location, landmark, description):
+        priority = "High"
+        score = max(score, 65)
+        reasons.append("Highway Priority Rule: All highway & NH-34 hazards receive critical High Preference.")
     cost = int(round(BASE_COST.get(category, 25000) * COST_MULTIPLIER[severity] / 500.0) * 500)
     area_text = f"{area:g} sq.m" if isinstance(area, (int, float)) else "Not measured"
 
