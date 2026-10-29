@@ -42,9 +42,8 @@ CATEGORIES = ["Pothole", "Road Crack", "Surface Damage", "Waterlogging",
 BASE_SEVERITY = {"Pothole": 3.0, "Road Crack": 2.0, "Surface Damage": 2.0,
                  "Waterlogging": 3.0, "Fallen Tree": 4.0, "Garbage": 2.0, "Other": 1.5}
 
-BASE_COST = {"Pothole": 35000, "Road Crack": 42000, "Surface Damage": 38000,
-             "Waterlogging": 95000, "Fallen Tree": 18000, "Garbage": 8000, "Other": 25000}
-COST_MULTIPLIER = {1: 0.6, 2: 0.8, 3: 1.0, 4: 1.2, 5: 1.45}
+BASE_COST = {}
+COST_MULTIPLIER = {}
 
 GRADE_LABEL = {5: "Critical", 4: "Critical", 3: "Severe", 2: "Moderate", 1: "Minor"}
 
@@ -298,7 +297,7 @@ def assess(image_bytes=None, category=None, description="", location="", landmar
         priority = "High"
         score = max(score, 65)
         reasons.append("Highway Priority Rule: All highway & NH-34 hazards receive critical High Preference.")
-    cost = int(round(BASE_COST.get(category, 25000) * COST_MULTIPLIER[severity] / 500.0) * 500)
+    cost = 0
     area_text = f"{area:g} sq.m" if isinstance(area, (int, float)) else "Not measured"
 
     return {
@@ -307,7 +306,7 @@ def assess(image_bytes=None, category=None, description="", location="", landmar
         "urgencyScore": score,
         "priority": priority,
         "slaHours": SLA_HOURS[priority],
-        "estimatedCost": cost,
+        
         "flagged": flagged,
         "reasons": reasons,
         "breakdown": {"severity": sev_pts, "trafficVolume": traffic_pts,

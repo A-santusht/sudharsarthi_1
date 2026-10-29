@@ -78,8 +78,7 @@ def build_message(report, reasons=None, image_path=None):
         f"Location    : {report.get('location')} ({report.get('landmark') or 'no landmark'})",
         f"Map         : {map_link}",
         f"Description : {report.get('description')}",
-        f"Est. cost   : Rs. {report.get('estimatedCost'):,}",
-    ]
+            ]
     if reasons:
         lines += ["", "Why this urgency:"] + [f"  - {r}" for r in reasons]
     if report.get("duplicateOf"):

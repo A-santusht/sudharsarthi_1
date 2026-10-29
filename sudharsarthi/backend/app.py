@@ -101,6 +101,9 @@ def add_cors(resp):
     resp.headers["Access-Control-Allow-Origin"] = os.environ.get("CORS_ORIGIN", "*")
     resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept"
     resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PATCH, PUT, DELETE, OPTIONS"
+    # Fast Edge Caching for static config and reports
+    if request.path in ("/api/reports", "/api/config", "/reports", "/config"):
+        resp.headers["Cache-Control"] = "public, max-age=15, s-maxage=30, stale-while-revalidate=120"
     return resp
 
 
@@ -501,7 +504,7 @@ def create_report():
             "description": description or "Civic issue reported by resident.",
             "imageUrl": image_url,
             "afterImageUrl": "",
-            "estimatedCost": assessment["estimatedCost"],
+            "estimatedCost": assessment.get("estimatedCost", 0),
             "dimensions": data.get("dimensions") or area,
             "aiClassification": assessment["aiClassification"],
             "riskScore": assessment["urgencyScore"],

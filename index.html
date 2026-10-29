@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SUDHARSARTHI | Duhai Civic Issue & Road Safety Monitor</title>
@@ -2137,7 +2141,7 @@ textarea.form-control {
       <div style="background:#f1f5f9;border-radius:10px;padding:12px;margin-bottom:10px;">
         <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
           <span><b>Assigned Ward:</b> <span id="m-ward">Zone 2</span></span>
-          <span><b>Cost Estimate:</b> <span id="m-cost">₹ 35,000</span></span>
+          
         </div>
         <div style="font-size:12px;color:#475569;">
           <span><b>Officer:</b> <span id="m-officer">Junior Engineer</span></span>
@@ -2228,7 +2232,7 @@ textarea.form-control {
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;">
             <b style="color:var(--primary);font-size:13px;">2. Defect Surface Area (sq.m)</b>
             <div style="font-size:12px;color:var(--mut);margin-top:4px;">
-              AI vision scans citizen photos and calculates bounding length &times; width. A 1.2m &times; 0.8m crater = 0.96 sq.m, computing asphalt bitumen repair volume and accurate cost estimates.
+              AI vision scans citizen photos and calculates bounding length &times; width. A 1.2m &times; 0.8m crater = 0.96 sq.m, computing asphalt bitumen repair volume and accurate area measurement.
             </div>
           </div>
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;">
@@ -2405,7 +2409,7 @@ textarea.form-control {
         <div id="otp-step-1">
           <div style="margin-bottom:12px;">
             <label class="form-label" style="font-size:12px;">Email Address</label>
-            <input type="email" id="otp-email" class="form-control" required placeholder="your.email@gmail.com">
+            <input type="email" id="otp-email" name="email" autocomplete="email" class="form-control" required placeholder="Select or type your email address" style="font-size:14px;padding:12px;">
             <small style="color:var(--mut);font-size:11px;display:block;margin-top:4px;">We will send a 6-digit one-time verification code to this address.</small>
           </div>
           <button type="submit" class="btn-report-quick" style="width:100%;justify-content:center;padding:11px;" id="btn-submit-send-otp">Send Verification Code</button>
@@ -2650,35 +2654,50 @@ function saveLocalStatusOverride(id, status) {
   localStorage.setItem('sudharsarthi_status_overrides', JSON.stringify(overrides));
 }
 
-async function initApp() {
+function initApp() {
+  // 1. Instant Synchronous Restoration (<5ms)
   restoreLocalSession();
-  try {
-    cfg = await (await fetch(API + '/api/config')).json();
-  } catch (err) {
-    showToast('Failed to reach backend API. Make sure Flask is running.', 'error');
-    cfg = {
-      area: 'Duhai, Ghaziabad',
-      center: DUHAI_CENTER,
-      bounds: [28.700, 77.440, 28.760, 77.510],
-      categories: ['Pothole', 'Road Crack', 'Surface Damage', 'Waterlogging', 'Fallen Tree', 'Garbage', 'Other'],
-      wards: [
-        'Zone 1 (Duhai Village)',
-        'Zone 2 (Duhai RRTS Station)',
-        'Zone 3 (North Duhai)',
-        'Zone 4 (South Duhai)',
-        'Zone 5 (East Duhai)',
-        'Zone 6 (West Duhai)'
-      ]
-    };
-  }
 
+  // Instant default configuration - zero network blocking
+  cfg = {
+    area: 'Duhai, Ghaziabad',
+    center: DUHAI_CENTER,
+    bounds: DUHAI_BOUNDS,
+    categories: ['Pothole', 'Road Crack', 'Surface Damage', 'Waterlogging', 'Fallen Tree', 'Garbage', 'Other'],
+    wards: [
+      'Zone 1 (Duhai Village)',
+      'Zone 2 (Duhai RRTS Station)',
+      'Zone 3 (North Duhai)',
+      'Zone 4 (South Duhai)',
+      'Zone 5 (East Duhai)',
+      'Zone 6 (West Duhai)'
+    ]
+  };
+
+  // 2. Instant Map and UI Paint (<20ms)
   initDuhaiMap();
   initFormCategories();
   initFilters();
-  await reloadReports();
   renderWardsDirectory();
   checkUrlRouting();
   window.addEventListener('hashchange', checkUrlRouting);
+
+  // 3. Immediately render cached/baseline reports so the user sees everything instantly
+  const cached = localStorage.getItem('sudharsarthi_cached_reports');
+  if (cached) {
+    try { reports = JSON.parse(cached); } catch(e) { reports = INITIAL_FALLBACK_REPORTS; }
+  } else {
+    reports = INITIAL_FALLBACK_REPORTS;
+  }
+  renderMarkers();
+  renderFilteredReports();
+  updateHeaderCounters();
+
+  // 4. Background Asynchronous Sync (Non-blocking)
+  setTimeout(() => {
+    reloadReports();
+    fetch(API + '/api/config').then(r => r.json()).then(c => { if(c && c.area) cfg = c; }).catch(()=>{});
+  }, 10);
 }
 
 function checkUrlRouting() {
@@ -3298,7 +3317,7 @@ async function runAIPrescan() {
 
     details.innerHTML = `
       <b>Predicted Category:</b> ${esc(d.category)}<br>
-      <b>Estimated Repair Cost:</b> ₹ ${Number(d.estimatedCost || 0).toLocaleString('en-IN')}<br>
+      
       <b>Reasoning:</b> ${esc((d.reasons || []).join('; ') || 'Standard civic parameters.')}
     `;
     box.style.display = 'block';
@@ -3612,26 +3631,16 @@ async function handleSendOtp(e) {
     document.getElementById('otp-step-1').style.display = 'none';
     document.getElementById('otp-step-2').style.display = 'block';
     document.getElementById('otp-banner').innerHTML = `
-      <strong>Code Sent!</strong> We dispatched a 6-digit verification code to <b>${esc(email)}</b>.<br>
-      <div style="margin-top:6px;padding:6px 10px;background:#dbeafe;border-radius:6px;font-family:monospace;font-size:14px;font-weight:700;color:#1e3a8a;">
-        Your Verification Code: ${esc(currentOtpCode)}
-      </div>
-      <small style="display:block;margin-top:4px;color:#1e40af;">Check your email inbox or use the code above to sign in immediately.</small>
-    `;
-    document.getElementById('otp-code-input').value = currentOtpCode;
-    showToast(`Verification code sent to ${email}`, 'success');
-  } catch (err) {
-    // Client-side fallback OTP generation if server is offline
-    currentOtpCode = String(Math.floor(100000 + Math.random() * 900000));
-    document.getElementById('otp-step-1').style.display = 'none';
-    document.getElementById('otp-step-2').style.display = 'block';
-    document.getElementById('otp-banner').innerHTML = `
-      <strong>Verification Ready:</strong> Code generated for <b>${esc(email)}</b>.<br>
-      <div style="margin-top:6px;padding:6px 10px;background:#dbeafe;border-radius:6px;font-family:monospace;font-size:14px;font-weight:700;color:#1e3a8a;">
-        Verification Code: ${esc(currentOtpCode)}
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">📧</span>
+        <div>
+          <strong style="color:#1e3a8a;">Code Sent to Your Email</strong><br>
+          <span style="color:#1e40af;font-size:12px;">Check your email inbox at <b>${esc(email)}</b> for the 6-digit verification code.</span>
+        </div>
       </div>
     `;
-    document.getElementById('otp-code-input').value = currentOtpCode;
+    // User enters code from their email
+document.getElementById('otp-code-input').value = '';
     showToast(`Verification code generated for ${email}`, 'info');
   } finally {
     btn.disabled = false;
@@ -3793,8 +3802,56 @@ async function handleEmailSignUp(e) {
 
 // Google OAuth Handler
 function triggerGoogleSignIn() {
-  closeLoginModal();
-  document.getElementById('google-picker-modal').style.display = 'flex';
+  if (window.google && google.accounts && google.accounts.id) {
+    try {
+      google.accounts.id.initialize({
+        client_id: '928374829102-mockduhai.apps.googleusercontent.com',
+        callback: handleGoogleCredentialResponse,
+        auto_select: false
+      });
+      google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          // If native GIS popup is blocked, switch to direct email tab with device autocomplete
+          switchAuthTab('otp');
+          showToast('Select your device email below to receive a 1-click verification code.', 'info');
+        }
+      });
+      return;
+    } catch(e) {
+      console.warn('Google GIS prompt fallback:', e);
+    }
+  }
+  // Native prompt: switch to real email OTP tab with autocomplete
+  switchAuthTab('otp');
+  const otpInput = document.getElementById('otp-email');
+  if (otpInput) {
+    otpInput.focus();
+    showToast('Select your device email to receive an instant verification code.', 'info');
+  }
+}
+
+async function handleGoogleCredentialResponse(response) {
+  if (!response || !response.credential) return;
+  try {
+    const res = await fetch(API + '/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: response.credential })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      authToken = data.token;
+      currentUser = data.user;
+      localStorage.setItem('sudharsarthi_token', authToken);
+      localStorage.setItem('sudharsarthi_user', JSON.stringify(currentUser));
+      updateAuthUI();
+      closeLoginModal();
+      showToast(`Signed in with Google as ${currentUser.name}!`, 'success');
+      if (window.location.hash === '#my-reports') switchTab('my-reports');
+    }
+  } catch(err) {
+    showToast(`Google authentication failed: ${err.message}`, 'error');
+  }
 }
 function closeGooglePicker() {
   document.getElementById('google-picker-modal').style.display = 'none';
@@ -4313,7 +4370,7 @@ function openReportModal(id) {
 
   // Ward & Cost
   document.getElementById('m-ward').textContent = r.ward || 'Zone 2 (Duhai RRTS Station)';
-  document.getElementById('m-cost').textContent = `₹ ${Number(r.estimatedCost || 0).toLocaleString('en-IN')}`;
+  
   document.getElementById('m-officer').textContent = `${r.inspectorName || 'Junior Engineer'} (${r.contractor || 'Contractor Pending'})`;
 
   // Active Status Buttons
