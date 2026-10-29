@@ -2581,16 +2581,22 @@ textarea.form-control {
    ===================================================================== */
 // Smart Backend Resolver: Supports Vercel -> Render connection via localStorage or query param
 let API = (function() {
+  // Clear any stale onrender.com backend URL from legacy setups
+  try {
+    const stored = localStorage.getItem('SUDHARSARTHI_BACKEND_URL');
+    if (stored && (stored.includes('onrender.com') || stored.includes('your-service'))) {
+      localStorage.removeItem('SUDHARSARTHI_BACKEND_URL');
+    }
+  } catch(e) {}
+
   const urlParam = new URLSearchParams(window.location.search).get('backend');
   if (urlParam) {
     localStorage.setItem('SUDHARSARTHI_BACKEND_URL', urlParam.replace(/\/+$/, ''));
     return urlParam.replace(/\/+$/, '');
   }
-  const stored = localStorage.getItem('SUDHARSARTHI_BACKEND_URL');
-  if (stored) return stored.replace(/\/+$/, '');
+  const activeStored = localStorage.getItem('SUDHARSARTHI_BACKEND_URL');
+  if (activeStored) return activeStored.replace(/\/+$/, '');
   if (window.API_BASE) return window.API_BASE.replace(/\/+$/, '');
-  if (window.location.hostname.includes('onrender.com')) return '';
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return 'http://127.0.0.1:5000';
   return '';
 })();
 const DUHAI_CENTER = [28.7285, 77.4740];
@@ -2704,14 +2710,14 @@ function saveLocalStatusOverride(id, status) {
 }
 
 function initApp() {
-  // 1. Instant Synchronous Restoration (<5ms)
-  restoreLocalSession();
+  // 1. Instant Synchronous Session Restoration
+  try { restoreLocalSession(); } catch(e) {}
 
-  // Instant default configuration - zero network blocking
+  // 2. Default Configuration (flat 4-number bounds to avoid unpacking error)
   cfg = {
     area: 'Duhai, Ghaziabad',
     center: DUHAI_CENTER,
-    bounds: DUHAI_BOUNDS,
+    bounds: [28.700, 77.440, 28.760, 77.510],
     categories: ['Pothole', 'Road Crack', 'Surface Damage', 'Waterlogging', 'Fallen Tree', 'Garbage', 'Other'],
     wards: [
       'Zone 1 (Duhai Village)',
@@ -2723,30 +2729,40 @@ function initApp() {
     ]
   };
 
-  // 2. Instant Map and UI Paint (<20ms)
-  initDuhaiMap();
-  initFormCategories();
-  initFilters();
-  renderWardsDirectory();
-  checkUrlRouting();
+  // 3. Initialize Map safely
+  try { initDuhaiMap(); } catch(e) { console.error('Map init error:', e); }
+
+  // 4. Initialize UI controls & forms
+  try { initFormCategories(); } catch(e) {}
+  try { initFilters(); } catch(e) {}
+  try { renderWardsDirectory(); } catch(e) {}
+  try { checkUrlRouting(); } catch(e) {}
   window.addEventListener('hashchange', checkUrlRouting);
 
-  // 3. Immediately render cached/baseline reports so the user sees everything instantly
+  // 5. Instantly render reports so citizen never sees blank screen
   const cached = localStorage.getItem('sudharsarthi_cached_reports');
   if (cached) {
-    try { reports = JSON.parse(cached); } catch(e) { reports = INITIAL_FALLBACK_REPORTS; }
+    try {
+      const parsed = JSON.parse(cached);
+      reports = (Array.isArray(parsed) && parsed.length > 0) ? parsed : INITIAL_FALLBACK_REPORTS;
+    } catch(e) {
+      reports = INITIAL_FALLBACK_REPORTS;
+    }
   } else {
     reports = INITIAL_FALLBACK_REPORTS;
   }
-  renderMarkers();
-  renderFilteredReports();
-  updateHeaderCounters();
 
-  // 4. Background Asynchronous Sync (Non-blocking)
+  try { renderMarkers(); } catch(e) { console.error('Markers error:', e); }
+  try { renderFilteredReports(); } catch(e) { console.error('Reports error:', e); }
+  try { updateHeaderCounters(); } catch(e) {}
+
+  // 6. Background Asynchronous Sync (Non-blocking)
   setTimeout(() => {
     reloadReports();
-    fetch(API + '/api/config').then(r => r.json()).then(c => { if(c && c.area) cfg = c; }).catch(()=>{});
-  }, 10);
+    fetch(API + '/api/config').then(r => r.json()).then(c => {
+      if (c && c.area) cfg = c;
+    }).catch(()=>{});
+  }, 50);
 }
 
 function checkUrlRouting() {
@@ -2771,10 +2787,24 @@ function checkUrlRouting() {
    DUHAI MAP ENGINE - STRICTLY CONSTRAINED TO DUHAI, GHAZIABAD
    --------------------------------------------------------------------- */
 function initDuhaiMap() {
-  const [s, w, n, e] = cfg.bounds || [28.700, 77.440, 28.760, 77.510];
+  let s = 28.700, w = 77.440, n = 28.760, e = 77.510;
+  if (cfg && cfg.bounds) {
+    if (Array.isArray(cfg.bounds) && cfg.bounds.length >= 4 && typeof cfg.bounds[0] === 'number') {
+      [s, w, n, e] = cfg.bounds;
+    } else if (Array.isArray(cfg.bounds) && Array.isArray(cfg.bounds[0]) && Array.isArray(cfg.bounds[1])) {
+      [s, w] = cfg.bounds[0];
+      [n, e] = cfg.bounds[1];
+    }
+  }
+
   const southWest = L.latLng(s, w);
   const northEast = L.latLng(n, e);
   const bounds = L.latLngBounds(southWest, northEast);
+
+  if (map) {
+    try { map.remove(); } catch(err) {}
+    map = null;
+  }
 
   // Initialize Map with smooth bounding constraints (no scroll trapping, no jerkiness)
   map = L.map('map', {
@@ -2782,7 +2812,7 @@ function initDuhaiMap() {
     maxZoom: 19,
     maxBounds: bounds.pad(0.08),
     maxBoundsViscosity: 0.5,
-    scrollWheelZoom: false,
+    scrollWheelZoom: true,
     zoomControl: true
   }).fitBounds(bounds, { padding: [15, 15] });
 
@@ -3033,8 +3063,11 @@ function createPopupContent(r) {
 }
 
 function renderMarkers() {
+  if (!map) return;
   // Clear old markers
-  Object.values(markers).forEach(m => map.removeLayer(m));
+  Object.values(markers).forEach(m => {
+    try { map.removeLayer(m); } catch(e) {}
+  });
   markers = {};
 
   reports.forEach(r => {
@@ -3100,11 +3133,15 @@ function renderFilteredReports() {
   });
 
   // Sync visible markers on map
-  Object.entries(markers).forEach(([id, marker]) => {
-    const isVisible = filtered.some(r => r.id === id);
-    if (isVisible && !map.hasLayer(marker)) marker.addTo(map);
-    if (!isVisible && map.hasLayer(marker)) map.removeLayer(marker);
-  });
+  if (map) {
+    Object.entries(markers).forEach(([id, marker]) => {
+      const isVisible = filtered.some(r => r.id === id);
+      try {
+        if (isVisible && !map.hasLayer(marker)) marker.addTo(map);
+        if (!isVisible && map.hasLayer(marker)) map.removeLayer(marker);
+      } catch(e) {}
+    });
+  }
 
   // Render Sidebar List
   const listEl = document.getElementById('reports-list');
