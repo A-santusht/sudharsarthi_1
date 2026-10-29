@@ -36,7 +36,7 @@ class VercelWSGIHandler:
             environ["QUERY_STRING"] = new_qs
             clean = subpath.lstrip("/")
             if not clean:
-                environ["PATH_INFO"] = "/"
+                environ["PATH_INFO"] = "/api"
             elif clean.startswith("uploads/"):
                 environ["PATH_INFO"] = "/" + clean
             elif clean.startswith("assets/"):
@@ -48,7 +48,7 @@ class VercelWSGIHandler:
         else:
             path = environ.get("PATH_INFO", "")
             if not path or path in ("/api/index.py", "/api/index", "/index.py", "/index"):
-                environ["PATH_INFO"] = "/"
+                environ["PATH_INFO"] = "/api"
 
         return self.application(environ, start_response)
 

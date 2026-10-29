@@ -369,7 +369,9 @@ def logout():
 
 # ------------------------------------------------------------------ Civic Reports Routes
 
+@app.get("/api")
 @app.get("/api/health")
+@app.get("/health")
 def health():
     return jsonify({
         "status": "ok",

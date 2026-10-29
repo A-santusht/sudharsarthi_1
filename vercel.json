@@ -1,26 +1,19 @@
 {
   "version": 2,
+  "framework": null,
   "cleanUrls": true,
   "rewrites": [
-    {
-      "source": "/api",
-      "destination": "/api/index.py?__path__=health"
-    },
     {
       "source": "/api/(.*)",
       "destination": "/api/index.py?__path__=$1"
     },
     {
+      "source": "/api",
+      "destination": "/api/index.py?__path__=health"
+    },
+    {
       "source": "/uploads/(.*)",
       "destination": "/api/index.py?__path__=uploads/$1"
-    },
-    {
-      "source": "/assets/(.*)",
-      "destination": "/api/index.py?__path__=assets/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/api/index.py?__path__=$1"
     }
   ]
 }
