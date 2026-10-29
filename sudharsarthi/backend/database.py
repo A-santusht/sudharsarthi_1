@@ -381,6 +381,16 @@ def authenticate_user(email: str, password: str):
     return None
 
 
+def upsert_otp_user(email: str, name: str = None):
+    """Sign in or register a user authenticating via verified Email OTP."""
+    email_clean = email.strip().lower()
+    existing = get_user_by_email(email_clean)
+    if existing:
+        return existing
+    default_name = name or email_clean.split("@")[0].replace(".", " ").capitalize()
+    return create_user(name=default_name, email=email_clean, role="citizen")
+
+
 def upsert_google_user(email: str, name: str, avatar: str = None, google_id: str = None):
     """Sign in or register a user authenticating via Google."""
     email_clean = email.strip().lower()

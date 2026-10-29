@@ -154,3 +154,38 @@ def notify_ward_officer(report, reasons=None, image_path=None, wait=False):
         t.join(timeout=30)
         return result.get("status", "pending")
     return t
+
+def send_otp_email(to_email, code, wait=False):
+    """Dispatch an email verification OTP code to the citizen."""
+    sender = os.environ.get("MAIL_FROM") or os.environ.get("SMTP_USER") or "sudharsarthi.auth@gmail.com"
+    msg = EmailMessage()
+    msg["From"] = sender
+    msg["To"] = to_email
+    msg["Subject"] = f"[{code}] Your SUDHARSARTHI Verification Code"
+    lines = [
+        "Welcome to SUDHARSARTHI Civic Monitor - Duhai Municipal Portal.",
+        "",
+        f"Your one-time email verification code is: {code}",
+        "",
+        "This code is valid for 10 minutes. Enter this code on the portal to verify your account and sign in.",
+        "",
+        "If you did not request this code, you can safely ignore this email.",
+        "",
+        "- SUDHARSARTHI Civic Administration Team (Duhai Ward Division)",
+    ]
+    msg.set_content("\n".join(lines))
+
+    result = {}
+    def run():
+        try:
+            result["status"] = _deliver(msg, f"otp_{to_email.replace('@', '_at_')}")
+        except Exception as exc:
+            result["status"] = f"failed: {type(exc).__name__}"
+            log.warning("OTP email dispatch failed: %s", exc)
+
+    t = threading.Thread(target=run, daemon=True)
+    t.start()
+    if wait:
+        t.join(timeout=30)
+        return result.get("status", "pending")
+    return t
