@@ -3762,7 +3762,7 @@ async function handleEmailSignUp(e) {
   const name = document.getElementById('signup-name').value.trim();
   const email = document.getElementById('signup-email').value.trim();
   const password = document.getElementById('signup-password').value;
-  const role = document.getElementById('signup-role').value;
+  const role = 'citizen';
   const btn = document.getElementById('btn-submit-signup');
   btn.disabled = true;
   btn.textContent = 'Creating account...';
