@@ -735,15 +735,26 @@ def not_found(e):
     }), 404
 
 
-if FRONTEND_DIR and not os.environ.get("VERCEL"):
-    @app.get("/", defaults={"path": "index.html"})
-    def frontend_root(path):
-        return send_from_directory(FRONTEND_DIR, path)
+_root_dir = os.path.dirname(os.path.dirname(BASE_DIR))
+if os.path.isfile(os.path.join(_root_dir, "index.html")):
+    STATIC_DIR = _root_dir
+elif FRONTEND_DIR and os.path.isfile(os.path.join(FRONTEND_DIR, "index.html")):
+    STATIC_DIR = FRONTEND_DIR
+else:
+    STATIC_DIR = BASE_DIR
 
-    @app.get("/assets/<path:path>")
-    def frontend_assets(path):
-        assets_dir = os.path.join(FRONTEND_DIR, "assets")
-        return send_from_directory(assets_dir, path)
+@app.get("/")
+def serve_root():
+    return send_from_directory(STATIC_DIR, "index.html")
+
+@app.get("/index.html")
+def serve_index_html():
+    return send_from_directory(STATIC_DIR, "index.html")
+
+@app.get("/assets/<path:path>")
+def serve_assets(path):
+    assets_dir = os.path.join(STATIC_DIR, "assets")
+    return send_from_directory(assets_dir, path)
 
 
 if __name__ == "__main__":

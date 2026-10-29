@@ -13,6 +13,14 @@
     {
       "source": "/uploads/(.*)",
       "destination": "/api/index.py?__path__=uploads/$1"
+    },
+    {
+      "source": "/assets/(.*)",
+      "destination": "/api/index.py?__path__=assets/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.py?__path__=$1"
     }
   ]
 }

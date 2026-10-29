@@ -21,7 +21,7 @@ flask_app = backend_module.app
 class VercelWSGIHandler:
     """
     WSGI wrapper ensuring clean request dispatching on Vercel Serverless Functions.
-    Accurately maps subpaths rewritten by Vercel into Flask routes.
+    Accurately maps root UI, assets, and /api/* subpaths into Flask routes.
     """
     def __init__(self, application):
         self.application = application
@@ -35,16 +35,20 @@ class VercelWSGIHandler:
             new_qs = urlencode([(k, v) for k, vs in params.items() for v in vs])
             environ["QUERY_STRING"] = new_qs
             clean = subpath.lstrip("/")
-            if clean.startswith("uploads/"):
+            if not clean:
+                environ["PATH_INFO"] = "/"
+            elif clean.startswith("uploads/"):
+                environ["PATH_INFO"] = "/" + clean
+            elif clean.startswith("assets/"):
+                environ["PATH_INFO"] = "/" + clean
+            elif clean in ("index.html", "favicon.ico", "favicon.svg"):
                 environ["PATH_INFO"] = "/" + clean
             else:
                 environ["PATH_INFO"] = "/api/" + clean
         else:
             path = environ.get("PATH_INFO", "")
-            x_matched = environ.get("HTTP_X_MATCHED_PATH") or environ.get("HTTP_X_VERCEL_PATH") or environ.get("REQUEST_URI") or ""
-            if path in ("/api/index.py", "/api/index", "/index.py", "/index", "") and x_matched:
-                clean_path = x_matched.split("?")[0]
-                environ["PATH_INFO"] = clean_path
+            if not path or path in ("/api/index.py", "/api/index", "/index.py", "/index"):
+                environ["PATH_INFO"] = "/"
 
         return self.application(environ, start_response)
 
