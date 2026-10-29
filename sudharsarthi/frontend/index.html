@@ -1716,18 +1716,8 @@ textarea.form-control {
       <span id="header-stats-text">Duhai Jurisdiction</span>
     </div>
 
-    <!-- ROLE SWITCHER TOGGLE (Citizen vs Ward Officer) -->
-    <div class="role-switcher-toggle" id="role-switcher-toggle" style="display:flex;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:999px;padding:2px;">
-      <button type="button" class="role-btn active" id="btn-role-citizen" onclick="setAppRole('citizen')" style="border:0;background:#fff;color:var(--primary);font-weight:700;font-size:11px;padding:5px 10px;border-radius:999px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-        👤 Citizen View
-      </button>
-      <button type="button" class="role-btn" id="btn-role-officer" onclick="setAppRole('officer')" style="border:0;background:transparent;color:var(--mut);font-weight:600;font-size:11px;padding:5px 10px;border-radius:999px;cursor:pointer;">
-        👮 Officer Mode
-      </button>
-    </div>
-
-    <!-- OFFICER ONLY DECISION ENGINE BUTTON -->
-    <button type="button" class="btn-login-header officer-only-badge" id="btn-hdr-decision" onclick="openDecisionModal()" style="display:none;background:#f0fdfa;border-color:#0ea5a4;color:#0f766e;font-weight:700;" title="Explainable AI Range & Urgency Decision Formula">
+        <!-- TRANSPARENT CIVIC AI DECISION ENGINE BUTTON -->
+    <button type="button" class="btn-login-header" id="btn-hdr-decision" onclick="openDecisionModal()" style="display:flex;background:#f0fdfa;border-color:#0ea5a4;color:#0f766e;font-weight:700;" title="Transparent Explainable AI Range & Urgency Decision Formula">
       <span>🔬 AI Decision Engine</span>
     </button>
 
@@ -2176,18 +2166,11 @@ textarea.form-control {
         <button type="button" class="btn-report-quick" style="padding:6px 14px;border-radius:8px;" onclick="postCommentOnModal()">Post</button>
       </div>
 
-      <!-- CITIZEN VIEW BADGE (Shown to citizens) -->
-      <div id="m-citizen-notice" style="display:block;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;margin-bottom:12px;">
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut);">
-          <span>🔒 <b>Citizen View</b>: Repair stages are managed and scheduled exclusively by verified Duhai Municipal Ward Engineers.</span>
-        </div>
-      </div>
-
-      <!-- WARD OFFICER ACTIONS (Hidden from citizens, shown to officers) -->
-      <div id="m-officer-controls" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin-bottom:12px;">
+            <!-- LIVE CIVIC STATUS TRACKER -->
+      <div id="m-status-section" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div class="modal-section-title" style="margin:0;color:#166534;">Update Repair Status (Ward Officer Console)</div>
-          <button type="button" class="preset-chip" onclick="openDecisionModal()" style="background:#0ea5a4;color:#fff;border:0;font-weight:700;">🔬 AI Urgency & Range Inspector</button>
+          <div class="modal-section-title" style="margin:0;color:var(--primary);">Issue Progress & Repair Lifecycle</div>
+          <button type="button" class="preset-chip" onclick="openDecisionModal()" style="background:#0ea5a4;color:#fff;border:0;font-weight:700;">🔬 AI Range & Urgency Inspector</button>
         </div>
         <div class="modal-status-changer">
           <button class="status-change-btn" data-st="Reported" onclick="updateCurrentReportStatus('Reported')">Reported</button>
@@ -2195,12 +2178,13 @@ textarea.form-control {
           <button class="status-change-btn" data-st="Repair in Progress" onclick="updateCurrentReportStatus('Repair in Progress')">In Progress</button>
           <button class="status-change-btn" data-st="Resolved" onclick="updateCurrentReportStatus('Resolved')">Resolved</button>
         </div>
-        <div style="font-size:11px;color:#15803d;margin-top:8px;">
-          📧 <b>Auto-Dispatch Target:</b> Updates notify ward officers & <code>awasthishailendra59@gmail.com</code> automatically.
+        <div style="font-size:11px;color:var(--mut);margin-top:8px;">
+          🔔 Automated alerts sent directly to Duhai civic authorities &amp; <code>awasthishailendra59@gmail.com</code>.
         </div>
       </div>
     </div>
   </div>
+</div>
 </div>
 
 
@@ -2473,13 +2457,7 @@ textarea.form-control {
           <label class="form-label" style="font-size:12px;">Password</label>
           <input type="password" id="signup-password" class="form-control" placeholder="Min 4 characters">
         </div>
-        <div style="margin-bottom:14px;">
-          <label class="form-label" style="font-size:12px;">Account Role</label>
-          <select id="signup-role" class="form-control">
-            <option value="citizen">Duhai Resident / Citizen</option>
-            <option value="officer">Municipal Officer / Inspector</option>
-          </select>
-        </div>
+        
         <button type="submit" class="btn-report-quick" style="width:100%;justify-content:center;padding:11px;" id="btn-submit-signup">Create Account</button>
       </form>
 
@@ -2488,7 +2466,7 @@ textarea.form-control {
         <div style="font-size:11px;color:var(--mut);margin-bottom:8px;font-weight:600;">⚡ Instant 1-Click Demo Accounts:</div>
         <div style="display:flex;gap:8px;justify-content:center;">
           <button type="button" class="preset-chip" onclick="quickFillLogin('citizen')">👤 Demo Citizen</button>
-          <button type="button" class="preset-chip" onclick="quickFillLogin('officer')">👮 Zone 2 Officer</button>
+          
         </div>
       </div>
     </div>

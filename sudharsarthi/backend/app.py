@@ -235,8 +235,7 @@ def register():
         return bad("Please provide a valid email address.")
     if not password or len(password) < 4:
         return bad("Password must be at least 4 characters.")
-    if role not in ("citizen", "officer", "admin"):
-        role = "citizen"
+    role = "citizen"  # 100% citizen platform
 
     if db.get_user_by_email(email):
         return bad("An account with this email already exists. Please log in.")
